@@ -2,28 +2,39 @@
 import React, { useEffect, useState } from 'react';
 
 export function TempProtectLayout({children}) {
-	const [isAuthenticated, setIsAuthenticated] = useState(false);
+	const [isAuthenticated, setIsAuthenticated] = useState(null);
 
 	useEffect(() => {
 		// Vérifier si l'utilisateur est déjà authentifié
-		const isAuthenticated = localStorage.getItem('isAuthenticated');
+		let localyAuthenticated = null;
 		
-		const corectPassword = 'Duvivier';
+		if (localStorage.getItem('isAuthenticated')) {
+			localyAuthenticated = localStorage.getItem('isAuthenticated');
+		}
 		
-		if (isAuthenticated) {
+		// ----
+		const answer = process.env.NEXT_PUBLIC_TEMP_DEV_PROTECTION;
+		
+		if (localyAuthenticated) {
 			setIsAuthenticated(true);
 		} else {
-			const password = prompt('Veuillez entrer le mot de passe pour accéder au site :');
-			if (password === corectPassword) {
+			const verif = prompt('Authentification requise :');
+			if (verif === answer) {
 				localStorage.setItem('isAuthenticated', 'true');
 				setIsAuthenticated(true);
 			} else {
-				alert('Mot de passe incorrect');
+				setIsAuthenticated(false);
 			}
 		}
 	}, []);
-
-	return isAuthenticated ? <>{children}</> : <div>Accès refusé</div>
+	
+	if (isAuthenticated === null) {
+		return ''
+	} else if (isAuthenticated) {
+		return <>{children}</>
+	} else if (isAuthenticated === false) {
+		return <p>Authentification requise. Recharger la page.</p>
+	}
 };
 
 export default TempProtectLayout;
