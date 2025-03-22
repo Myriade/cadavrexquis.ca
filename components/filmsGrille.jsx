@@ -55,8 +55,8 @@ export function FilmsGrille() {
       deserialize: false,
     })
     
-    //console.log(fetchedData.data[1].attributes);
     if (!isDataReady.current) {
+      console.log(fetchedData.data[1].attributes);
       const randomizedData = fetchedData.data.sort((a, b) => 0.5 - Math.random());
       setFilms(randomizedData)
       isDataReady.current = true
@@ -80,7 +80,8 @@ export function FilmsGrille() {
                 className="film p-4"
                 style={{minHeight: `${randomHeight}%` }}
               >
-                {film.title}
+                {film.title} <br/>
+                <small>{film.field_annees_de_sortie}{film.field_duree ? `, ${film.field_duree}` : ''}</small>
               </div>
             )
           })}
