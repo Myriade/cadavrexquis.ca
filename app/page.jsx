@@ -1,23 +1,24 @@
-import { drupal } from "/lib/drupal.ts"
+
+import { FilmsGrille } from '../components/filmsGrille';
 
 export default async function Page() {
     
-  const data = await drupal.getView(
-    "cadavre_exquis--page_1",
-    {
-      withAuth : {
-        username: process.env.NEXT_PUBLIC_DRUPAL_USERNAME,
-        password: process.env.NEXT_PUBLIC_DRUPAL_PASSWORD,
-      }
-    }
-  )
-  
-  console.log(data.results);
+  // const fetchedData = await drupal.getResourceCollection("node--film", {
+  //   params: {
+  //     //"filter[status]": "1",
+  //   },
+  //   deserialize: false,
+  // })
+  // 
+  // console.log(fetchedData.data[1].attributes);
+  // const data = fetchedData.data;
   
   return (
     <>
       <h1>Cadavre exquis</h1>
       <pre><code>Prototype 1.0</code></pre>
+      
+      <FilmsGrille></FilmsGrille>
     </>
   );
 }
