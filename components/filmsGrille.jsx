@@ -4,22 +4,43 @@ import styled from 'styled-components';
 import { drupal } from "/lib/drupal.ts"
 
 const Styled = styled.section`
-  width: 1015px;
+  --ficheWidth: 250px;
+  container-type: inline-size;
   padding-block: 10vh;
   
   .grille {
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
-    gap: 5px;
+    gap:0;
     height: 80vh;
     max-width: 100%;
-    overflow: hidden;
-  }
+    overflow: hidden;}
   
   .film {
-    width: 250px;
+    border: 1px dotted;
+    width: var(--ficheWidth);}
+    
+  @container (min-width: 250px) {
+    .grille {
+      max-width: var(--ficheWidth);}
   }
+    
+  @container (min-width: 500px) {
+    .grille {
+      max-width: calc( var(--ficheWidth) * 2 );}
+  }
+  
+  @container (min-width: 750px) {
+    .grille {
+      max-width: calc( var(--ficheWidth) * 3 );}
+  }
+  
+  @container (min-width: 1000px) {
+    .grille {
+      max-width: calc( var(--ficheWidth) * 4 );}
+  }
+  
 `;
 
 export function FilmsGrille() {
@@ -51,12 +72,12 @@ export function FilmsGrille() {
           {films.map( item => { 
             const film = item.attributes;
             
-            const randomHeight = Math.floor(Math.random() * (50 - 13 + 1) + 13);
+            const randomHeight = Math.floor(Math.random() * (50 - 20 + 1) + 20);
             
             return (
               <div 
                 key={film.drupal_internal__nid}
-                className="film border p-4"
+                className="film p-4"
                 style={{minHeight: `${randomHeight}%` }}
               >
                 {film.title}
