@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import styled from 'styled-components';
 import { drupal } from "/lib/drupal.ts"
 
@@ -23,8 +23,8 @@ const Styled = styled.section`
 `;
 
 export function FilmsGrille() {
-  const [isDataReady, setIsDataReady] = useState(false);
   const [films, setFilms] = useState([]);
+  const isDataReady = useRef(false);
   
   async function fetchData() {
     const fetchedData = await drupal.getResourceCollection("node--film", {
@@ -34,10 +34,11 @@ export function FilmsGrille() {
       deserialize: false,
     })
     
-    console.log(fetchedData.data[1].attributes);
-    if (!isDataReady) {
-      setFilms(fetchedData.data)
-      setIsDataReady(true)
+    //console.log(fetchedData.data[1].attributes);
+    if (!isDataReady.current) {
+      const randomizedData = fetchedData.data.sort((a, b) => 0.5 - Math.random());
+      setFilms(randomizedData)
+      isDataReady.current = true
     }
   }
   
@@ -49,10 +50,14 @@ export function FilmsGrille() {
         <div className="grille">
           {films.map( item => { 
             const film = item.attributes;
+            
+            const randomHeight = Math.floor(Math.random() * (50 - 13 + 1) + 13);
+            
             return (
               <div 
                 key={film.drupal_internal__nid}
                 className="film border p-4"
+                style={{minHeight: `${randomHeight}%` }}
               >
                 {film.title}
               </div>
