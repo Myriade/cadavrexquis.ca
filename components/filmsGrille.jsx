@@ -43,8 +43,14 @@ const Styled = styled.section`
   
 `;
 
+const defautlFilm = {attributes: {
+  drupal_internal__nid: 0,
+  title: '...',
+  field_annees_de_sortie: 'chargement'
+}}
+
 export function FilmsGrille() {
-  const [films, setFilms] = useState([]);
+  const [films, setFilms] = useState([defautlFilm]);
   const isDataReady = useRef(false);
   
   async function fetchData() {
@@ -56,7 +62,7 @@ export function FilmsGrille() {
     })
     
     if (!isDataReady.current) {
-      console.log(fetchedData.data[1].attributes);
+      //console.log(fetchedData.data[1].attributes);
       const randomizedData = fetchedData.data.sort((a, b) => 0.5 - Math.random());
       setFilms(randomizedData)
       isDataReady.current = true

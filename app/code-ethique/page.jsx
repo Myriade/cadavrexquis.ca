@@ -1,11 +1,15 @@
+import { DrupalPage } from '../../components/drupalPage';
+
 export const metadata = {
-    title: 'Code d’éthique du réemploi'
+  title: 'Code d’éthique du réemploi'
 };
 
 export default async function Page() {
-    return (
-        <>
-            <h1>Code d’éthique du réemploi</h1>
-        </>
-    );
+  return (
+    <>
+      <h1>Code d’éthique du réemploi</h1>
+      <DrupalPage nid={46}></DrupalPage>
+    </>
+  );
 }
+

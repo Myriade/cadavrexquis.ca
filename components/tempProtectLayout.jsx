@@ -12,7 +12,6 @@ export function TempProtectLayout({children}) {
 			localyAuthenticated = localStorage.getItem('isAuthenticated');
 		}
 		
-		// ----
 		const answer = process.env.NEXT_PUBLIC_TEMP_DEV_PROTECTION;
 		
 		if (localyAuthenticated) {

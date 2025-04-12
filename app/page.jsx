@@ -1,17 +1,6 @@
-
 import { FilmsGrille } from '../components/filmsGrille';
 
 export default async function Page() {
-    
-  // const fetchedData = await drupal.getResourceCollection("node--film", {
-  //   params: {
-  //     //"filter[status]": "1",
-  //   },
-  //   deserialize: false,
-  // })
-  // 
-  // console.log(fetchedData.data[1].attributes);
-  // const data = fetchedData.data;
   
   return (
     <>

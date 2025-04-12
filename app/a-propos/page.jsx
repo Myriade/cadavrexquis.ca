@@ -1,11 +1,15 @@
+import { DrupalPage } from '../../components/drupalPage';
+
 export const metadata = {
-    title: 'À propos'
+  title: 'À propos'
 };
 
 export default async function Page() {
-    return (
-        <>
-            <h1>À propos</h1>
-        </>
-    );
+    
+  return (
+    <>
+      <h1>À propos</h1>
+      <DrupalPage nid={45}></DrupalPage>
+    </>
+  );
 }
