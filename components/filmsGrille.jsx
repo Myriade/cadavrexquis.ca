@@ -81,14 +81,16 @@ export function FilmsGrille() {
             const randomHeight = Math.floor(Math.random() * (50 - 20 + 1) + 20);
             
             return (
-              <div 
+              <a 
                 key={film.drupal_internal__nid}
+                href={ film.path ? `/film${film.path.alias}` : '#' }
                 className="film p-4"
                 style={{minHeight: `${randomHeight}%` }}
               >
                 {film.title} <br/>
                 <small>{film.field_annees_de_sortie}{film.field_duree ? `, ${film.field_duree}` : ''}</small>
-              </div>
+                <div>{ film.path || !isDataReady.current ? '' : '!! pas de path !!' }</div>
+              </a>
             )
           })}
         </div>
