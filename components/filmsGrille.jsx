@@ -9,35 +9,32 @@ const Styled = styled.section`
   padding-block: 10vh;
   
   .grille {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-    gap:0;
-    height: 80vh;
-    max-width: 100%;
-    overflow: hidden;}
+    column-count: 1;
+    column-gap: 0;
+    max-width: var(--ficheWidth);
+  }
   
   .film {
+    display: block;
+    break-inside: avoid-column;
     border: 1px dotted;
     width: var(--ficheWidth);}
-    
-  @container (min-width: 250px) {
-    .grille {
-      max-width: var(--ficheWidth);}
-  }
-    
+  
   @container (min-width: 500px) {
     .grille {
+      column-count: 2;
       max-width: calc( var(--ficheWidth) * 2 );}
   }
-  
+ 
   @container (min-width: 750px) {
-    .grille {
+   .grille {
+      column-count: 3;
       max-width: calc( var(--ficheWidth) * 3 );}
   }
   
   @container (min-width: 1000px) {
     .grille {
+      column-count: 4;
       max-width: calc( var(--ficheWidth) * 4 );}
   }
   
@@ -78,14 +75,14 @@ export function FilmsGrille() {
           {films.map( item => { 
             const film = item.attributes;
             
-            const randomHeight = Math.floor(Math.random() * (50 - 20 + 1) + 20);
+            const randomHeight = Math.random() * (1.5 - 0.5) + 0.5;
             
             return (
               <a 
                 key={film.drupal_internal__nid}
                 href={ film.path ? `/film${film.path.alias}` : '#' }
                 className="film p-4"
-                style={{minHeight: `${randomHeight}%` }}
+                style={{minHeight: `calc(var(--ficheWidth) * ${randomHeight})` }}
               >
                 {film.title} <br/>
                 <small>{film.field_annees_de_sortie}{film.field_duree ? `, ${film.field_duree}` : ''}</small>
