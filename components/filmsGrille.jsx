@@ -1,7 +1,8 @@
 'use client'
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components';
-import { drupal } from "/lib/drupal.ts"
+//import { drupal } from "/lib/drupal.ts"
+import { useLoadData } from '../lib/fecthAllFilms'
 
 const Styled = styled.section`
   --ficheWidth: 250px;
@@ -63,30 +64,32 @@ const defautlFilm = {attributes: {
 }}
 
 export function FilmsGrille({random, lazylaod}) {
+  const [fetchedData, setFetchedData] = useState(null)
+  const isLoadingFilms = useLoadData(setFetchedData, defautlFilm, 'allFilms');
   const [allFilms, setAllFilms] = useState([defautlFilm])
   const isDataReady = useRef(false)
   
-  async function fetchAndRandomizeData() {
-    const fetchedData = await drupal.getResourceCollection("node--film", {
-      params: {
-        //"filter[status]": "1",
-      },
-      deserialize: false,
-    })
+  function parseData(array) {
     
-    if (!isDataReady.current) {
-      if (random) {
-        const randomizedData = fetchedData.data.sort((a, b) => 0.5 - Math.random());
-        setAllFilms(randomizedData)
-        isDataReady.current = true
-      } else {
-        setallFilms(fetchedData.data)
-        isDataReady.current = true
+    function randomizeData(array) {
+      if (!isDataReady.current) {
+        if (random) {
+          const randomizedData = fetchedData.sort((a, b) => 0.5 - Math.random());
+          setAllFilms(randomizedData)
+          isDataReady.current = true
+        } else {
+          setallFilms(fetchedData)
+          isDataReady.current = true
+        }
       }
-    } 
+    }
+    
+    randomizeData(array)
   }
-
-  fetchAndRandomizeData();
+  
+  if (fetchedData) {
+    parseData(fetchedData)
+  }
   
   // event handler
   const loadMoreClick = () => {
