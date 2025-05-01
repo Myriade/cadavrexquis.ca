@@ -16,9 +16,13 @@ const Styled = styled.section`
   
   .film {
     display: block;
+    overflow: hidden;
     break-inside: avoid-column;
     border: 1px dotted;
-    width: var(--ficheWidth);}
+    width: var(--ficheWidth);
+    transition: all 0.7s ease-in;}
+  
+  .film.hidden {border: 0;}
   
   @container (min-width: 500px) {
     .grille {
@@ -38,6 +42,18 @@ const Styled = styled.section`
       max-width: calc( var(--ficheWidth) * 4 );}
   }
   
+  #load-more {
+    margin: 2rem auto;
+    border: 1px solid black;
+    display: block;
+    padding: 0.5em 1em;
+    &:hover {
+      background: black;
+      color: white;
+      cursor: pointer;
+    }
+  }
+  
 `;
 
 const defautlFilm = {attributes: {
@@ -46,11 +62,11 @@ const defautlFilm = {attributes: {
   field_annees_de_sortie: 'chargement'
 }}
 
-export function FilmsGrille() {
-  const [films, setFilms] = useState([defautlFilm]);
-  const isDataReady = useRef(false);
+export function FilmsGrille({random, lazylaod}) {
+  const [allFilms, setAllFilms] = useState([defautlFilm])
+  const isDataReady = useRef(false)
   
-  async function fetchData() {
+  async function fetchAndRandomizeData() {
     const fetchedData = await drupal.getResourceCollection("node--film", {
       params: {
         //"filter[status]": "1",
@@ -59,38 +75,49 @@ export function FilmsGrille() {
     })
     
     if (!isDataReady.current) {
-      //console.log(fetchedData.data[1].attributes);
-      const randomizedData = fetchedData.data.sort((a, b) => 0.5 - Math.random());
-      setFilms(randomizedData)
-      isDataReady.current = true
-    }
+      if (random) {
+        const randomizedData = fetchedData.data.sort((a, b) => 0.5 - Math.random());
+        setAllFilms(randomizedData)
+        isDataReady.current = true
+      } else {
+        setallFilms(fetchedData.data)
+        isDataReady.current = true
+      }
+    } 
   }
+
+  fetchAndRandomizeData();
   
-  fetchData();
+  // event handler
+  const loadMoreClick = () => {
+    console.log('Charger plus clicked')
+  }
   
   return (
     <>
       <Styled>
         <div className="grille">
-          {films.map( item => { 
+          {allFilms.map( (item, index) => { 
             const film = item.attributes;
             
-            const randomHeight = Math.random() * (1.5 - 0.5) + 0.5;
+            const randomHeightFactor = Math.random() * (1.5 - 0.5) + 0.5;
+            const elemHeight = `calc( var(--ficheWidth) * ${randomHeightFactor})`
             
             return (
               <a 
                 key={film.drupal_internal__nid}
                 href={ film.path ? `/film${film.path.alias}` : '#' }
                 className="film p-4"
-                style={{minHeight: `calc(var(--ficheWidth) * ${randomHeight})` }}
+                style={{minHeight: elemHeight}}
               >
-                {film.title} <br/>
+                {/*index*/} {film.title}<br/>
                 <small>{film.field_annees_de_sortie}{film.field_duree ? `, ${film.field_duree}` : ''}</small>
                 <div>{ film.path || !isDataReady.current ? '' : '!! pas de path !!' }</div>
               </a>
             )
           })}
         </div>
+        {lazylaod ? <button id='load-more' onClick={loadMoreClick}>Charger plus de films</button> : ''}
       </Styled>
     </>
   );

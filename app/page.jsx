@@ -5,9 +5,9 @@ export default async function Page() {
   return (
     <>
       <h1>Cadavre exquis</h1>
-      <pre><code>Prototype 1.0</code></pre>
+      <pre><code>Prototype 1.1</code></pre>
       
-      <FilmsGrille></FilmsGrille>
+      <FilmsGrille random></FilmsGrille>
     </>
   );
 }
