@@ -52,51 +52,88 @@ const defautlFilm = {attributes: {
   field_annees_de_sortie: 'chargement'
 }}
 
-export function FilmsGrille({random, lazylaod}) {
+export function FilmsGrille({random, lazyload}) {
   const [fetchedData, setFetchedData] = useState(null)
-  const isLoadingFilms = useLoadData(setFetchedData, defautlFilm, 'allFilms');
-  const [allFilms, setAllFilms] = useState([defautlFilm])
+  const isLoadingFilms = useLoadData(setFetchedData, defautlFilm, 'allFilmsCache')
+  const [visibleItems, setVisibleItems] = useState([defautlFilm])
+  const allFilms = useRef([])
   const isDataReady = useRef(false)
   
-  function parseData(array) {
+  // Set load batch qty from Lazyload prop
+  function setLazyLoad(value) {
+    let result = null
     
-    function randomizeData(array) {
-      if (!isDataReady.current) {
-        if (random) {
-          const randomizedData = fetchedData.sort((a, b) => 0.5 - Math.random());
-          setAllFilms(randomizedData)
-          isDataReady.current = true
-        } else {
-          setallFilms(fetchedData)
-          isDataReady.current = true
-        }
+    if (!value) {
+      return result
+    } else {  
+      result = parseInt(value)
+      if (isNaN(result) || result < 2) {
+        result = 10; // par défaut
       }
     }
     
-    randomizeData(array)
+    return result
   }
   
-  if (fetchedData) {
-    parseData(fetchedData)
+  const loadBatchQty = setLazyLoad(lazyload);
+ 
+ // Process Data array with prop options and set visible items
+  function processData(filmsArray) {
+    let resultArray = null;
+    
+    // Randomize if random prop is present 
+    function randomizeData(array) {
+      const randomizedData = fetchedData.sort((a, b) => 0.5 - Math.random());
+      return randomizedData;
+    }
+    
+    if (random) { 
+      resultArray = randomizeData(filmsArray) 
+    } else {
+      resultArray = filmsArray
+    }
+    
+    // Set visibleItems according to loadBatchQty value
+    function setFirstVisibleItems(arr) {
+      if (loadBatchQty) {
+        setVisibleItems(arr.slice(0, loadBatchQty)) // set first batch
+      } else {
+        setVisibleItems(arr) // set full array
+      }
+    }
+    
+    // Finalize
+    allFilms.current = resultArray 
+    setFirstVisibleItems(resultArray)
+    isDataReady.current = true
+  }
+  
+  if (fetchedData && !isDataReady.current) {
+    processData(fetchedData)
   }
   
   // event handler
   const loadMoreClick = () => {
-    console.log('Charger plus clicked')
+    const startIndex = visibleItems.length;
+    const endIndex = Math.min(startIndex + loadBatchQty, allFilms.current.length);
+    
+    if (startIndex >= allFilms.current.length) return;
+    
+    setVisibleItems(prevItems => [...prevItems, ...allFilms.current.slice(startIndex, endIndex)]);
   }
   
   return (
     <>
       <Styled>
         <div className="grille">
-          {allFilms.map( (item, index) => (
+          {visibleItems.map( (item, index) => (
             <FilmCard 
               key={item.attributes.drupal_internal__nid}
               filmdata={item.attributes}
             ></FilmCard>
           ))}
         </div>
-        {lazylaod ? <button id='load-more' onClick={loadMoreClick}>Charger plus de films</button> : ''}
+        {lazyload ? <button id='load-more' onClick={loadMoreClick}>Charger plus de films</button> : ''}
       </Styled>
     </>
   );

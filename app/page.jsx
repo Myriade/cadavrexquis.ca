@@ -4,7 +4,7 @@ export default async function Page() {
   
   return (
     <>
-      <FilmsGrille random></FilmsGrille>
+      <FilmsGrille random lazyload></FilmsGrille>
     </>
   );
 }
