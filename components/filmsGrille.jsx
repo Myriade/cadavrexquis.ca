@@ -1,29 +1,18 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components';
-//import { drupal } from "/lib/drupal.ts"
 import { useLoadData } from '../lib/fecthAllFilms'
+import { FilmCard } from '../components/filmCard';
 
 const Styled = styled.section`
   --ficheWidth: 250px;
   container-type: inline-size;
-  padding-block: 10vh;
+  padding-bottom: 10vh;
   
   .grille {
     column-count: 1;
     column-gap: 0;
-    max-width: var(--ficheWidth);
-  }
-  
-  .film {
-    display: block;
-    overflow: hidden;
-    break-inside: avoid-column;
-    border: 1px dotted;
-    width: var(--ficheWidth);
-    transition: all 0.7s ease-in;}
-  
-  .film.hidden {border: 0;}
+    max-width: var(--ficheWidth);}
   
   @container (min-width: 500px) {
     .grille {
@@ -100,25 +89,12 @@ export function FilmsGrille({random, lazylaod}) {
     <>
       <Styled>
         <div className="grille">
-          {allFilms.map( (item, index) => { 
-            const film = item.attributes;
-            
-            const randomHeightFactor = Math.random() * (1.5 - 0.5) + 0.5;
-            const elemHeight = `calc( var(--ficheWidth) * ${randomHeightFactor})`
-            
-            return (
-              <a 
-                key={film.drupal_internal__nid}
-                href={ film.path ? `/film${film.path.alias}` : '#' }
-                className="film p-4"
-                style={{minHeight: elemHeight}}
-              >
-                {/*index*/} {film.title}<br/>
-                <small>{film.field_annees_de_sortie}{film.field_duree ? `, ${film.field_duree}` : ''}</small>
-                <div>{ film.path || !isDataReady.current ? '' : '!! pas de path !!' }</div>
-              </a>
-            )
-          })}
+          {allFilms.map( (item, index) => (
+            <FilmCard 
+              key={item.attributes.drupal_internal__nid}
+              filmdata={item.attributes}
+            ></FilmCard>
+          ))}
         </div>
         {lazylaod ? <button id='load-more' onClick={loadMoreClick}>Charger plus de films</button> : ''}
       </Styled>
