@@ -8,9 +8,11 @@
 @layer base {
     h1 {
         @apply mb-6 text-4xl font-bold tracking-tight md:text-5xl;
+        font-family: var(--font-serif)
     }
     h2 {
-        @apply mb-6 text-2xl;
+        @apply mb-6 text-2xl tracking-tight;
+        font-family: var(--font-sans)
     }
 }
 
@@ -30,6 +32,34 @@ a:hover {
     @apply text-neutral-400 bg-neutral-700;
 }
 
+/* Variables */
 html {
     --ficheWidth: 250px;
+    --font-sans: "Circular", sans-serif;
+    --font-serif: "Caslon", serif;
+    
+    --color-rouge: #ed4e45;
+    --color-noir: #000;
+    --color-gris: #231F20;
+    
+    color: var(--color-noir);
+}
+
+/* Typography */
+@font-face {
+  font-family: "Circular";
+  src: url("CircularStd-Book.otf");
+}
+
+@font-face {
+  font-family: "Caslon";
+  src: url("LibreCaslonText-Regular.ttf");
+}
+
+.font-sans {
+    font-family: var(--font-sans);
+}
+
+.font-serif {
+    font-family: var(--font-serif);
 }

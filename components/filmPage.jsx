@@ -4,6 +4,9 @@ import styled from 'styled-components';
 import { drupal } from "/lib/drupal.ts"
 
 const Styled = styled.section`
+
+  .type, .infos {
+    color: var(--color-rouge);}
   
   @container (min-width: 250px) { }
     
@@ -53,9 +56,17 @@ export function FilmPage( {path} ) {
   return (
     <>
       <Styled>
-        <h1>{film.type ? film.title : ' '}</h1>
-        <p>{film.type ? film.field_annees_de_sortie : '... chargement'} {film.field_duree ? `, ${film.field_duree}` : ''}</p>
-        <div dangerouslySetInnerHTML={film.type ? { __html: film.field_resume_de_l_institution_de.processed } : {__html: ''}}></div>
+        <img src='/images/video-temp.png' alt='' className='video mb-8'/>
+        <p className='type text-xl mb-6'>Collection</p>
+        <h1 className='mb-6'>{film.type ? film.title : ' '}</h1>
+        <p className='infos text-xl font-sans mb-6'>
+          {film.type ? film.field_annees_de_sortie : '... chargement'}
+          {film.field_duree ? ` / ${film.field_duree}` : ''}
+        </p>
+        <div 
+          dangerouslySetInnerHTML={film.type ? { __html: film.field_resume_de_l_institution_de.processed } : {__html: ''}}
+          className='texte text-lg font-serif mb-6'
+        ></div>
       </Styled>
     </>
   );
