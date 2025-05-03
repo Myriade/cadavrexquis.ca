@@ -5,7 +5,6 @@ import { useLoadData } from '../lib/fecthAllFilms'
 import { FilmCard } from '../components/filmCard';
 
 const Styled = styled.section`
-  --ficheWidth: 250px;
   container-type: inline-size;
   padding-bottom: 10vh;
   
@@ -13,7 +12,8 @@ const Styled = styled.section`
     column-count: 1;
     column-gap: 0;
     max-width: var(--ficheWidth);
-    margin-bottom: 2rem;}
+    margin-bottom: 2rem;
+    margin-inline: auto;}
   
   @container (min-width: 500px) {
     .grille {
@@ -52,9 +52,12 @@ const defautlFilm = {attributes: {
   title: '...',
   field_annees_de_sortie: 'chargement',
   styles: {
-    elemHeight: 'var(--ficheWidth)'
+    elemHeight: 'var(--ficheWidth)',
+    couleur: '#ff8049'
   }
 }}
+
+const couleurs = ['#fd8abd', '#35cdff', '#f5d437', '#19f76b', '#ff8049', '#a081ff']
 
 export function FilmsGrille({random, lazyload}) {
   const [fetchedData, setFetchedData] = useState(null)
@@ -96,7 +99,7 @@ export function FilmsGrille({random, lazyload}) {
   function processData(filmsArray) {
     let resultArray = null;
     
-    // Randomize if random prop is present 
+    // Randomize items order 
     function randomizeData(array) {
       const randomizedData = fetchedData.sort((a, b) => 0.5 - Math.random());
       return randomizedData;
@@ -121,6 +124,12 @@ export function FilmsGrille({random, lazyload}) {
         const height = `calc( var(--ficheWidth) * ${randomHeightFactor})`
         film.attributes.styles = {}
         film.attributes.styles.elemHeight = height;
+        
+        // couleur
+        const total = couleurs.length;
+        const randomCouleurIndex = Math.floor(Math.random() * total);
+        film.attributes.styles.couleur = couleurs[randomCouleurIndex];
+        
       })
     }
     randomStyles()

@@ -3,20 +3,23 @@ import React, { useState, useRef } from 'react'
 import styled from 'styled-components';
 
 const Styled = styled.div`
-  --ficheWidth: 250px;
+  --padding: 1.25rem;
   container-type: inline-size;
+  padding: 0 3px 6px;
   
   .film {
-    display: block;
-    overflow: hidden;
+    display: grid;
+    align-content: space-between;
     break-inside: avoid-column;
-    border: 1px dotted;
-    width: var(--ficheWidth);
-    height: 0;
-    transition: all 0.7s ease-in;}
-  
-  .film.hidden {
-    border: 0;}
+    padding: var(--padding);}
+    
+  h2 {
+    font-weight: 500;
+    text-wrap: balance;
+    overflow-wrap: break-word;
+    word-break: normal;
+    max-width: calc(var(--ficheWidth) - (var(--padding) * 2) );
+  }
 `;
 
 export function FilmCard({filmdata}) {
@@ -28,11 +31,17 @@ export function FilmCard({filmdata}) {
       <Styled>
         <a
           href={ filmAlias }
-          className="film p-4"
-          style={{minHeight: filmdata.styles.elemHeight}}
+          className="film"
+          style={{
+            minHeight: filmdata.styles.elemHeight, 
+            background: filmdata.styles.couleur
+          }}
         >
-          {filmdata.filmIndex} {filmdata.title}<br/>
-          <small>{filmdata.field_annees_de_sortie}{filmdata.field_duree ? `, ${filmdata.field_duree}` : ''}</small>
+          <h2>{filmdata.title}</h2>
+          <div>
+            <p><i>[{filmdata.filmIndex + 1}]</i> {filmdata.field_annees_de_sortie}<br/>
+            {filmdata.field_duree ? `${filmdata.field_duree}` : ''}</p>
+          </div>
         </a>
       </Styled>
     </>
