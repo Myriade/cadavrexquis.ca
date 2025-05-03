@@ -52,27 +52,44 @@ const defautlFilm = {attributes: {
   field_annees_de_sortie: 'chargement'
 }}
 
+const defaultStyles = {
+  elemHeight: 'var(--ficheWidth)'
+}
+
 export function FilmsGrille({random, lazyload}) {
   const [fetchedData, setFetchedData] = useState(null)
   const isLoadingFilms = useLoadData(setFetchedData, defautlFilm, 'allFilmsCache')
-  const [visibleItems, setVisibleItems] = useState([defautlFilm])
+  const [firstFilmBatch, setFirstFilmBatch] = useState([defautlFilm])
+  const [isStyleReady, setIsStyleReady] = useState(false)
+  const [newFilmBatch, setNewFilmBatch] = useState([])
+  
   const allFilms = useRef([])
+  const allCardStyles = useRef([defaultStyles])
+  const newLoadStart = useRef(0) 
+  const newLoadEnd = useRef()
   const isDataReady = useRef(false)
   
   // Set load batch qty from Lazyload prop
   function setLazyLoad(value) {
-    let result = null
     
     if (!value) {
-      return result
-    } else {  
-      result = parseInt(value)
-      if (isNaN(result) || result < 2) {
-        result = 10; // par défaut
+      return false
+    } else {
+      
+      let batchQty = parseInt(value)
+      
+      if (isNaN(batchQty) || batchQty < 2) {
+        batchQty = 10; // par défaut
       }
+      
+      // set start and end index for the first lazyload click
+      if (!isDataReady.current) {
+        newLoadStart.current = batchQty;
+        newLoadEnd.current = batchQty * 2;
+      } 
+      
+      return batchQty
     }
-    
-    return result
   }
   
   const loadBatchQty = setLazyLoad(lazyload);
@@ -93,12 +110,17 @@ export function FilmsGrille({random, lazyload}) {
       resultArray = filmsArray
     }
     
-    // Set visibleItems according to loadBatchQty value
+    // Set filmIndex attribute
+    resultArray.forEach( (film, index) => {
+      film.attributes.filmIndex = index
+    })
+    
+    // Set firstFilmBatch according to loadBatchQty value
     function setFirstVisibleItems(arr) {
       if (loadBatchQty) {
-        setVisibleItems(arr.slice(0, loadBatchQty)) // set first batch
+        setFirstFilmBatch(arr.slice(0, loadBatchQty)) // set first batch
       } else {
-        setVisibleItems(arr) // set full array
+        setFirstFilmBatch(arr) // set full array
       }
     }
     
@@ -112,27 +134,68 @@ export function FilmsGrille({random, lazyload}) {
     processData(fetchedData)
   }
   
+  // Create random values for film Card styles
+  function randomizeCardStyles() {
+    
+    let resultArray = [];
+    
+    for (let i = 0; i < allFilms.current.length; i++) {
+      
+      // create object with height style
+      const randomHeightFactor = Math.random() * (1.5 - 0.5) + 0.5;
+      const height = `calc( var(--ficheWidth) * ${randomHeightFactor})`
+      resultArray.push({elemHeight: height})
+    }
+    
+    return resultArray
+  }
+  
+  if (allFilms.current.length && !isStyleReady) {
+    allCardStyles.current = randomizeCardStyles()
+    setIsStyleReady(true)
+  }
+  
   // event handler
   const loadMoreClick = () => {
-    const startIndex = visibleItems.length;
-    const endIndex = Math.min(startIndex + loadBatchQty, allFilms.current.length);
     
-    if (startIndex >= allFilms.current.length) return;
+    if (newLoadEnd.current >= allFilms.current.length + loadBatchQty) return;
     
-    setVisibleItems(prevItems => [...prevItems, ...allFilms.current.slice(startIndex, endIndex)]);
+    const newBatch = allFilms.current.slice(newLoadStart.current, newLoadEnd.current);
+    
+    setNewFilmBatch( prevItems => {
+      const result = [...prevItems, newBatch];
+      return result
+    })
+    
+    newLoadStart.current += loadBatchQty
+    newLoadEnd.current += loadBatchQty
   }
   
   return (
     <>
       <Styled>
-        <div className="grille">
-          {visibleItems.map( (item, index) => (
+        <div className="grille grille_first">
+          {firstFilmBatch.map( (item, index) => (
             <FilmCard 
               key={item.attributes.drupal_internal__nid}
               filmdata={item.attributes}
+              styles={allCardStyles.current ? allCardStyles.current[index] : defaultStyles}
             ></FilmCard>
           ))}
         </div>
+        
+        {newFilmBatch.map( (batch, index) => (
+          <div className="grille" key={index}>
+            {batch.map( (item, i) => (
+              <FilmCard 
+                key={item.attributes.drupal_internal__nid}
+                filmdata={item.attributes}
+                styles={defaultStyles}
+              ></FilmCard>
+            ))}
+          </div>
+        ))}
+        
         {lazyload ? <button id='load-more' onClick={loadMoreClick}>Charger plus de films</button> : ''}
       </Styled>
     </>

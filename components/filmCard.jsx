@@ -12,16 +12,15 @@ const Styled = styled.div`
     break-inside: avoid-column;
     border: 1px dotted;
     width: var(--ficheWidth);
+    height: 0;
     transition: all 0.7s ease-in;}
   
   .film.hidden {
     border: 0;}
 `;
 
-export function FilmCard({filmdata}) {
+export function FilmCard({filmdata, styles}) {
   
-  const randomHeightFactor = Math.random() * (1.5 - 0.5) + 0.5;
-  const elemHeight = `calc( var(--ficheWidth) * ${randomHeightFactor})`
   const filmAlias = filmdata.path ? `/film${filmdata.path.alias}` : '#'
   
   return (
@@ -30,9 +29,9 @@ export function FilmCard({filmdata}) {
         <a
           href={ filmAlias }
           className="film p-4"
-          style={{minHeight: elemHeight}}
+          style={{minHeight: styles.elemHeight}}
         >
-          {filmdata.title}<br/>
+          {filmdata.filmIndex} {filmdata.title}<br/>
           <small>{filmdata.field_annees_de_sortie}{filmdata.field_duree ? `, ${filmdata.field_duree}` : ''}</small>
         </a>
       </Styled>
