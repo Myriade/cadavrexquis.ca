@@ -12,7 +12,8 @@ const Styled = styled.section`
   .grille {
     column-count: 1;
     column-gap: 0;
-    max-width: var(--ficheWidth);}
+    max-width: var(--ficheWidth);
+    margin-bottom: 2rem;}
   
   @container (min-width: 500px) {
     .grille {
@@ -49,27 +50,24 @@ const Styled = styled.section`
 const defautlFilm = {attributes: {
   drupal_internal__nid: 0,
   title: '...',
-  field_annees_de_sortie: 'chargement'
+  field_annees_de_sortie: 'chargement',
+  styles: {
+    elemHeight: 'var(--ficheWidth)'
+  }
 }}
-
-const defaultStyles = {
-  elemHeight: 'var(--ficheWidth)'
-}
 
 export function FilmsGrille({random, lazyload}) {
   const [fetchedData, setFetchedData] = useState(null)
   const isLoadingFilms = useLoadData(setFetchedData, defautlFilm, 'allFilmsCache')
   const [firstFilmBatch, setFirstFilmBatch] = useState([defautlFilm])
-  const [isStyleReady, setIsStyleReady] = useState(false)
   const [newFilmBatch, setNewFilmBatch] = useState([])
   
   const allFilms = useRef([])
-  const allCardStyles = useRef([defaultStyles])
   const newLoadStart = useRef(0) 
   const newLoadEnd = useRef()
   const isDataReady = useRef(false)
   
-  // Set load batch qty from Lazyload prop
+  // Set loadBatch value to int or false from Lazyload prop
   function setLazyLoad(value) {
     
     if (!value) {
@@ -92,7 +90,7 @@ export function FilmsGrille({random, lazyload}) {
     }
   }
   
-  const loadBatchQty = setLazyLoad(lazyload);
+  const loadBatch = setLazyLoad(lazyload);
  
  // Process Data array with prop options and set visible items
   function processData(filmsArray) {
@@ -115,10 +113,22 @@ export function FilmsGrille({random, lazyload}) {
       film.attributes.filmIndex = index
     })
     
-    // Set firstFilmBatch according to loadBatchQty value
+    // Create random values for filmCard styles
+    function randomStyles() {
+      resultArray.forEach( film => {
+        // height style
+        const randomHeightFactor = Math.random() * (1.5 - 0.5) + 0.5;
+        const height = `calc( var(--ficheWidth) * ${randomHeightFactor})`
+        film.attributes.styles = {}
+        film.attributes.styles.elemHeight = height;
+      })
+    }
+    randomStyles()
+    
+    // Set firstFilmBatch according to loadBatch value
     function setFirstVisibleItems(arr) {
-      if (loadBatchQty) {
-        setFirstFilmBatch(arr.slice(0, loadBatchQty)) // set first batch
+      if (loadBatch) {
+        setFirstFilmBatch(arr.slice(0, loadBatch)) // set first batch
       } else {
         setFirstFilmBatch(arr) // set full array
       }
@@ -134,31 +144,10 @@ export function FilmsGrille({random, lazyload}) {
     processData(fetchedData)
   }
   
-  // Create random values for film Card styles
-  function randomizeCardStyles() {
-    
-    let resultArray = [];
-    
-    for (let i = 0; i < allFilms.current.length; i++) {
-      
-      // create object with height style
-      const randomHeightFactor = Math.random() * (1.5 - 0.5) + 0.5;
-      const height = `calc( var(--ficheWidth) * ${randomHeightFactor})`
-      resultArray.push({elemHeight: height})
-    }
-    
-    return resultArray
-  }
-  
-  if (allFilms.current.length && !isStyleReady) {
-    allCardStyles.current = randomizeCardStyles()
-    setIsStyleReady(true)
-  }
-  
   // event handler
   const loadMoreClick = () => {
     
-    if (newLoadEnd.current >= allFilms.current.length + loadBatchQty) return;
+    if (newLoadEnd.current >= allFilms.current.length + loadBatch) return;
     
     const newBatch = allFilms.current.slice(newLoadStart.current, newLoadEnd.current);
     
@@ -167,30 +156,28 @@ export function FilmsGrille({random, lazyload}) {
       return result
     })
     
-    newLoadStart.current += loadBatchQty
-    newLoadEnd.current += loadBatchQty
+    newLoadStart.current += loadBatch
+    newLoadEnd.current += loadBatch
   }
   
   return (
     <>
       <Styled>
-        <div className="grille grille_first">
+        <div className="grille">
           {firstFilmBatch.map( (item, index) => (
             <FilmCard 
               key={item.attributes.drupal_internal__nid}
               filmdata={item.attributes}
-              styles={allCardStyles.current ? allCardStyles.current[index] : defaultStyles}
             ></FilmCard>
           ))}
         </div>
         
         {newFilmBatch.map( (batch, index) => (
-          <div className="grille" key={index}>
+          <div className="grille grille--lazyloaded" key={index}>
             {batch.map( (item, i) => (
               <FilmCard 
                 key={item.attributes.drupal_internal__nid}
                 filmdata={item.attributes}
-                styles={defaultStyles}
               ></FilmCard>
             ))}
           </div>

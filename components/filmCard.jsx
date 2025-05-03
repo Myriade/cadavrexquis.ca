@@ -19,7 +19,7 @@ const Styled = styled.div`
     border: 0;}
 `;
 
-export function FilmCard({filmdata, styles}) {
+export function FilmCard({filmdata}) {
   
   const filmAlias = filmdata.path ? `/film${filmdata.path.alias}` : '#'
   
@@ -29,7 +29,7 @@ export function FilmCard({filmdata, styles}) {
         <a
           href={ filmAlias }
           className="film p-4"
-          style={{minHeight: styles.elemHeight}}
+          style={{minHeight: filmdata.styles.elemHeight}}
         >
           {filmdata.filmIndex} {filmdata.title}<br/>
           <small>{filmdata.field_annees_de_sortie}{filmdata.field_duree ? `, ${filmdata.field_duree}` : ''}</small>
