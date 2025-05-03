@@ -11,7 +11,9 @@ const Styled = styled.div`
     display: grid;
     align-content: space-between;
     break-inside: avoid-column;
-    padding: var(--padding);}
+    padding: var(--padding);
+      &:hover {
+        text-decoration: none;}}
     
   h2 {
     font-weight: 500;
@@ -40,7 +42,8 @@ export function FilmCard({filmdata}) {
           <h2>{filmdata.title}</h2>
           <div>
             <p><i>[{filmdata.filmIndex + 1}]</i> {filmdata.field_annees_de_sortie}<br/>
-            {filmdata.field_duree ? `${filmdata.field_duree}` : ''}</p>
+            {filmdata.styles.categorie}
+            {/* filmdata.field_duree ? `${filmdata.field_duree}` : '' */}</p>
           </div>
         </a>
       </Styled>

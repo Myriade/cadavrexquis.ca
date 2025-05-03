@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components';
 import { useLoadData } from '../lib/fecthAllFilms'
 import { FilmCard } from '../components/filmCard';
+import { CategoryFilter } from '../components/categoryFilter';
 
 const Styled = styled.section`
   container-type: inline-size;
@@ -14,6 +15,10 @@ const Styled = styled.section`
     max-width: var(--ficheWidth);
     margin-bottom: 2rem;
     margin-inline: auto;}
+    
+  .button {
+    margin: 2rem auto;
+  }
   
   @container (min-width: 500px) {
     .grille {
@@ -32,19 +37,6 @@ const Styled = styled.section`
       column-count: 4;
       max-width: calc( var(--ficheWidth) * 4 );}
   }
-  
-  #load-more {
-    margin: 2rem auto;
-    border: 1px solid black;
-    display: block;
-    padding: 0.5em 1em;
-    &:hover {
-      background: black;
-      color: white;
-      cursor: pointer;
-    }
-  }
-  
 `;
 
 const defautlFilm = {attributes: {
@@ -53,11 +45,15 @@ const defautlFilm = {attributes: {
   field_annees_de_sortie: 'chargement',
   styles: {
     elemHeight: 'var(--ficheWidth)',
-    couleur: '#ff8049'
+    couleur: '#ff8049',
+    categorie: 'Biologie'
   }
 }}
 
 const couleurs = ['#fd8abd', '#35cdff', '#f5d437', '#19f76b', '#ff8049', '#a081ff']
+
+// temporaire dev
+const categories = ['Biologie', 'Chimie', 'Santé mentale', 'Botanique', 'Médecine']
 
 export function FilmsGrille({random, lazyload}) {
   const [fetchedData, setFetchedData] = useState(null)
@@ -130,6 +126,11 @@ export function FilmsGrille({random, lazyload}) {
         const randomCouleurIndex = Math.floor(Math.random() * total);
         film.attributes.styles.couleur = couleurs[randomCouleurIndex];
         
+        // catégories Temporaire
+        const catTotal = categories.length;
+        const randomCatIndex = Math.floor(Math.random() * catTotal);
+        film.attributes.styles.categorie = categories[randomCatIndex];
+        
       })
     }
     randomStyles()
@@ -153,8 +154,8 @@ export function FilmsGrille({random, lazyload}) {
     processData(fetchedData)
   }
   
-  // event handler
-  const loadMoreClick = () => {
+  // event handlers
+  function loadMoreClick() {
     
     if (newLoadEnd.current >= allFilms.current.length + loadBatch) return;
     
@@ -169,8 +170,15 @@ export function FilmsGrille({random, lazyload}) {
     newLoadEnd.current += loadBatch
   }
   
+  function handleMessageFromChild(i) {
+    const catId = i;
+    const catName = categories[i]
+    console.log('categorySelect', catId, catName)
+  }
+  
   return (
     <>
+      <CategoryFilter onSendMessage={handleMessageFromChild} />
       <Styled>
         <div className="grille">
           {firstFilmBatch.map( (item, index) => (
@@ -192,7 +200,7 @@ export function FilmsGrille({random, lazyload}) {
           </div>
         ))}
         
-        {lazyload ? <button id='load-more' onClick={loadMoreClick}>Charger plus de films</button> : ''}
+        {lazyload ? <button id='load-more' className='button' onClick={loadMoreClick}>Charger plus de films</button> : ''}
       </Styled>
     </>
   );
