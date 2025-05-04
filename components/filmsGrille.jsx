@@ -1,41 +1,40 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react'
+import { Fragment } from 'react';
 import styled from 'styled-components';
 import { useLoadData } from '../lib/fecthAllFilms'
 import { FilmCard } from '../components/filmCard';
 import { CategoryFilter } from '../components/categoryFilter';
+import Masonry from 'react-masonry-css'
 
 const Styled = styled.section`
   container-type: inline-size;
   padding-bottom: 10vh;
   
   .grille {
-    column-count: 1;
-    column-gap: 0;
-    max-width: var(--ficheWidth);
+    display: flex;
+    margin-left: -0px; /* gutter size offset */
+    width: auto;
     margin-bottom: 2rem;
-    margin-inline: auto;}
+  }
+  .grille__column {
+    padding-left: 0px; /* gutter size */
+    background-clip: padding-box;
+  }
     
   .button {
-    margin: 2rem auto;
-  }
+    margin-inline: auto;}
   
   @container (min-width: 500px) {
-    .grille {
-      column-count: 2;
-      max-width: calc( var(--ficheWidth) * 2 );}
+    .grille {}
   }
  
   @container (min-width: 750px) {
-   .grille {
-      column-count: 3;
-      max-width: calc( var(--ficheWidth) * 3 );}
+   .grille {}
   }
   
   @container (min-width: 1000px) {
-    .grille {
-      column-count: 4;
-      max-width: calc( var(--ficheWidth) * 4 );}
+    .grille {}
   }
 `;
 
@@ -46,7 +45,7 @@ const defautlFilm = {attributes: {
   styles: {
     elemHeight: 'var(--ficheWidth)',
     couleur: '#ff8049',
-    categorie: '...'
+    categorie: {nom: '...'}
   },
   filmIndex: 0
 }}
@@ -54,22 +53,21 @@ const defautlFilm = {attributes: {
 const couleurs = ['#fd8abd', '#35cdff', '#f5d437', '#19f76b', '#ff8049', '#a081ff']
 
 // temporaire dev
-const categories = [{nom:'Biologie', id:1}, {nom: 'Chimie', id:2}, {nom:'Santé mentale',id:3}, {nom:'Botanique',id:4}, {nom:'Médecine',id:5}]
+const tempCategories = [{nom:'Biologie', id:1}, {nom: 'Chimie', id:2}, {nom:'Santé mentale',id:3}, {nom:'Botanique',id:4}, {nom:'Médecine',id:5}]
 
 export function FilmsGrille({random, lazyload}) {
   const [fetchedData, setFetchedData] = useState(null)
-  const isLoadingFilms = useLoadData(setFetchedData, defautlFilm, 'allFilmsCache')
-  const [firstFilmBatch, setFirstFilmBatch] = useState([defautlFilm])
-  const [newFilmBatch, setNewFilmBatch] = useState([])
+  const isLoadingData = useLoadData(setFetchedData, defautlFilm, 'allFilmsCache')
+  const [filmsItems, setFilmsItems] = useState([defautlFilm])
+  const [selectedCategory, setSelectedCategory] = useState('default')
   
   const allFilms = useRef([])
-  const newLoadStart = useRef(0) 
   const newLoadEnd = useRef()
   const isDataReady = useRef(false)
-  const grilleRef = useRef()
+  const loadModeBtnRef = useRef()
   
-  // Set loadBatch value to int or false from Lazyload prop
-  function setLazyLoad(value) {
+  // Set loadBatchQty value to int or false from Lazyload prop
+  function setLoadBatchQty(value) {
     
     if (!value) {
       return false
@@ -77,13 +75,10 @@ export function FilmsGrille({random, lazyload}) {
       
       let batchQty = parseInt(value)
       
-      if (isNaN(batchQty) || batchQty < 2) {
-        batchQty = 10; // par défaut
-      }
+      if (isNaN(batchQty) || batchQty < 2) batchQty = 10; // par défaut
       
       // set start and end index for the first lazyload click
       if (!isDataReady.current) {
-        newLoadStart.current = batchQty;
         newLoadEnd.current = batchQty * 2;
       } 
       
@@ -91,7 +86,7 @@ export function FilmsGrille({random, lazyload}) {
     }
   }
   
-  const loadBatch = setLazyLoad(lazyload);
+  const loadBatchQty = setLoadBatchQty(lazyload);
  
  // Process Data array with prop options and set visible items
   function processData(filmsArray) {
@@ -129,20 +124,20 @@ export function FilmsGrille({random, lazyload}) {
         film.attributes.styles.couleur = couleurs[randomCouleurIndex];
         
         // catégories Temporaire
-        const catTotal = categories.length;
+        const catTotal = tempCategories.length;
         const randomCatIndex = Math.floor(Math.random() * catTotal);
-        film.attributes.styles.categorie = categories[randomCatIndex];
+        film.attributes.styles.categorie = tempCategories[randomCatIndex];
         
       })
     }
     randomStyles()
     
-    // Set firstFilmBatch according to loadBatch value
+    // Set visible films according to loadBatchQty value
     function setFirstVisibleItems(arr) {
-      if (loadBatch) {
-        setFirstFilmBatch(arr.slice(0, loadBatch)) // set first batch
+      if (loadBatchQty) {
+        setFilmsItems(arr.slice(0, loadBatchQty)) // set first batch
       } else {
-        setFirstFilmBatch(arr) // set full array
+        setFilmsItems(arr) // set full array
       }
     }
     
@@ -159,88 +154,62 @@ export function FilmsGrille({random, lazyload}) {
   // event handlers
   function loadMoreClick() {
     
-    if (newLoadEnd.current >= allFilms.current.length + loadBatch) return;
+    const newVisibleBatch = allFilms.current.slice(0, newLoadEnd.current);
+    setFilmsItems(newVisibleBatch)
     
-    const newBatch = allFilms.current.slice(newLoadStart.current, newLoadEnd.current);
-    
-    setNewFilmBatch( prevItems => {
-      const result = [...prevItems, newBatch];
-      return result
-    })
-    
-    newLoadStart.current += loadBatch
-    newLoadEnd.current += loadBatch
+    if (filmsItems.length + loadBatchQty >= allFilms.current.length) {
+      loadModeBtnRef.current.style.display = "none"
+    } else {
+      newLoadEnd.current += loadBatchQty
+    }
   }
   
   function categoryChangeHandler(id) {
-    const catId = id;
-    const allCards = grilleRef.current.querySelectorAll('.card');
+    loadModeBtnRef.current.style.display = "none"
     
-    if (catId === 'all') {
-      allCards.forEach( card => {
-        card.classList.add('selected')
-        card.classList.remove('hidden')
+    if (id === 'all') {
+      setFilmsItems(allFilms.current)
+      setSelectedCategory('Toutes catégories')
+    } else {
+      //console.log('categorie clicked', id)
+      const visibleCards = allFilms.current.filter( film => {
+        return film.attributes.styles.categorie.id === id
       })
-      return
+      setFilmsItems(visibleCards)
+      setSelectedCategory(tempCategories[id - 1].nom)
     }
-    
-    // const catName = categories[id-1].nom
-    // console.log('categorySelect', catId, catName)
-    
-    const visibleCards = Array.from(allCards).filter( card => {
-      const allClass = card.classList;
-      const result = Array.from(allClass).includes(`category-${catId}`) ;
-      return result
-    })
-    
-    const hiddenCards = Array.from(allCards).filter( card => {
-      const allClass = card.classList;
-      const result = !Array.from(allClass).includes(`category-${catId}`) ;
-      return result
-    })
-    
-    visibleCards.forEach( card => {
-      card.classList.add('selected')
-      card.classList.remove('hidden')
-    })
-    
-    hiddenCards.forEach( card => {
-      card.classList.add('hidden')
-      card.classList.remove('selected')
-    })
   }
   
   return (<>
     <CategoryFilter onCategoryChange={categoryChangeHandler} />
-    <Styled ref={grilleRef}>
-    
+    <Styled>
       <Masonry
         breakpointCols={4}
         className="grille"
         columnClassName="grille__column">
-        {firstFilmBatch.map( (item, index) => (
+        {filmsItems.map( (item, index) => (
           <FilmCard 
             key={item.attributes.drupal_internal__nid}
             filmdata={item.attributes}
           ></FilmCard>
-        ))}
-        
-        {newFilmBatch.map( (batch, index) => (
-          <Fragment key={index}>
-            {batch.map( (item, i) => (
-              <FilmCard 
-                key={item.attributes.drupal_internal__nid}
-                filmdata={item.attributes}
-              ></FilmCard>
-            ))}
-          </Fragment>
-        ))}
-        
+        ))}  
       </Masonry>
       
+      <p className='text-center mb-0'>
+        {selectedCategory !== 'default' ? `${selectedCategory} : ` : ''}
+        {fetchedData ? `${filmsItems.length} films sur ${fetchedData.length}` : '...'}
+      </p>
       
-      
-      {lazyload ? <button id='load-more' className='button' onClick={loadMoreClick}>Charger plus de films</button> : ''}
+      {lazyload ? (
+        <button 
+          id='load-more' 
+          className='button' 
+          onClick={loadMoreClick}
+          ref={loadModeBtnRef}
+        >
+          Charger plus de films
+        </button>
+      ) : ''}
     </Styled>
   </>);
 };
