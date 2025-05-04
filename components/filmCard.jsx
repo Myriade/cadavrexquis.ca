@@ -7,6 +7,14 @@ const Styled = styled.div`
   container-type: inline-size;
   padding: 0 3px 6px;
   
+  &.selected {
+    display: block;
+  }
+  
+  &.hidden {
+    display:none;
+  }
+  
   .film {
     display: grid;
     align-content: space-between;
@@ -29,24 +37,24 @@ export function FilmCard({filmdata}) {
   const filmAlias = filmdata.path ? `/film${filmdata.path.alias}` : '#'
   
   return (
-    <>
-      <Styled>
-        <a
-          href={ filmAlias }
-          className="film"
-          style={{
-            minHeight: filmdata.styles.elemHeight, 
-            background: filmdata.styles.couleur
-          }}
-        >
-          <h2>{filmdata.title}</h2>
-          <div>
-            <p><i>[{filmdata.filmIndex + 1}]</i> {filmdata.field_annees_de_sortie}<br/>
-            {filmdata.styles.categorie}
-            {/* filmdata.field_duree ? `${filmdata.field_duree}` : '' */}</p>
-          </div>
-        </a>
-      </Styled>
-    </>
+    <Styled
+      className={`card category-${filmdata.styles.categorie.id}`}
+    >
+      <a
+        href={ filmAlias }
+        className="film"
+        style={{
+          minHeight: filmdata.styles.elemHeight, 
+          background: filmdata.styles.couleur
+        }}
+      >
+        <h2>{filmdata.title}</h2>
+        <div>
+          <p><i>[{filmdata.filmIndex + 1}]</i> {filmdata.field_annees_de_sortie}<br/>
+          {filmdata.styles.categorie.nom}
+          {/* filmdata.field_duree ? `${filmdata.field_duree}` : '' */}</p>
+        </div>
+      </a>
+    </Styled>
   );
 };

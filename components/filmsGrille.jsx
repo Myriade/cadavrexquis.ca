@@ -46,14 +46,15 @@ const defautlFilm = {attributes: {
   styles: {
     elemHeight: 'var(--ficheWidth)',
     couleur: '#ff8049',
-    categorie: 'Biologie'
-  }
+    categorie: '...'
+  },
+  filmIndex: 0
 }}
 
 const couleurs = ['#fd8abd', '#35cdff', '#f5d437', '#19f76b', '#ff8049', '#a081ff']
 
 // temporaire dev
-const categories = ['Biologie', 'Chimie', 'Santé mentale', 'Botanique', 'Médecine']
+const categories = [{nom:'Biologie', id:1}, {nom: 'Chimie', id:2}, {nom:'Santé mentale',id:3}, {nom:'Botanique',id:4}, {nom:'Médecine',id:5}]
 
 export function FilmsGrille({random, lazyload}) {
   const [fetchedData, setFetchedData] = useState(null)
@@ -65,6 +66,7 @@ export function FilmsGrille({random, lazyload}) {
   const newLoadStart = useRef(0) 
   const newLoadEnd = useRef()
   const isDataReady = useRef(false)
+  const grilleRef = useRef()
   
   // Set loadBatch value to int or false from Lazyload prop
   function setLazyLoad(value) {
@@ -170,16 +172,35 @@ export function FilmsGrille({random, lazyload}) {
     newLoadEnd.current += loadBatch
   }
   
-  function handleMessageFromChild(i) {
-    const catId = i;
-    const catName = categories[i]
+  function categoryChangeHandler(id) {
+    const catId = id;
+    const catName = categories[id-1].nom
     console.log('categorySelect', catId, catName)
+    const allCards = grilleRef.current.querySelectorAll('.card');
+    const visibleCards = Array.from(allCards).filter( card => {
+      const allClass = card.classList;
+      const result = Array.from(allClass).includes(`category-${catId}`) ;
+      return result
+    })
+    const hiddenCards = Array.from(allCards).filter( card => {
+      const allClass = card.classList;
+      const result = !Array.from(allClass).includes(`category-${catId}`) ;
+      return result
+    })
+    visibleCards.forEach( card => {
+      card.classList.add('selected')
+      card.classList.remove('hidden')
+    })
+    hiddenCards.forEach( card => {
+      card.classList.add('hidden')
+      card.classList.remove('selected')
+    })
   }
   
   return (
     <>
-      <CategoryFilter onSendMessage={handleMessageFromChild} />
-      <Styled>
+      <CategoryFilter onCategoryChange={categoryChangeHandler} />
+      <Styled ref={grilleRef}>
         <div className="grille">
           {firstFilmBatch.map( (item, index) => (
             <FilmCard 
