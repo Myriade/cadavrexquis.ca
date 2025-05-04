@@ -21,12 +21,17 @@ const categories = [{nom:'Biologie', id:1}, {nom: 'Chimie', id:2}, {nom:'Santé 
 export function CategoryFilter({ onCategoryChange }) {
   const wrapElem = useRef()
   
-  // Click Event handler
+  // Click Event handlers
   function onBtnClick(e) {
     const allBtnElems = wrapElem.current.children
     const selectedElem = e.target
     Array.from(allBtnElems).forEach( elem => elem.classList.remove('selected'))
     selectedElem.classList.add('selected')
+  }
+  
+  function resetAll(e) {
+    const allBtnElems = wrapElem.current.children
+    Array.from(allBtnElems).forEach( elem => elem.classList.remove('selected'))
   }
     
   return (
@@ -34,6 +39,13 @@ export function CategoryFilter({ onCategoryChange }) {
       className='mb-6'
       ref={wrapElem}
     >
+      <button 
+        className='button'
+        onClick={ (e) => {
+          onBtnClick(e)
+          onCategoryChange('all')
+        }}
+      >Tous</button>
       {categories.map( category => (
         <button 
           className='button' 

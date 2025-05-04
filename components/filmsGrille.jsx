@@ -174,55 +174,73 @@ export function FilmsGrille({random, lazyload}) {
   
   function categoryChangeHandler(id) {
     const catId = id;
-    const catName = categories[id-1].nom
-    console.log('categorySelect', catId, catName)
     const allCards = grilleRef.current.querySelectorAll('.card');
+    
+    if (catId === 'all') {
+      allCards.forEach( card => {
+        card.classList.add('selected')
+        card.classList.remove('hidden')
+      })
+      return
+    }
+    
+    // const catName = categories[id-1].nom
+    // console.log('categorySelect', catId, catName)
+    
     const visibleCards = Array.from(allCards).filter( card => {
       const allClass = card.classList;
       const result = Array.from(allClass).includes(`category-${catId}`) ;
       return result
     })
+    
     const hiddenCards = Array.from(allCards).filter( card => {
       const allClass = card.classList;
       const result = !Array.from(allClass).includes(`category-${catId}`) ;
       return result
     })
+    
     visibleCards.forEach( card => {
       card.classList.add('selected')
       card.classList.remove('hidden')
     })
+    
     hiddenCards.forEach( card => {
       card.classList.add('hidden')
       card.classList.remove('selected')
     })
   }
   
-  return (
-    <>
-      <CategoryFilter onCategoryChange={categoryChangeHandler} />
-      <Styled ref={grilleRef}>
-        <div className="grille">
-          {firstFilmBatch.map( (item, index) => (
-            <FilmCard 
-              key={item.attributes.drupal_internal__nid}
-              filmdata={item.attributes}
-            ></FilmCard>
-          ))}
-        </div>
+  return (<>
+    <CategoryFilter onCategoryChange={categoryChangeHandler} />
+    <Styled ref={grilleRef}>
+    
+      <Masonry
+        breakpointCols={4}
+        className="grille"
+        columnClassName="grille__column">
+        {firstFilmBatch.map( (item, index) => (
+          <FilmCard 
+            key={item.attributes.drupal_internal__nid}
+            filmdata={item.attributes}
+          ></FilmCard>
+        ))}
         
         {newFilmBatch.map( (batch, index) => (
-          <div className="grille grille--lazyloaded" key={index}>
+          <Fragment key={index}>
             {batch.map( (item, i) => (
               <FilmCard 
                 key={item.attributes.drupal_internal__nid}
                 filmdata={item.attributes}
               ></FilmCard>
             ))}
-          </div>
+          </Fragment>
         ))}
         
-        {lazyload ? <button id='load-more' className='button' onClick={loadMoreClick}>Charger plus de films</button> : ''}
-      </Styled>
-    </>
-  );
+      </Masonry>
+      
+      
+      
+      {lazyload ? <button id='load-more' className='button' onClick={loadMoreClick}>Charger plus de films</button> : ''}
+    </Styled>
+  </>);
 };
