@@ -13,29 +13,17 @@ const Styled = styled.section`
   
   .grille {
     display: flex;
-    margin-left: -0px; /* gutter size offset */
+    margin-left: calc( -1 * var(--ficheMarge)); /* gutter size offset */
     width: auto;
-    margin-bottom: 2rem;
-  }
+    margin-bottom: 2rem;}
+  
   .grille__column {
-    padding-left: 0px; /* gutter size */
+    padding-left: var(--ficheMarge); /* gutter size */
     background-clip: padding-box;
-  }
+    max-width: var(--ficheWidth);}
     
   .button {
     margin-inline: auto;}
-  
-  @container (min-width: 500px) {
-    .grille {}
-  }
- 
-  @container (min-width: 750px) {
-   .grille {}
-  }
-  
-  @container (min-width: 1000px) {
-    .grille {}
-  }
 `;
 
 const defautlFilm = {attributes: {
@@ -44,11 +32,19 @@ const defautlFilm = {attributes: {
   field_annees_de_sortie: 'chargement',
   styles: {
     elemHeight: 'var(--ficheWidth)',
-    couleur: '#ff8049',
+    couleur: '',
     categorie: {nom: '...'}
   },
   filmIndex: 0
 }}
+
+const breakpointColumnsObj = {
+  default: 5,
+  1325: 4,
+  1075: 3,
+  825: 2,
+  575: 1
+};
 
 const couleurs = ['#fd8abd', '#35cdff', '#f5d437', '#19f76b', '#ff8049', '#a081ff']
 
@@ -182,9 +178,9 @@ export function FilmsGrille({random, lazyload}) {
   
   return (<>
     <CategoryFilter onCategoryChange={categoryChangeHandler} />
-    <Styled>
+    <Styled className='mt-8'>
       <Masonry
-        breakpointCols={4}
+        breakpointCols={breakpointColumnsObj}
         className="grille"
         columnClassName="grille__column">
         {filmsItems.map( (item, index) => (

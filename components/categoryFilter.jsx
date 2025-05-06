@@ -5,7 +5,7 @@ import styled from 'styled-components';
 const Styled = styled.section`
   display: flex;
   gap: 2rem;
-  justify-content: center;
+  flex-wrap: wrap;
   
   button {
     &.selected {
@@ -36,7 +36,6 @@ export function CategoryFilter({ onCategoryChange }) {
     
   return (
     <Styled
-      className='mb-6'
       ref={wrapElem}
     >
       <button 

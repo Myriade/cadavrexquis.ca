@@ -5,30 +5,23 @@ import styled from 'styled-components';
 const Styled = styled.div`
   --padding: 1.25rem;
   container-type: inline-size;
-  padding: 0 3px 6px;
-  
-  &.selected {
-    display: block;
-  }
-  
-  &.hidden {
-    display:none;
-  }
   
   .film {
     display: grid;
     align-content: space-between;
     break-inside: avoid-column;
+    margin-bottom: var(--ficheMarge);
     padding: var(--padding);
       &:hover {
         text-decoration: none;}}
     
   h2 {
-    font-weight: 500;
+    font-weight: normal;
     text-wrap: balance;
-    overflow-wrap: break-word;
     word-break: normal;
-    max-width: calc(var(--ficheWidth) - (var(--padding) * 2) );
+    max-width: 21ch;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 `;
 
