@@ -9,6 +9,7 @@
         "lint": "next lint"
     },
     "dependencies": {
+        "@gsap/react": "^2.1.2",
         "@netlify/blobs": "^8.1.1",
         "@tailwindcss/postcss": "^4.0.15",
         "blobshape": "^1.0.0",

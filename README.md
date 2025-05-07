@@ -1,12 +1,11 @@
-# Next.js on Netlify Platform Starter
+# Cadavre Exquis
+## Projet créatif du Département d’histoire de l’art, de cinéma et des médias audiovisuels de l'Univesité de Montréal
+### [cadavrexquis.ca](https://cadavrexquis.ca/)
 
-[Live Demo](https://nextjs-platform-starter.netlify.app/)
-
-A modern starter based on Next.js 14 (App Router), Tailwind, daisyUI, and [Netlify Core Primitives](https://docs.netlify.com/core/overview/#develop) (Edge Functions, Image CDN, Blob Store).
-
-In this site, Netlify Core Primitives are used both implictly for running Next.js features (e.g. Route Handlers, image optimization via `next/image`, and more) and also explicitly by the user code. 
-
-Implicit usage means you're using any Next.js functionality and everything "just works" when deployed - all the plumbing is done for you. Explicit usage is framework-agnostic and typically provides more features than what Next.js exposes.
+Porteur de projet : André Habib  
+Design graphique : Dominique Fortier  
+Développement web : Myriam Bizier
+Collaboration: Louis Pelletier, Corina MacDonald
 
 ## Deploying to Netlify
 

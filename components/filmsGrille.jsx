@@ -1,11 +1,14 @@
 'use client'
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef } from 'react'
 import { Fragment } from 'react';
 import styled from 'styled-components';
 import { useLoadData } from '../lib/fecthAllFilms'
 import { FilmCard } from '../components/filmCard';
 import { CategoryFilter } from '../components/categoryFilter';
+
 import Masonry from 'react-masonry-css'
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
 const Styled = styled.section`
   container-type: inline-size;
@@ -58,9 +61,13 @@ export function FilmsGrille({random, lazyload}) {
   const [selectedCategory, setSelectedCategory] = useState('default')
   
   const allFilms = useRef([])
+  const newLoadStart = useRef(0)
   const newLoadEnd = useRef()
   const isDataReady = useRef(false)
   const loadModeBtnRef = useRef()
+  const gsapContainer = useRef();
+  
+  gsap.registerPlugin(useGSAP); // register the hook to avoid React version discrepancies 
   
   // Set loadBatchQty value to int or false from Lazyload prop
   function setLoadBatchQty(value) {
@@ -147,6 +154,47 @@ export function FilmsGrille({random, lazyload}) {
     processData(fetchedData)
   }
   
+  // GSAP
+  const gsapInstance = useGSAP( async () => {
+    
+    function setCardsToReveal() {
+      const all = gsapContainer.current.querySelectorAll('.card__inner');
+      let result = null
+      
+      if (all.length > 1) {
+        if (selectedCategory === 'default') {
+          const startIndex = newLoadStart.current
+          let endIndex = startIndex + loadBatchQty
+          all.forEach( elem => {
+            const num = parseInt(elem.dataset.cardindex);
+            if (num >= startIndex && num <= endIndex) {
+              elem.classList.add('to-be-revealed');
+            } else {
+              elem.classList.remove('to-be-revealed');
+            }
+          })
+          // console.log('startIndex', startIndex, 'endIndex', endIndex)
+          result = gsapContainer.current.querySelectorAll('.card__inner.to-be-revealed');
+        } else {
+          // console.log('categoy', selectedCategory)
+          result = all
+        }
+        return result 
+      }
+    }
+    
+    if (filmsItems.length > 1) {
+      const cardsToReveal = await setCardsToReveal();
+      gsap.from(cardsToReveal, {
+        height: 0,
+        stagger: {
+          amount: 0.5
+        }
+      });
+    }
+    
+  }, { dependencies: [filmsItems], scope: gsapContainer });
+  
   // event handlers
   function loadMoreClick() {
     
@@ -155,13 +203,16 @@ export function FilmsGrille({random, lazyload}) {
     
     if (filmsItems.length + loadBatchQty >= allFilms.current.length) {
       loadModeBtnRef.current.style.display = "none"
+      newLoadEnd.current = allFilms.current.length
+      newLoadStart.current += loadBatchQty
     } else {
       newLoadEnd.current += loadBatchQty
+      newLoadStart.current += loadBatchQty
     }
   }
   
   function categoryChangeHandler(id) {
-    loadModeBtnRef.current.style.display = "none"
+    loadModeBtnRef.current.style.display = 'none'
     
     if (id === 'all') {
       setFilmsItems(allFilms.current)
@@ -174,11 +225,17 @@ export function FilmsGrille({random, lazyload}) {
       setFilmsItems(visibleCards)
       setSelectedCategory(tempCategories[id - 1].nom)
     }
+    
+    newLoadStart.current = 0
+    newLoadEnd.current = filmsItems.length
   }
   
   return (<>
     <CategoryFilter onCategoryChange={categoryChangeHandler} />
-    <Styled className='mt-8'>
+    <Styled
+      className='mt-8' 
+      ref={gsapContainer}
+    >
       <Masonry
         breakpointCols={breakpointColumnsObj}
         className="grille"
