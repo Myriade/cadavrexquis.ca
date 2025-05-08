@@ -31,28 +31,30 @@ const Styled = styled.section`
 
 const defautlFilm = {attributes: {
   drupal_internal__nid: 0,
-  title: '...',
-  field_annees_de_sortie: 'chargement',
+  title: 'chargement',
+  field_annees_de_sortie: '...',
   styles: {
     elemHeight: 'var(--ficheWidth)',
-    couleur: '',
-    categorie: {nom: '...'}
-  },
-  filmIndex: 0
+    couleur: '#eee',
+    categorie: {nom: ''}
+  }
 }}
 
 const breakpointColumnsObj = {
   default: 5,
   1325: 4,
   1075: 3,
-  825: 2,
-  575: 1
+  825: 2
 };
 
 const couleurs = ['#fd8abd', '#35cdff', '#f5d437', '#19f76b', '#ff8049', '#a081ff']
+const focus = ['left top', 'top', 'right top', 'left center', 'center', 'right center', 'left bottom', 'bottom', 'right bottom']
 
-// temporaire dev
+///// temporaire dev /////
 const tempCategories = [{nom:'Biologie', id:1}, {nom: 'Chimie', id:2}, {nom:'Santé mentale',id:3}, {nom:'Botanique',id:4}, {nom:'Médecine',id:5}]
+
+const tempPhotograms = ['photogramme-temp-1.jpg', 'photogramme-temp-2.jpg', 'photogramme-temp-3.jpg', 'photogramme-temp-4.jpg', 'photogramme-temp-5.jpg', 'photogramme-temp-6.jpg']
+//////               /////
 
 export function FilmsGrille({random, lazyload}) {
   const [fetchedData, setFetchedData] = useState(null)
@@ -116,20 +118,31 @@ export function FilmsGrille({random, lazyload}) {
     function randomStyles() {
       resultArray.forEach( film => {
         // height style
-        const randomHeightFactor = Math.random() * (1.5 - 0.5) + 0.5;
+        const randomHeightFactor = Math.random() * (1.5 - 0.75) + 0.3;
         const height = `calc( var(--ficheWidth) * ${randomHeightFactor})`
         film.attributes.styles = {}
         film.attributes.styles.elemHeight = height;
         
         // couleur
-        const total = couleurs.length;
-        const randomCouleurIndex = Math.floor(Math.random() * total);
+        const totalCouleurs = couleurs.length;
+        const randomCouleurIndex = Math.floor(Math.random() * totalCouleurs);
         film.attributes.styles.couleur = couleurs[randomCouleurIndex];
         
-        // catégories Temporaire
+        // focus (image)
+        const totalFocus = focus.length;
+        const randomFocusIndex = Math.floor(Math.random() * totalFocus);
+        film.attributes.styles.focus = focus[randomFocusIndex]; 
+        
+        /////// catégories Temporaire ///////
         const catTotal = tempCategories.length;
         const randomCatIndex = Math.floor(Math.random() * catTotal);
         film.attributes.styles.categorie = tempCategories[randomCatIndex];
+        
+        ////// Photogrammes Temporaire
+        const photoTotal = tempPhotograms.length;
+        const randomPhotoIndex = Math.floor(Math.random() * photoTotal);
+        film.attributes.styles.photogramme = tempPhotograms[randomPhotoIndex];
+        ///////                       ///////
         
       })
     }
@@ -173,10 +186,10 @@ export function FilmsGrille({random, lazyload}) {
               elem.classList.remove('to-be-revealed');
             }
           })
-          // console.log('startIndex', startIndex, 'endIndex', endIndex)
+           console.log('startIndex', startIndex, 'endIndex', endIndex)
           result = gsapContainer.current.querySelectorAll('.card__inner.to-be-revealed');
         } else {
-          // console.log('categoy', selectedCategory)
+           console.log('categoy', selectedCategory)
           result = all
         }
         return result 
@@ -212,7 +225,9 @@ export function FilmsGrille({random, lazyload}) {
   }
   
   function categoryChangeHandler(id) {
-    loadModeBtnRef.current.style.display = 'none'
+    if (loadModeBtnRef.current) {
+      loadModeBtnRef.current.style.display = 'none'
+    }
     
     if (id === 'all') {
       setFilmsItems(allFilms.current)
@@ -244,6 +259,7 @@ export function FilmsGrille({random, lazyload}) {
           <FilmCard 
             key={item.attributes.drupal_internal__nid}
             filmdata={item.attributes}
+            shouldwait={lazyload ? 700 : 0}
           ></FilmCard>
         ))}  
       </Masonry>

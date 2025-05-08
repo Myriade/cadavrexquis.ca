@@ -43,10 +43,14 @@ html {
   --color-noir: #000;
   --color-gris: #231F20;
   
-  --ficheWidth: clamp(250px, 50vh ,275px);
+  --ficheWidth: 350px;
   --ficheMarge: 6px;
   
   color: var(--color-noir);
+}
+
+@media (min-with: 1080px) {
+  --ficheWidth: 400px;
 }
 
 /* Typography */
