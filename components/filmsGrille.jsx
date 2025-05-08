@@ -170,35 +170,37 @@ export function FilmsGrille({random, lazyload}) {
   // GSAP
   const gsapInstance = useGSAP( async () => {
     
-    function setCardsToReveal() {
+    function setCardsToLoad() {
       const all = gsapContainer.current.querySelectorAll('.card__inner');
       let result = null
       
       if (all.length > 1) {
-        if (selectedCategory === 'default') {
+        
+        if (selectedCategory === 'default' && loadBatchQty) {
           const startIndex = newLoadStart.current
           let endIndex = startIndex + loadBatchQty
           all.forEach( elem => {
             const num = parseInt(elem.dataset.cardindex);
             if (num >= startIndex && num <= endIndex) {
-              elem.classList.add('to-be-revealed');
+              elem.classList.add('loaded');
             } else {
-              elem.classList.remove('to-be-revealed');
+              elem.classList.remove('loaded');
             }
           })
-           console.log('startIndex', startIndex, 'endIndex', endIndex)
-          result = gsapContainer.current.querySelectorAll('.card__inner.to-be-revealed');
+           //console.log('startIndex', startIndex, 'endIndex', endIndex)
+          result = gsapContainer.current.querySelectorAll('.card__inner.loaded');
         } else {
-           console.log('categoy', selectedCategory)
+          // console.log('selectedCategory', selectedCategory)
           result = all
         }
-        return result 
       }
+      
+      return result 
     }
     
     if (filmsItems.length > 1) {
-      const cardsToReveal = await setCardsToReveal();
-      gsap.from(cardsToReveal, {
+      const cardsToLoad = await setCardsToLoad();
+      gsap.from(cardsToLoad, {
         height: 0,
         stagger: {
           amount: 0.5

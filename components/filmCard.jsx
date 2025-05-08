@@ -19,7 +19,9 @@ const Styled = styled.div`
   
   .card__image {
     grid-area: 1 / 1;
-    display: grid;}
+    display: grid;
+    background-size: 300%;
+    background-repeat: no-repeat;}
   
   .card__infos {
     grid-area: 1 / 1;
