@@ -77,7 +77,7 @@ export function FilmPage( {path} ) {
       <Curated className='mb-6'>
         <hr className='mb-6' />
         <h2>À voir aussi</h2>
-        <p><i>[... Liens vers d'autres films (à programmer) ...]</i></p>
+        <p><i>[ Fiches d'autres films liés (curation) ]</i></p>
       </Curated>
     </>
   );
