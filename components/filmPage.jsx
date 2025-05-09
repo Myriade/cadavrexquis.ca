@@ -18,6 +18,8 @@ const Styled = styled.section`
   
 `;
 
+const Curated = styled.section``
+
 // const defautlFilm = {}
 
 export function FilmPage( {path} ) {
@@ -60,14 +62,23 @@ export function FilmPage( {path} ) {
         <p className='type text-xl mb-6'>Collection</p>
         <h1 className='mb-6'>{film.type ? film.title : '...'}</h1>
         <p className='infos text-xl font-sans mb-6'>
-          {film.type ? film.field_annees_de_sortie : 'chargement'}
-          {film.field_duree ? ` / ${film.field_duree}` : ''}
+          {film.type ? film.field_annees_de_sortie : 'chargement'}&nbsp;/ 
+          <i> [un autre champ]</i>
         </p>
         <div 
           dangerouslySetInnerHTML={film.type ? { __html: film.field_resume_de_l_institution_de.processed } : {__html: ''}}
           className='texte text-lg font-serif mb-6'
         ></div>
+        <div className='mb-6'>
+          <i>[la liste des champs à afficher]</i>
+        </div>
       </Styled>
+      
+      <Curated className='mb-6'>
+        <hr className='mb-6' />
+        <h2>À voir aussi</h2>
+        <p><i>[... Liens vers d'autres films (à programmer) ...]</i></p>
+      </Curated>
     </>
   );
 };
