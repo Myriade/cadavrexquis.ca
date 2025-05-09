@@ -62,7 +62,7 @@ export function FilmPage( {path} ) {
         <p className='type text-xl mb-6'>Collection</p>
         <h1 className='mb-6'>{film.type ? film.title : '...'}</h1>
         <p className='infos text-xl font-sans mb-6'>
-          {film.type ? film.field_annees_de_sortie : 'chargement'}&nbsp;/ 
+          {film.type ? film.field_annees_de_sortie : 'chargement'} / 
           <i> [un autre champ]</i>
         </p>
         <div 
