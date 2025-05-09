@@ -58,9 +58,9 @@ export function FilmPage( {path} ) {
       <Styled>
         <img src='/images/video-temp.png' alt='' className='video mb-8'/>
         <p className='type text-xl mb-6'>Collection</p>
-        <h1 className='mb-6'>{film.type ? film.title : ' '}</h1>
+        <h1 className='mb-6'>{film.type ? film.title : '...'}</h1>
         <p className='infos text-xl font-sans mb-6'>
-          {film.type ? film.field_annees_de_sortie : '... chargement'}
+          {film.type ? film.field_annees_de_sortie : 'chargement'}
           {film.field_duree ? ` / ${film.field_duree}` : ''}
         </p>
         <div 
