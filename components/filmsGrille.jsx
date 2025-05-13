@@ -2,7 +2,7 @@
 import React, { useState, useRef } from 'react'
 import { Fragment } from 'react';
 import styled from 'styled-components';
-import { useLoadData } from '../lib/fecthAllFilms'
+import { useLoadData } from '../lib/fecthDrupalData'
 import { FilmCard } from '../components/filmCard';
 import { CategoryFilter } from '../components/categoryFilter';
 
