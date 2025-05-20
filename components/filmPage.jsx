@@ -1,9 +1,11 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components';
+import Script from 'next/script'
 import { drupal } from "/lib/drupal.ts"
 import { useLoadTaxonomies } from '../lib/fecthDrupalData'
 import { findVocabularyTermNames } from '../lib/utils.ts'
+
 
 const Styled = styled.section`
 
@@ -190,9 +192,9 @@ export function FilmPage( {path} ) {
         { vimeoSource ? (
           <div className='vimeo mb-6'>
             <iframe src={vimeoSource} frameBorder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" title=""></iframe>
+            <Script src="https://third-party-script.js"></Script>
           </div>
         ): ( <div className='vimeo mb-6 loading'><span className='text-6xl'>...</span></div>)}
-        <script src="https://player.vimeo.com/api/player.js"></script>
         <p className='type text-xl mb-6'>{film.field_site_collection}</p>
         <h1 className='mb-6'>{film.title}</h1>
         <p className='infos text-xl font-sans mb-6'>
