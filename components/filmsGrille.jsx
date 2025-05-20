@@ -2,7 +2,7 @@
 import React, { useState, useRef } from 'react'
 import { Fragment } from 'react';
 import styled from 'styled-components';
-import { useLoadData } from '../lib/fecthDrupalData'
+import { useLoadData, useLoadTaxonomies } from '../lib/fecthDrupalData'
 import { FilmCard } from '../components/filmCard';
 import { CategoryFilter } from '../components/categoryFilter';
 
@@ -50,9 +50,6 @@ const breakpointColumnsObj = {
 const couleurs = ['#fd8abd', '#35cdff', '#f5d437', '#19f76b', '#ff8049', '#a081ff']
 const focus = ['left top', 'top', 'right top', 'left center', 'center', 'right center', 'left bottom', 'bottom', 'right bottom']
 
-///// temporaire dev /////
-const tempCategories = [{nom:'Biologie', id:1}, {nom: 'Chimie', id:2}, {nom:'Santé mentale',id:3}, {nom:'Botanique',id:4}, {nom:'Médecine',id:5}]
-
 const tempPhotograms = ['photogramme-temp-1.jpg', 'photogramme-temp-2.jpg', 'photogramme-temp-3.jpg', 'photogramme-temp-4.jpg', 'photogramme-temp-5.jpg', 'photogramme-temp-6.jpg']
 //////               /////
 
@@ -69,7 +66,11 @@ export function FilmsGrille({random, lazyload}) {
   const loadModeBtnRef = useRef()
   const gsapContainer = useRef();
   
-  gsap.registerPlugin(useGSAP); // register the hook to avoid React version discrepancies 
+  gsap.registerPlugin(useGSAP); // register the hook to avoid React version discrepancies
+  
+  // Thematique
+  let thematique = null
+  const { data: taxonomyData, loading, error } = useLoadTaxonomies()
   
   // Set loadBatchQty value to int or false from Lazyload prop
   function setLoadBatchQty(value) {
@@ -131,12 +132,7 @@ export function FilmsGrille({random, lazyload}) {
         // focus (image)
         const totalFocus = focus.length;
         const randomFocusIndex = Math.floor(Math.random() * totalFocus);
-        film.attributes.styles.focus = focus[randomFocusIndex]; 
-        
-        /////// catégories Temporaire ///////
-        const catTotal = tempCategories.length;
-        const randomCatIndex = Math.floor(Math.random() * catTotal);
-        film.attributes.styles.categorie = tempCategories[randomCatIndex];
+        film.attributes.styles.focus = focus[randomFocusIndex];
         
         ////// Photogrammes Temporaire
         const photoTotal = tempPhotograms.length;
@@ -237,10 +233,12 @@ export function FilmsGrille({random, lazyload}) {
     } else {
       //console.log('categorie clicked', id)
       const visibleCards = allFilms.current.filter( film => {
-        return film.attributes.styles.categorie.id === id
+        if (film.attributes.styles.categorie) {
+          return film.attributes.styles.categorie.id === id
+        }
       })
       setFilmsItems(visibleCards)
-      setSelectedCategory(tempCategories[id - 1].nom)
+      setSelectedCategory(taxonomyData[id].nom)
     }
     
     newLoadStart.current = 0

@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useRef } from 'react'
-import styled from 'styled-components';
+import styled from 'styled-components'
+import { useLoadTaxonomies } from '../lib/fecthDrupalData'
 
 const Styled = styled.section`
   display: flex;
@@ -15,11 +16,16 @@ const Styled = styled.section`
   }
 `;
 
-// temporaire dev
-const categories = [{nom:'Biologie', id:1}, {nom: 'Chimie', id:2}, {nom:'Santé mentale',id:3}, {nom:'Botanique',id:4}, {nom:'Médecine',id:5}]
-
 export function CategoryFilter({ onCategoryChange }) {
+  const [categories, setCategories] = useState()
   const wrapElem = useRef()
+  
+  const { data: taxonomyData, loading, error } = useLoadTaxonomies()
+  //console.log('taxonomyData', taxonomyData.site_categorie)
+  
+  if (taxonomyData && !categories) {
+    setCategories(taxonomyData.site_categorie)
+  }
   
   // Click Event handlers
   function onBtnClick(e) {
@@ -45,7 +51,7 @@ export function CategoryFilter({ onCategoryChange }) {
           onCategoryChange('all')
         }}
       >Tous</button>
-      {categories.map( category => (
+      {categories ? categories.map( category => (
         <button 
           className='button' 
           key={category.id}
@@ -54,9 +60,9 @@ export function CategoryFilter({ onCategoryChange }) {
             onCategoryChange(category.id)
           }}
         >
-          {category.nom}
+          {category.name}
         </button>
-      ))}
+      )) : ''}
     </Styled>
   );
 };
