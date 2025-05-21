@@ -3,8 +3,6 @@ import React, { useRef } from 'react'
 import styled from 'styled-components';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { useLoadTaxonomies } from '../lib/fecthDrupalData'
-import { findVocabularyTermNames } from '../lib/utils.ts'
 
 const Styled = styled.div`
   --padding: 1.25rem;
@@ -51,15 +49,6 @@ export function FilmCard({filmdata, shouldwait}) {
   const filmAlias = filmdata.path ? `/film${filmdata.path.alias}` : '#'
   const photogrammeUrl = filmdata.styles.photogramme ? `/images/${filmdata.styles.photogramme}` : ''
   
-  //console.log('filmdata', filmdata)
-  
-  // Thematique
-  let thematique = null
-  const { data: taxonomyData, loading, error } = useLoadTaxonomies()
-  if (taxonomyData && filmdata && filmdata.field_site_thematique) {
-    thematique = findVocabularyTermNames([filmdata.field_site_thematique], taxonomyData.site_categorie)
-  }
-  
   // GSAP
   const gsapCardInstance = useGSAP(() => {
     const imageElem = imageElemRef.current
@@ -93,7 +82,7 @@ export function FilmCard({filmdata, shouldwait}) {
   
   return (
     <Styled
-      className={ thematique ? `card category-${thematique}` : ''}
+      className='card'
       style={{minHeight: filmdata.styles.elemHeight}}
       ref={gsapCardContainer}
     >
@@ -106,7 +95,7 @@ export function FilmCard({filmdata, shouldwait}) {
           <h2>{filmdata.title}</h2>
           <div>
             <p>{filmdata.field_annees_de_sortie}<br/>
-            {thematique ? thematique : ''}</p>
+            {filmdata.filmThematiques.noms}</p>
           </div>
         </a>
         <div 

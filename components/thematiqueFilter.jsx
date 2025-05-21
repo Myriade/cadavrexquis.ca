@@ -16,16 +16,17 @@ const Styled = styled.section`
   }
 `;
 
-export function CategoryFilter({ onCategoryChange }) {
-  const [categories, setCategories] = useState()
+export function ThematiqueFilter({ onThematiqueChange }) {
+  const [thematiques, setThematiques] = useState()
   const wrapElem = useRef()
   
   const { data: taxonomyData, loading, error } = useLoadTaxonomies()
-  //console.log('taxonomyData', taxonomyData.site_categorie)
   
-  if (taxonomyData && !categories) {
-    setCategories(taxonomyData.site_categorie)
+  if (taxonomyData && !thematiques) {
+    setThematiques(taxonomyData.site_categorie)
   }
+  
+  // console.log('thematiques', thematiques)
   
   // Click Event handlers
   function onBtnClick(e) {
@@ -48,19 +49,19 @@ export function CategoryFilter({ onCategoryChange }) {
         className='button'
         onClick={ (e) => {
           onBtnClick(e)
-          onCategoryChange('all')
+          onThematiqueChange('all')
         }}
       >Tous</button>
-      {categories ? categories.map( category => (
+      {thematiques ? thematiques.map( thematique => (
         <button 
           className='button' 
-          key={category.id}
+          key={thematique.id}
           onClick={ (e) => {
             onBtnClick(e)
-            onCategoryChange(category.id)
+            onThematiqueChange(thematique.id)
           }}
         >
-          {category.name}
+          {thematique.name}
         </button>
       )) : ''}
     </Styled>
