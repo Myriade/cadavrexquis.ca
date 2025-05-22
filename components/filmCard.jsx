@@ -82,7 +82,7 @@ export function FilmCard({filmdata, shouldwait}) {
   
   return (
     <Styled
-      className={`card category-${filmdata.styles.categorie.id}`}
+      className='card'
       style={{minHeight: filmdata.styles.elemHeight}}
       ref={gsapCardContainer}
     >
@@ -95,7 +95,7 @@ export function FilmCard({filmdata, shouldwait}) {
           <h2>{filmdata.title}</h2>
           <div>
             <p>{filmdata.field_annees_de_sortie}<br/>
-            {filmdata.styles.categorie.nom}</p>
+            {filmdata.filmThematiques.noms}</p>
           </div>
         </a>
         <div 
@@ -110,6 +110,3 @@ export function FilmCard({filmdata, shouldwait}) {
     </Styled>
   );
 };
-
-// Voir l'index pour débogage
-// <i>{filmdata.filmIndex >= 0 ? `[${filmdata.filmIndex + 1}] ` : ''}</i> 

@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useRef } from 'react'
-import styled from 'styled-components';
+import styled from 'styled-components'
+import { useLoadTaxonomies } from '../lib/fecthDrupalData'
 
 const Styled = styled.section`
   display: flex;
@@ -15,11 +16,17 @@ const Styled = styled.section`
   }
 `;
 
-// temporaire dev
-const categories = [{nom:'Biologie', id:1}, {nom: 'Chimie', id:2}, {nom:'Santé mentale',id:3}, {nom:'Botanique',id:4}, {nom:'Médecine',id:5}]
-
-export function CategoryFilter({ onCategoryChange }) {
+export function ThematiqueFilter({ onThematiqueChange }) {
+  const [thematiques, setThematiques] = useState()
   const wrapElem = useRef()
+  
+  const { data: taxonomyData, loading, error } = useLoadTaxonomies()
+  
+  if (taxonomyData && !thematiques) {
+    setThematiques(taxonomyData.site_categorie)
+  }
+  
+  // console.log('thematiques', thematiques)
   
   // Click Event handlers
   function onBtnClick(e) {
@@ -42,21 +49,21 @@ export function CategoryFilter({ onCategoryChange }) {
         className='button'
         onClick={ (e) => {
           onBtnClick(e)
-          onCategoryChange('all')
+          onThematiqueChange('all')
         }}
       >Tous</button>
-      {categories.map( category => (
+      {thematiques ? thematiques.map( thematique => (
         <button 
           className='button' 
-          key={category.id}
+          key={thematique.id}
           onClick={ (e) => {
             onBtnClick(e)
-            onCategoryChange(category.id)
+            onThematiqueChange(thematique.id)
           }}
         >
-          {category.nom}
+          {thematique.name}
         </button>
-      ))}
+      )) : ''}
     </Styled>
   );
 };
