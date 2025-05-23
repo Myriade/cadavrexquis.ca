@@ -191,7 +191,6 @@ export function FilmsGrille({random, lazyload}) {
   
   // GSAP
   const gsapInstance = useGSAP( async () => {
-    
     function setCardsToLoad() {
       const all = gsapContainer.current.querySelectorAll('.card__inner');
       let result = null
@@ -227,12 +226,10 @@ export function FilmsGrille({random, lazyload}) {
         }
       });
     }
-    
   }, { dependencies: [filmsItems], scope: gsapContainer });
   
   // event handlers
   function loadMoreClick() {
-    
     const newVisibleBatch = allFilms.current.slice(0, newLoadEnd.current);
     setFilmsItems(newVisibleBatch)
     
@@ -271,9 +268,11 @@ export function FilmsGrille({random, lazyload}) {
     newLoadEnd.current = filmsItems.length
   }
   
-  // <ThematiqueFilter onThematiqueChange={thematiqueChangeHandler} />
-  
   return (<>
+    <ThematiqueFilter 
+      allThematiques={thematiqueVocab} 
+      onThematiqueChange={thematiqueChangeHandler} 
+    />
     <Styled
       className='mt-8' 
       ref={gsapContainer}
