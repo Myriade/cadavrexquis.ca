@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components';
 import Script from 'next/script'
 import { drupal } from "/lib/drupal.ts"
-import { useLoadTaxonomies } from '../lib/fecthDrupalData'
+import { useFetchFilmsPaths, useLoadTaxonomies } from '../lib/fecthDrupalData'
 import { findVocabularyTermNames, getVimeoId } from '../lib/utils.ts'
 
 
@@ -112,48 +112,32 @@ const defautlFilm = {
 
 export function FilmPage( {path} ) {
   const [ film, setFilm ] = useState(defautlFilm)
-  const { data: taxonomyData, loading, error } = useLoadTaxonomies()
+  const { data : allFilmsPaths, isLoading, error } = useFetchFilmsPaths(defautlFilm)
+  const { data: taxonomyData, loading, error: taxoError } = useLoadTaxonomies()
   
   let { vimeoSource, type, thematique, realisation, langues } = ''
   
-  // Handle loading state
-  if (loading) {
-    console.log('useLoadTaxonomies() loading...')
-  }
-  
-  // Handle error state
-  // if (error) {
-  //   return <div>Error: {error.message}</div>;
-  // }
-  
-  // Fetch film node id Drupal DB 
-  async function fetchFilm() {
-    console.log('Fetching film node data...')
-    // fetch tous les nodes films avec seulement leur path alias
-    const fetchedData = await drupal.getResourceCollection("node--film", {
-      params: {
-        "fields[node--film]": "drupal_internal__nid,path"
-      },
-      deserialize: false,
-    })
-    
-    // trouver le nid du node qui a le path.alias === au prop path
-    const node = await fetchedData.data.filter((node) => node.attributes.path.alias === `/${path}`);
-    
-    // get le node complet avec le nid  
-    const filmFetchedData = await drupal.getResource(
-      "node--film",
-      node[0].id
-    )
-    
-    if (filmFetchedData.type) {
-      setFilm(filmFetchedData);
+  // Fetch film node id Drupal DB
+  useEffect(() => {
+    if (allFilmsPaths && !film.type) {
+      console.log('Fetching film node data')
+      async function fetchFilm() {
+        // trouver le nid du node qui a le path.alias === path prop
+        const node = await allFilmsPaths.data.filter( node => node.attributes.path.alias === `/${path}`);
+        
+        // get le node complet avec le nid  
+        const filmData = await drupal.getResource(
+          "node--film",
+          node[0].id
+        )
+        
+        if (filmData.type) {
+          setFilm(filmData);
+        }
+      }
+      fetchFilm();
     }
-  }
-  
-  if (!film.type) {
-    fetchFilm();
-  } 
+  }, [allFilmsPaths, film])
   
   // Process taxonomies and other data for presentation
   if (film.type && taxonomyData) {

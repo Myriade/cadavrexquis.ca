@@ -3,7 +3,7 @@ import React, { useState, useRef } from 'react'
 import { Fragment } from 'react';
 import styled from 'styled-components';
 import { drupal } from "/lib/drupal.ts"
-import { useFetchAllFilmsData } from '../lib/fecthDrupalData'
+import { useFetchAllFilms } from '../lib/fecthDrupalData'
 import { FilmCard } from '../components/filmCard';
 import { ThematiqueFilter } from '../components/thematiqueFilter';
 import { findTermName } from '../lib/utils.ts'
@@ -70,7 +70,7 @@ export function FilmsGrille({random, lazyload}) {
   const loadModeBtnRef = useRef()
   const gsapContainer = useRef()
   
-  const { data : allFilmsData, isLoading, error } = useFetchAllFilmsData(defautlFilm)
+  const { data : allFilmsData, isLoading, error } = useFetchAllFilms(defautlFilm)
   gsap.registerPlugin(useGSAP); // register the hook to avoid React version discrepancies
   
   // Thématiques vocabulary (l'ensemble de tous les termes présents dans l'ensemble de tous les films)
