@@ -8,8 +8,6 @@ Comme certains appels à taxonomie.
 
 - Vérifier si l'appel au fichier drupal.ts est redondant dans les différents fichiers de hook et de composant
 
-- renommer useLoadData pour plus éloquent (useFetchAllFilms)
-
 - FilmGrille : renommer les states et autres pour plus de clareté. Comme :
   - SelectedThematique = SelectedThematiqueNom
 	- prefix underscore pour les fictions et variables internes 

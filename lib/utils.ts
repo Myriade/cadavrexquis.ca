@@ -1,15 +1,24 @@
-export function formatDate(input: string): string {
-  const date = new Date(input)
-  return date.toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  })
+export function findTermName(fieldTermsArray, vocabArray) {
+  const matchingItems = [];
+  
+  fieldTermsArray.forEach( fieldTerm => {
+    const idMatch = vocabArray.find( vocabTerm => {
+        // console.log('vocabTerm.attributes.termid', vocabTerm.attributes.termid)
+        // console.log('fieldTerm.meta.drupal_internal__target_id', fieldTerm.meta.drupal_internal__target_id)
+        return vocabTerm.attributes.termid === fieldTerm.meta.drupal_internal__target_id
+      }
+    );
+    
+    // If a match is found, add its name to the array
+    if (idMatch && idMatch.name) {
+      matchingItems.push(idMatch.name)
+    }
+  });
+  
+  // Join all names with commas and return
+  return matchingItems.join(', ');
 }
 
-export function absoluteUrl(input: string) {
-  return `${process.env.NEXT_PUBLIC_DRUPAL_BASE_URL}${input}`
-}
 
 export function findVocabularyTermNames(fieldTermsArray, vocabArray) {
     const matchingItems = [];
@@ -56,3 +65,16 @@ export function getVimeoId(url) {
   
   return match[1];
 }  
+
+// export function formatDate(input: string): string {
+//   const date = new Date(input)
+//   return date.toLocaleDateString("en-US", {
+//     month: "long",
+//     day: "numeric",
+//     year: "numeric",
+//   })
+// }
+// 
+// export function absoluteUrl(input: string) {
+//   return `${process.env.NEXT_PUBLIC_DRUPAL_BASE_URL}${input}`
+// }

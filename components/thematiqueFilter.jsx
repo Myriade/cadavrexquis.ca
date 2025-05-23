@@ -5,8 +5,9 @@ import { useLoadTaxonomies } from '../lib/fecthDrupalData'
 
 const Styled = styled.section`
   display: flex;
-  gap: 2rem;
+  gap: 1rem;
   flex-wrap: wrap;
+  justify-content: space-between;
   
   button {
     &.selected {
