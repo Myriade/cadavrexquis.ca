@@ -138,7 +138,7 @@ export function FilmPage( {path} ) {
       }
       fetchFilm();
     }
-  }, [allFilmsPaths, film])
+  }, [allFilmsPaths, film, path])
   
   // Process fields for presentation
   const _fields =  { vimeoSource: null, filmType: null, thematique:null, realisation:null, langues:null }
@@ -191,7 +191,7 @@ export function FilmPage( {path} ) {
         <h1 className='mb-6'>{film.title}</h1>
         
         <p className='infos text-xl font-sans mb-6'>
-          {film.field_annees_de_sortie ? film.field_annees_de_sortie : 's.o.'}
+          {film.field_annees_de_sortie ? film.field_annees_de_sortie : 's.o. (annee de sortie)'}
           {_fields.thematique ? (
             <> / <i>{_fields.thematique}</i></>
           ) : ''}
@@ -201,7 +201,7 @@ export function FilmPage( {path} ) {
           dangerouslySetInnerHTML={ film.field_descriptions_cadavrexquis.length ? { 
             __html: film.field_descriptions_cadavrexquis[0].processed 
           } : { 
-            __html: '! Le champ « Descriptions et résumés de l’équipe de Cadavre exquis » est vide'
+            __html: 's.o (Descriptions et résumés de l’équipe de Cadavre exquis)'
           }}
           className='texte text-lg font-serif mb-6'
         ></div>
