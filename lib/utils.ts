@@ -19,22 +19,21 @@ export function findTermName(fieldTermsArray, vocabArray) {
 
 export function getVimeoId(url) {
   // Check if input is valid
-  if (!url || typeof url !== 'string') {
-    throw new Error('Invalid input: URL must be a non-empty string');
+  const validUrl = url.startsWith('https://')
+  if (!url || typeof url !== 'string' || !validUrl) {
+    console.error("getVimeoId Erreur : format d'url invalide. - ");
+    return null
   }
   
   const regex = /(?:vimeo\.com\/)([^\/\?\s]+)(?:\/([^\/\?\s]+))?/;
-
-  // Match numbers after .com/
   const match = url.match(regex)
-  console.log('match', match)
   
   if (!match) {
-    throw new Error('Invalid Vimeo URL format');
+    console.error("getVimeoId Erreur : le lien n'est pas un lien valide de Viméo. - ");
+    return null
   }
   
   const string = match.slice(1).join('?h=')
-  console.log('string', string)
   
   return string;
 }

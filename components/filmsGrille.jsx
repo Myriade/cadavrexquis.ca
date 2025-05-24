@@ -58,7 +58,7 @@ export function FilmsGrille({random, lazyload}) {
   const [filmsItems, setFilmsItems] = useState([defautlFilm])
   const [selectedThematique, setSelectedThematique] = useState('default')
   const [thematiqueVocab, setThematiqueVocab] = useState()
-  const [images, setImages] = useState()
+  const [allImages, setAllImages] = useState()
   
   const displayableFilms = useRef([])
   const newLoadStart = useRef(0)
@@ -79,11 +79,11 @@ export function FilmsGrille({random, lazyload}) {
   }
   
   // Les images (l'ensemble de toutes les images présentes dans l'ensemble de tous les films)
-  if (!isLoading && !images) {
+  if (!isLoading && !allImages) {
     const result = allFilmsData.included.filter( item => {
       return item.type === "file--file"
     });
-    setImages(result)
+    setAllImages(result)
   }
   
   // Set loadBatchQty value to int or false from Lazyload prop
@@ -147,24 +147,21 @@ export function FilmsGrille({random, lazyload}) {
       }
       
       // Image  
-      let image = null 
+      let imagePath = null 
       function findImagePath(imgId, imagesArray) {
         const matchImage = imagesArray.find( img => {
-          console.log(img)
-          return img.attributes.drupal_internal__target_id === imgId
+          return img.attributes.drupal_internal__fid === imgId
         });
-        //console.log('matchImage', matchImage)
-        return matchImage
+        return matchImage.attributes.uri.url
       }
-      if (film.relationships.field_site_photogramme.data) {
-        const id = film.relationships.field_site_photogramme.data.meta.drupal_internal__target_id
-        //console.log('id', id)
-        image = findImagePath(id, images)
-      }
-      //console.log('image', image)
       
-      if (image)
-        film.attributes.styles.photogramme = image;
+      if (film.relationships.field_site_photogramme.data && !imagePath) {
+        const id = film.relationships.field_site_photogramme.data.meta.drupal_internal__target_id
+        imagePath = findImagePath(id, allImages)
+      }
+      
+      if (imagePath)
+        film.attributes.filmImageUrl = imagePath;
       
     })
     
