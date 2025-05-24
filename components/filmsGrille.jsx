@@ -54,14 +54,11 @@ const breakpointColumnsObj = {
 const couleurs = ['#fd8abd', '#35cdff', '#f5d437', '#19f76b', '#ff8049', '#a081ff']
 const focus = ['left top', 'top', 'right top', 'left center', 'center', 'right center', 'left bottom', 'bottom', 'right bottom']
 
-/////  TEMPORAIRE  //////
-const tempPhotograms = ['photogramme-temp-1.jpg', 'photogramme-temp-2.jpg', 'photogramme-temp-3.jpg', 'photogramme-temp-4.jpg', 'photogramme-temp-5.jpg', 'photogramme-temp-6.jpg']
-//////               /////
-
 export function FilmsGrille({random, lazyload}) {
   const [filmsItems, setFilmsItems] = useState([defautlFilm])
   const [selectedThematique, setSelectedThematique] = useState('default')
   const [thematiqueVocab, setThematiqueVocab] = useState()
+  const [images, setImages] = useState()
   
   const displayableFilms = useRef([])
   const newLoadStart = useRef(0)
@@ -79,6 +76,14 @@ export function FilmsGrille({random, lazyload}) {
       return item.type === "taxonomy_term--site_categorie"
     });
     setThematiqueVocab(result)
+  }
+  
+  // Les images (l'ensemble de toutes les images présentes dans l'ensemble de tous les films)
+  if (!isLoading && !images) {
+    const result = allFilmsData.included.filter( item => {
+      return item.type === "file--file"
+    });
+    setImages(result)
   }
   
   // Set loadBatchQty value to int or false from Lazyload prop
@@ -118,7 +123,7 @@ export function FilmsGrille({random, lazyload}) {
       resultArray = filmsArray
     }
     
-    // Set filmIndex and filmThematiques attributes
+    // Set filmIndex filmThematiques & filmImage attributes
     resultArray.forEach( (film, index) => {
       // Index (pour garder le même ordre jusqu'au prochain vrai page load)
       film.attributes.filmIndex = index
@@ -140,6 +145,27 @@ export function FilmsGrille({random, lazyload}) {
         // Si aucune thematique, envoyer les donnees par defaut
         film.attributes.filmThematiques = defautlFilm.attributes.filmThematiques
       }
+      
+      // Image  
+      let image = null 
+      function findImagePath(imgId, imagesArray) {
+        const matchImage = imagesArray.find( img => {
+          console.log(img)
+          return img.attributes.drupal_internal__target_id === imgId
+        });
+        //console.log('matchImage', matchImage)
+        return matchImage
+      }
+      if (film.relationships.field_site_photogramme.data) {
+        const id = film.relationships.field_site_photogramme.data.meta.drupal_internal__target_id
+        //console.log('id', id)
+        image = findImagePath(id, images)
+      }
+      //console.log('image', image)
+      
+      if (image)
+        film.attributes.styles.photogramme = image;
+      
     })
     
     // Create random values for filmCard styles
@@ -160,13 +186,6 @@ export function FilmsGrille({random, lazyload}) {
         const totalFocus = focus.length;
         const randomFocusIndex = Math.floor(Math.random() * totalFocus);
         film.attributes.styles.focus = focus[randomFocusIndex];
-        
-        ////// Photogrammes Temporaire
-        const photoTotal = tempPhotograms.length;
-        const randomPhotoIndex = Math.floor(Math.random() * photoTotal);
-        film.attributes.styles.photogramme = tempPhotograms[randomPhotoIndex];
-        ///////                       ///////
-        
       })
     }
     randomStyles()
