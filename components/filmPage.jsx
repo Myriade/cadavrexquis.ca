@@ -159,7 +159,7 @@ export function FilmPage( {path} ) {
     // Vimeo
     if (film.field_url_interne.length && film.field_url_interne[0] !== null) {  
       const vimeoId = getVimeoId(film.field_url_interne[0].uri)
-      _fields.vimeoSource = `https://player.vimeo.com/video/${vimeoId}?badge=0&amp;byline=false&amp;title=false&amp;autopause=0&amp;player_id=0&amp;app_id=58479`
+      _fields.vimeoSource = `https://player.vimeo.com/video/${vimeoId}&amp;badge=0&amp;byline=false&amp;title=false&amp;autopause=0&amp;player_id=0&amp;app_id=58479`
     }
     
     // Collection filmType

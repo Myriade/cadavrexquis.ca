@@ -22,13 +22,19 @@ export function getVimeoId(url) {
   if (!url || typeof url !== 'string') {
     throw new Error('Invalid input: URL must be a non-empty string');
   }
+  
+  const regex = /(?:vimeo\.com\/)([^\/\?\s]+)(?:\/([^\/\?\s]+))?/;
 
   // Match numbers after .com/
-  const match = url.match(/\.com\/(\d+)/);
+  const match = url.match(regex)
+  console.log('match', match)
   
   if (!match) {
     throw new Error('Invalid Vimeo URL format');
   }
   
-  return match[1];
+  const string = match.slice(1).join('?h=')
+  console.log('string', string)
+  
+  return string;
 }
