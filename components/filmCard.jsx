@@ -47,7 +47,7 @@ export function FilmCard({filmdata, shouldwait}) {
   const imageElemRef = useRef()
   
   const filmAlias = filmdata.path ? `/film${filmdata.path.alias}` : '#'
-  const photogrammeUrl = filmdata.styles.photogramme ? `/images/${filmdata.styles.photogramme}` : ''
+  const photogrammeUrl = filmdata.filmImageUrl ? `https://database.cadavrexquis.ca/${filmdata.filmImageUrl}` : ''
   
   // GSAP
   const gsapCardInstance = useGSAP(() => {

@@ -3,8 +3,8 @@ import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components';
 import Script from 'next/script'
 import { drupal } from "/lib/drupal.ts"
-import { useLoadTaxonomies } from '../lib/fecthDrupalData'
-import { findVocabularyTermNames, getVimeoId } from '../lib/utils.ts'
+import { useFetchFilmsPaths } from '../lib/fecthDrupalData'
+import { getVimeoId } from '../lib/utils.ts'
 
 
 const Styled = styled.section`
@@ -25,7 +25,7 @@ const Styled = styled.section`
     min-height: 500px;
     width: 100%;}
 
-  .type, .infos {
+  .film-type, .infos {
     color: var(--color-rouge);}
     
   dt, dd {
@@ -44,16 +44,15 @@ const Styled = styled.section`
 const Curated = styled.section``
 
 const defautlFilm = {
+  "id": null,
   "field_url_interne": [{uri: null}],
   "field_site_collection": null,
   "title": '\u00A0',
-  "field_annees_de_sortie": '... chargement',
+  "field_annees_de_sortie": '\u00A0',
   "field_site_thematique": [],
-  "field_descriptions_cadavrexquis": [{processed: ''}],
+  "field_descriptions_cadavrexquis": [{processed: '\u00A0'}],
   "field_realisation": [],
   "field_langue": [],
-  "type": null,
-  "id": null,
   "drupal_internal__nid": null,
   "path": {},
   "created": null,
@@ -109,96 +108,113 @@ const defautlFilm = {
   "field_type_d_image": null,
   "field_vedettes_matiere": []
 }
-
+  
 export function FilmPage( {path} ) {
   const [ film, setFilm ] = useState(defautlFilm)
-  const { data: taxonomyData, loading, error } = useLoadTaxonomies()
+  const { data : allFilmsPaths, isLoading, error } = useFetchFilmsPaths(defautlFilm)
   
-  let { vimeoSource, type, thematique, realisation, langues } = ''
-  
-  // Handle loading state
-  if (loading) {
-    console.log('useLoadTaxonomies() loading...')
-  }
-  
-  // Handle error state
-  // if (error) {
-  //   return <div>Error: {error.message}</div>;
-  // }
-  
-  // Fetch film node id Drupal DB 
-  async function fetchFilm() {
-    console.log('Fetching film node data...')
-    // fetch tous les nodes films avec seulement leur path alias
-    const fetchedData = await drupal.getResourceCollection("node--film", {
-      params: {
-        "fields[node--film]": "drupal_internal__nid,path"
-      },
-      deserialize: false,
-    })
-    
-    // trouver le nid du node qui a le path.alias === au prop path
-    const node = await fetchedData.data.filter((node) => node.attributes.path.alias === `/${path}`);
-    
-    // get le node complet avec le nid  
-    const filmFetchedData = await drupal.getResource(
-      "node--film",
-      node[0].id
-    )
-    
-    if (filmFetchedData.type) {
-      setFilm(filmFetchedData);
+  // Fetch film node id in Drupal DB
+  useEffect(() => {
+    if (allFilmsPaths && !film.id) {
+      console.log('Fetching film node data')
+      async function fetchFilm() {
+        // trouver le nid du node qui a le path.alias === path prop
+        const node = await allFilmsPaths.data.filter( node => node.attributes.path.alias === `/${path}`);
+        
+        // get le node complet avec le nid  
+        const filmData = await drupal.getResource(
+          "node--film",
+          node[0].id,
+          {
+            params: {
+              include: "field_site_thematique,field_realisation,field_langue"
+            }
+          }
+        )
+        
+        if (filmData.id) {
+          setFilm(filmData);
+        }
+      }
+      fetchFilm();
     }
-  }
+  }, [allFilmsPaths, film, path])
   
-  if (!film.type) {
-    fetchFilm();
-  } 
-  
-  // Process taxonomies and other data for presentation
-  if (film.type && taxonomyData) {
-    // console.log('film.field x output', field_url_interne)
+  // Process fields for presentation
+  const _fields =  { vimeoSource: null, filmType: null, thematique:null, realisation:null, langues:null }
+  if (film.id) {
+    // console.log(film)
     
-    realisation = findVocabularyTermNames(film.field_realisation, taxonomyData.realisation)
-    langues = findVocabularyTermNames(film.field_langue, taxonomyData.langue)
-    thematique = findVocabularyTermNames(film.field_site_thematique, taxonomyData.site_categorie)
+    function joinTerms(fieldSource, fieldOutput) {
+      if (fieldSource) {
+        const array = fieldSource.map( item => item.name )
+        _fields[fieldOutput] = array.join(', ')
+      }
+    }
     
+    joinTerms(film.field_site_thematique, 'thematique')
+    joinTerms(film.field_realisation, 'realisation')
+    joinTerms(film.field_langues, 'langues')
+    
+    // Vimeo
     if (film.field_url_interne.length && film.field_url_interne[0] !== null) {  
       const vimeoId = getVimeoId(film.field_url_interne[0].uri)
-      vimeoSource = `https://player.vimeo.com/video/${vimeoId}?badge=0&amp;byline=false&amp;title=false&amp;autopause=0&amp;player_id=0&amp;app_id=58479`
+      _fields.vimeoSource = `https://player.vimeo.com/video/${vimeoId}&amp;badge=0&amp;byline=false&amp;title=false&amp;autopause=0&amp;player_id=0&amp;app_id=58479`
     }
     
-    if (film.field_site_collection) {
-      if (film.field_site_collection === 'collection') {
-        type = 'Collection'
-      } else if (film.field_site_collection === 'cadavre_exquis') {
-        type= 'Cadavre exquis'
-      }
+    // Collection filmType
+    if (film.field_site_collection === 'collection') {
+      _fields.filmType = 'Collection'
+    } else if (film.field_site_collection === 'cadavre_exquis') {
+      _fields.filmType = 'Cadavre exquis'
+    } else {
+      _fields.filmType = 's.o.'
     }
   }
   
   return (
     <>
       <Styled>
-        { vimeoSource ? (
+        { _fields.vimeoSource ? (
           <div className='vimeo mb-6'>
-            <iframe src={vimeoSource} frameBorder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" title=""></iframe>
+            <iframe src={_fields.vimeoSource} frameBorder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" title=""></iframe>
             <Script src="https://third-party-script.js"></Script>
           </div>
-        ): ( <div className='vimeo mb-6 loading'><span className='text-6xl'>...</span></div>)}
-        <p className='type text-xl mb-6'>{type ? type : ''}</p>
-        <h1 className='mb-6'>{film.title}</h1>
-        <p className='infos text-xl font-sans mb-6'>
-          {film.field_annees_de_sortie}
-          {thematique ? (<> / <i>{thematique}</i></>) : ''}
+        ) : ( 
+          <div className='vimeo mb-6 loading'><span className='text-6xl'>...</span></div>
+        )}
+        
+        <p className='film-type text-xl mb-6'>
+          {_fields.filmType ? _fields.filmType : '... chargement'}
         </p>
+        
+        <h1 className='mb-6'>{film.title}</h1>
+        
+        <p className='infos text-xl font-sans mb-6'>
+          {film.field_annees_de_sortie ? film.field_annees_de_sortie : 's.o. (annee de sortie)'}
+          {_fields.thematique ? (
+            <> / <i>{_fields.thematique}</i></>
+          ) : ''}
+        </p>
+        
         <div 
-          dangerouslySetInnerHTML={ film.field_descriptions_cadavrexquis.length ? { __html: film.field_descriptions_cadavrexquis[0].processed } : {__html: '! Le champ « Descriptions et résumés de l’équipe de Cadavre exquis » est vide'}}
+          dangerouslySetInnerHTML={ film.field_descriptions_cadavrexquis.length ? { 
+            __html: film.field_descriptions_cadavrexquis[0].processed 
+          } : { 
+            __html: 's.o (Descriptions et résumés de l’équipe de Cadavre exquis)'
+          }}
           className='texte text-lg font-serif mb-6'
         ></div>
+        
         <dl className='mb-6'>
-          <div><dt>Réalisation :</dt> <dd>{ realisation ? realisation : '...' }</dd></div>
-          <div><dt>Langues :</dt> <dd>{ langues ? langues : '...' }</dd></div>
+          <div>
+            <dt>Réalisation : </dt>
+            <dd>{ _fields.realisation ? _fields.realisation : 's.o.' }</dd>
+          </div>
+          <div>
+            <dt>Langues : </dt>
+            <dd>{ _fields.langues ? _fields.langues : 's.o.' }</dd>
+          </div>
         </dl>
       </Styled>
       

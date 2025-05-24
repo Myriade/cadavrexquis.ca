@@ -3,10 +3,10 @@ import React, { useState, useRef } from 'react'
 import { Fragment } from 'react';
 import styled from 'styled-components';
 import { drupal } from "/lib/drupal.ts"
-import { useLoadData, useLoadTaxonomies } from '../lib/fecthDrupalData'
+import { useFetchAllFilms } from '../lib/fecthDrupalData'
 import { FilmCard } from '../components/filmCard';
 import { ThematiqueFilter } from '../components/thematiqueFilter';
-import { findVocabularyTermNames } from '../lib/utils.ts'
+import { findTermName } from '../lib/utils.ts'
 
 import Masonry from 'react-masonry-css'
 import gsap from 'gsap';
@@ -54,31 +54,36 @@ const breakpointColumnsObj = {
 const couleurs = ['#fd8abd', '#35cdff', '#f5d437', '#19f76b', '#ff8049', '#a081ff']
 const focus = ['left top', 'top', 'right top', 'left center', 'center', 'right center', 'left bottom', 'bottom', 'right bottom']
 
-/////  TEMPORAIRE  //////
-const tempPhotograms = ['photogramme-temp-1.jpg', 'photogramme-temp-2.jpg', 'photogramme-temp-3.jpg', 'photogramme-temp-4.jpg', 'photogramme-temp-5.jpg', 'photogramme-temp-6.jpg']
-//////               /////
-
 export function FilmsGrille({random, lazyload}) {
-  const [fetchedData, setFetchedData] = useState(null)
   const [filmsItems, setFilmsItems] = useState([defautlFilm])
   const [selectedThematique, setSelectedThematique] = useState('default')
+  const [thematiqueVocab, setThematiqueVocab] = useState()
+  const [allImages, setAllImages] = useState()
   
-  const allFilms = useRef([])
+  const displayableFilms = useRef([])
   const newLoadStart = useRef(0)
   const newLoadEnd = useRef()
-  const isDataReady = useRef(false)
+  const isDisplayReady = useRef(false)
   const loadModeBtnRef = useRef()
   const gsapContainer = useRef()
-  const thematiqueVocab = useRef()
   
-  const isLoadingData = useLoadData(setFetchedData, defautlFilm, 'allFilmsCache')
+  const { data : allFilmsData, isLoading, error } = useFetchAllFilms(defautlFilm)
+  gsap.registerPlugin(useGSAP);
   
-  gsap.registerPlugin(useGSAP); // register the hook to avoid React version discrepancies
+  // Thématiques vocabulary (l'ensemble de tous les termes présents dans l'ensemble de tous les films)
+  if (!isLoading && !thematiqueVocab) {
+    const result = allFilmsData.included.filter( item => {
+      return item.type === "taxonomy_term--site_categorie"
+    });
+    setThematiqueVocab(result)
+  }
   
-  // Thématiques fetch vocabulary data
-  const { data: taxonomyData, loading, error } = useLoadTaxonomies()
-  if (taxonomyData) {
-    thematiqueVocab.current = taxonomyData.site_categorie
+  // Les images (l'ensemble de toutes les images présentes dans l'ensemble de tous les films)
+  if (!isLoading && !allImages) {
+    const result = allFilmsData.included.filter( item => {
+      return item.type === "file--file"
+    });
+    setAllImages(result)
   }
   
   // Set loadBatchQty value to int or false from Lazyload prop
@@ -93,17 +98,16 @@ export function FilmsGrille({random, lazyload}) {
       if (isNaN(batchQty) || batchQty < 2) batchQty = 10; // par défaut
       
       // set start and end index for the first lazyload click
-      if (!isDataReady.current) {
+      if (!isDisplayReady.current) {
         newLoadEnd.current = batchQty * 2;
       } 
       
       return batchQty
     }
   }
-  
   const loadBatchQty = setLoadBatchQty(lazyload);
- 
- // Process Data array with prop options and set visible items
+  
+  // Process Data array with prop options and set visible items
   function processData(filmsArray) {
     let resultArray = null;
     
@@ -114,12 +118,12 @@ export function FilmsGrille({random, lazyload}) {
     }
     
     if (random) { 
-      resultArray = randomizeData(fetchedData) 
+      resultArray = randomizeData(allFilmsData.data) 
     } else {
       resultArray = filmsArray
     }
     
-    // Set filmIndex and filmThematiques attributes
+    // Set filmIndex filmThematiques & filmImage attributes
     resultArray.forEach( (film, index) => {
       // Index (pour garder le même ordre jusqu'au prochain vrai page load)
       film.attributes.filmIndex = index
@@ -127,20 +131,38 @@ export function FilmsGrille({random, lazyload}) {
       // Thématique
       const thematiquesValueArray = film.relationships.field_site_thematique.data;
       
-      if (thematiquesValueArray.length) {
+      if (thematiquesValueArray.length && thematiqueVocab.length) {
         film.attributes.filmThematiques = {}
         
         // Les noms des termes pour affichage sur les cartes (string)
-        const termNames = findVocabularyTermNames(thematiquesValueArray, taxonomyData.site_categorie)
+        const termNames = findTermName(thematiquesValueArray, thematiqueVocab)
         film.attributes.filmThematiques.noms = termNames
         
-        // les ID pour pouvoir filtrer les films par classe CSS (array)
+        // les ID pour pouvoir filtrer les films
         const termIds = thematiquesValueArray.map( term => term.meta.drupal_internal__target_id)
         film.attributes.filmThematiques.ids = termIds
       } else {
         // Si aucune thematique, envoyer les donnees par defaut
         film.attributes.filmThematiques = defautlFilm.attributes.filmThematiques
       }
+      
+      // Image  
+      let imagePath = null 
+      function findImagePath(imgId, imagesArray) {
+        const matchImage = imagesArray.find( img => {
+          return img.attributes.drupal_internal__fid === imgId
+        });
+        return matchImage.attributes.uri.url
+      }
+      
+      if (film.relationships.field_site_photogramme.data && !imagePath) {
+        const id = film.relationships.field_site_photogramme.data.meta.drupal_internal__target_id
+        imagePath = findImagePath(id, allImages)
+      }
+      
+      if (imagePath)
+        film.attributes.filmImageUrl = imagePath;
+      
     })
     
     // Create random values for filmCard styles
@@ -161,13 +183,6 @@ export function FilmsGrille({random, lazyload}) {
         const totalFocus = focus.length;
         const randomFocusIndex = Math.floor(Math.random() * totalFocus);
         film.attributes.styles.focus = focus[randomFocusIndex];
-        
-        ////// Photogrammes Temporaire
-        const photoTotal = tempPhotograms.length;
-        const randomPhotoIndex = Math.floor(Math.random() * photoTotal);
-        film.attributes.styles.photogramme = tempPhotograms[randomPhotoIndex];
-        ///////                       ///////
-        
       })
     }
     randomStyles()
@@ -182,18 +197,17 @@ export function FilmsGrille({random, lazyload}) {
     }
     
     // Finalize
-    allFilms.current = resultArray 
+    displayableFilms.current = resultArray 
     setFirstVisibleItems(resultArray)
-    isDataReady.current = true
+    isDisplayReady.current = true
   }
-  
-  if (fetchedData && !isDataReady.current && taxonomyData) {
-    processData(fetchedData)
+  if (!isLoading && thematiqueVocab && !isDisplayReady.current && !displayableFilms.current.length) {
+    //console.log(displayableFilms.current.length)
+    processData(allFilmsData.data)
   }
   
   // GSAP
   const gsapInstance = useGSAP( async () => {
-    
     function setCardsToLoad() {
       const all = gsapContainer.current.querySelectorAll('.card__inner');
       let result = null
@@ -211,10 +225,8 @@ export function FilmsGrille({random, lazyload}) {
               elem.classList.remove('loaded');
             }
           })
-           //console.log('startIndex', startIndex, 'endIndex', endIndex)
           result = gsapContainer.current.querySelectorAll('.card__inner.loaded');
         } else {
-          // console.log('selectedThematique', selectedThematique)
           result = all
         }
       }
@@ -231,18 +243,16 @@ export function FilmsGrille({random, lazyload}) {
         }
       });
     }
-    
   }, { dependencies: [filmsItems], scope: gsapContainer });
   
   // event handlers
   function loadMoreClick() {
-    
-    const newVisibleBatch = allFilms.current.slice(0, newLoadEnd.current);
+    const newVisibleBatch = displayableFilms.current.slice(0, newLoadEnd.current);
     setFilmsItems(newVisibleBatch)
     
-    if (filmsItems.length + loadBatchQty >= allFilms.current.length) {
+    if (filmsItems.length + loadBatchQty >= displayableFilms.current.length) {
       loadModeBtnRef.current.style.display = "none"
-      newLoadEnd.current = allFilms.current.length
+      newLoadEnd.current = displayableFilms.current.length
       newLoadStart.current += loadBatchQty
     } else {
       newLoadEnd.current += loadBatchQty
@@ -256,10 +266,10 @@ export function FilmsGrille({random, lazyload}) {
     }
     
     if (id === 'all') {
-      setFilmsItems(allFilms.current)
+      setFilmsItems(displayableFilms.current)
       setSelectedThematique('Toutes catégories')
     } else {
-      const filteredCards = allFilms.current.filter( film => {
+      const filteredCards = displayableFilms.current.filter( film => {
         if (film.attributes.filmThematiques) {
           return film.attributes.filmThematiques.ids.includes(id)
         }
@@ -267,7 +277,7 @@ export function FilmsGrille({random, lazyload}) {
       setFilmsItems(filteredCards)
       
       // Outputs thematique name at the bottom near the film count
-      const termName = findVocabularyTermNames([{meta: {drupal_internal__target_id: id}}], thematiqueVocab.current); // simuler l'objet comme s'il vient de la db
+      const termName = findTermName([{meta: {drupal_internal__target_id: id}}], thematiqueVocab); // simuler l'objet comme s'il vient de la db
       setSelectedThematique(termName)
     }
     
@@ -276,7 +286,10 @@ export function FilmsGrille({random, lazyload}) {
   }
   
   return (<>
-    <ThematiqueFilter onThematiqueChange={thematiqueChangeHandler} />
+    <ThematiqueFilter 
+      allThematiques={thematiqueVocab} 
+      onThematiqueChange={thematiqueChangeHandler} 
+    />
     <Styled
       className='mt-8' 
       ref={gsapContainer}
@@ -296,7 +309,7 @@ export function FilmsGrille({random, lazyload}) {
       
       <p className='text-center mb-0'>
         {selectedThematique !== 'default' ? `${selectedThematique} : ` : ''}
-        {fetchedData ? `${filmsItems.length} films sur ${fetchedData.length}` : '...'}
+        {isLoading ? '...' : `${filmsItems.length} films sur ${allFilmsData.data.length}`}
       </p>
       
       {lazyload ? (

@@ -1,58 +1,39 @@
-export function formatDate(input: string): string {
-  const date = new Date(input)
-  return date.toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  })
-}
-
-export function absoluteUrl(input: string) {
-  return `${process.env.NEXT_PUBLIC_DRUPAL_BASE_URL}${input}`
-}
-
-export function findVocabularyTermNames(fieldTermsArray, vocabArray) {
-    const matchingItems = [];
+export function findTermName(fieldTermsArray, vocabArray) {
+  const matchingItems = [];
+  
+  fieldTermsArray.forEach( fieldTerm => {
+    const idMatch = vocabArray.find( vocabTerm => {
+        return vocabTerm.attributes.termid === fieldTerm.meta.drupal_internal__target_id
+      }
+    );
     
-    fieldTermsArray.forEach( fieldTerm => {
-      let termId = null
-      
-      // from FilmPage
-      if (fieldTerm.resourceIdObjMeta) {
-        termId = fieldTerm.resourceIdObjMeta.drupal_internal__target_id
-      }
-      
-      // from FilmsGrille 
-      if (fieldTerm.meta) {
-        termId = fieldTerm.meta.drupal_internal__target_id
-      }
-      
-      const idMatch = vocabArray.find( vocabTerm => 
-        vocabTerm.id === termId
-      );
-      
-      // If a match is found, add its name to the array
-      if (idMatch && idMatch.name) {
-        matchingItems.push(idMatch.name)
-      }
-    });
-    
-    // Join all names with commas and return
-    return matchingItems.join(', ');
+    // If a match is found, add its name to the array
+    if (idMatch && idMatch.attributes.name) {
+      matchingItems.push(idMatch.attributes.name)
+    }
+  });
+  
+  // Join all names with commas and return
+  return matchingItems.join(', ');
 }
 
 export function getVimeoId(url) {
   // Check if input is valid
-  if (!url || typeof url !== 'string') {
-    throw new Error('Invalid input: URL must be a non-empty string');
+  const validUrl = url.startsWith('https://')
+  if (!url || typeof url !== 'string' || !validUrl) {
+    console.error("getVimeoId Erreur : format d'url invalide. - ");
+    return null
   }
-
-  // Match numbers after .com/
-  const match = url.match(/\.com\/(\d+)/);
+  
+  const regex = /(?:vimeo\.com\/)([^\/\?\s]+)(?:\/([^\/\?\s]+))?/;
+  const match = url.match(regex)
   
   if (!match) {
-    throw new Error('Invalid Vimeo URL format');
+    console.error("getVimeoId Erreur : le lien n'est pas un lien valide de Viméo. - ");
+    return null
   }
   
-  return match[1];
-}  
+  const string = match.slice(1).join('?h=')
+  
+  return string;
+}
