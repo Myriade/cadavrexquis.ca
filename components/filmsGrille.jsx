@@ -63,7 +63,7 @@ export function FilmsGrille({random, lazyload}) {
   const [selectedThematique, setSelectedThematique] = useState('default')
   const [thematiqueVocab, setThematiqueVocab] = useState()
   
-  const allFilms = useRef([])
+  const displayableFilms = useRef([])
   const newLoadStart = useRef(0)
   const newLoadEnd = useRef()
   const isDisplayReady = useRef(false)
@@ -71,7 +71,7 @@ export function FilmsGrille({random, lazyload}) {
   const gsapContainer = useRef()
   
   const { data : allFilmsData, isLoading, error } = useFetchAllFilms(defautlFilm)
-  gsap.registerPlugin(useGSAP); // register the hook to avoid React version discrepancies
+  gsap.registerPlugin(useGSAP);
   
   // Thématiques vocabulary (l'ensemble de tous les termes présents dans l'ensemble de tous les films)
   if (!isLoading && !thematiqueVocab) {
@@ -181,11 +181,12 @@ export function FilmsGrille({random, lazyload}) {
     }
     
     // Finalize
-    allFilms.current = resultArray 
+    displayableFilms.current = resultArray 
     setFirstVisibleItems(resultArray)
     isDisplayReady.current = true
   }
-  if (!isLoading && thematiqueVocab && !isDisplayReady.current) {
+  if (!isLoading && thematiqueVocab && !isDisplayReady.current && !displayableFilms.current.length) {
+    //console.log(displayableFilms.current.length)
     processData(allFilmsData.data)
   }
   
@@ -230,12 +231,12 @@ export function FilmsGrille({random, lazyload}) {
   
   // event handlers
   function loadMoreClick() {
-    const newVisibleBatch = allFilms.current.slice(0, newLoadEnd.current);
+    const newVisibleBatch = displayableFilms.current.slice(0, newLoadEnd.current);
     setFilmsItems(newVisibleBatch)
     
-    if (filmsItems.length + loadBatchQty >= allFilms.current.length) {
+    if (filmsItems.length + loadBatchQty >= displayableFilms.current.length) {
       loadModeBtnRef.current.style.display = "none"
-      newLoadEnd.current = allFilms.current.length
+      newLoadEnd.current = displayableFilms.current.length
       newLoadStart.current += loadBatchQty
     } else {
       newLoadEnd.current += loadBatchQty
@@ -249,10 +250,10 @@ export function FilmsGrille({random, lazyload}) {
     }
     
     if (id === 'all') {
-      setFilmsItems(allFilms.current)
+      setFilmsItems(displayableFilms.current)
       setSelectedThematique('Toutes catégories')
     } else {
-      const filteredCards = allFilms.current.filter( film => {
+      const filteredCards = displayableFilms.current.filter( film => {
         if (film.attributes.filmThematiques) {
           return film.attributes.filmThematiques.ids.includes(id)
         }
