@@ -270,7 +270,7 @@ export function FilmPage( {path} ) {
 				
 				<button className='button'>Voir plus + </button>
 				<dl className='mb-6'>
-					<dd>[ Au clic sur voir +, les autres champs s'afficheront au cas par cas, visibles seulement si contient une donné ]</dd>
+					<dd>[ Au clic sur voir +, les autres champs s&apos;afficheront au cas par cas, visibles seulement si contient une donné ]</dd>
 				</dl>
 				
 			</Styled>
