@@ -1,11 +1,13 @@
 ## TODOS 
 
-- Permettre 2 séries de chiffres dans l'url Vimeo
+- filmPage : optional fields pour la section "voir plus"
+
+- Optimiser les images avec le composant Image de Next https://nextjs.org/docs/app/getting-started/images
 
 - Vérifier si l'appel au fichier drupal.ts est redondant dans les différents fichiers de hook et de composant
 
 - FilmGrille : renommer les states et autres pour plus de clareté. Comme :
-  - SelectedThematique = SelectedThematiqueNom
+	- SelectedThematique = SelectedThematiqueNom
 	- prefix underscore pour les fictions et variables internes 
 	
 - Utils fieldTerm : accepter un nombre représentant l'id.
