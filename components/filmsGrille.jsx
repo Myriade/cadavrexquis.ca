@@ -51,7 +51,7 @@ const breakpointColumnsObj = {
 const couleurs = ['#fd8abd', '#35cdff', '#f5d437', '#19f76b', '#ff8049', '#a081ff']
 const focus = ['left top', 'top', 'right top', 'left center', 'center', 'right center', 'left bottom', 'bottom', 'right bottom']
 
-export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, searchTerm}) {
+export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, isSearch}) {
   const [filmsItems, setFilmsItems] = useState([defautlFilm])
   const [selectedThematique, setSelectedThematique] = useState('default')
   const [thematiqueVocab, setThematiqueVocab] = useState()
@@ -64,7 +64,6 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, s
   const loadModeBtnRef = useRef()
   const gsapContainer = useRef()
   
-  // const { data : allFilmsData, isLoading, error } = useFetchAllFilms(defautlFilm, searchTerm)
   gsap.registerPlugin(useGSAP);
   
   // Thématiques vocabulary (l'ensemble de tous les termes présents dans l'ensemble de tous les films)
@@ -293,7 +292,7 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, s
   }
   
   return allFilmsData ? (<>
-    { !searchTerm ? <ThematiqueFilter 
+    { !isSearch ? <ThematiqueFilter 
       allThematiques={thematiqueVocab} 
       onThematiqueChange={thematiqueChangeHandler} 
     /> : ''}
