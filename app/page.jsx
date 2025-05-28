@@ -1,10 +1,8 @@
-import { FilmsGrille } from '../components/filmsGrille';
+import AccueilPage from '../components/accueilPage';
 
-export default async function Page() {
+export default function Page() {
   
   return (
-    <>
-      <FilmsGrille random lazyload></FilmsGrille>
-    </>
+    <AccueilPage></AccueilPage>
   );
 }
