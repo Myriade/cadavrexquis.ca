@@ -1,6 +1,7 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import tempLogo from 'public/images/cadavre-exquis-logo.svg';
+import Image from 'next/image'
+import Link from 'next/link'
+import { SearchTool } from '../components/searchTool'
+import tempLogo from 'public/images/cadavre-exquis-logo.svg'
 
 const navItems = [
     //{ linkText: 'À propos', href: '/a-propos' },
@@ -15,9 +16,10 @@ export function Header() {
             <Link href="/">
                 <Image src={tempLogo} alt="Cadavre exquis" className="w-40"/>
             </Link>
-            <p>
+            <div>
                 <i>[loupe]</i>
-            </p>
+                <SearchTool />
+            </div>
         </nav>
         
         <nav className='hidden'>
