@@ -19,8 +19,6 @@ const defautlFilm = {
 export default function AccueilPage() {
   const { data, isLoading, error } = useFetchAllFilms(defautlFilm)
   
-  console.log('isLoading', isLoading, 'error', error, 'data', data)
-  
   return (
     <>
       <FilmsGrille 
@@ -28,7 +26,7 @@ export default function AccueilPage() {
         isLoading={isLoading} 
         error={error} 
         random 
-        lazyload
+        lazyload={10}
       >
       </FilmsGrille>
     </>
