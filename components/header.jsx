@@ -1,42 +1,43 @@
+'use client'
 import Image from 'next/image'
 import Link from 'next/link'
+import styled from 'styled-components'
+import { Menu } from '../components/menu'
 import { SearchTool } from '../components/searchTool'
 import tempLogo from 'public/images/cadavre-exquis-logo.svg'
 
-const navItems = [
-    //{ linkText: 'À propos', href: '/a-propos' },
-];
+const Styled = styled.div`
+  nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    justify-items: center;
+    & > :first-child {
+      justify-self: start;}
+    & > :last-child {
+    justify-self: end;}
+  }
+`
 
 export function Header() {
-    return (<>
-        <nav className="flex flex-wrap justify-between items-center gap-4 pt-6 pb-10">
-            <p>
-                <i>[menu]</i>
-            </p>
-            <Link href="/">
-                <Image src={tempLogo} alt="Cadavre exquis" className="w-40"/>
-            </Link>
-            <div>
-                <i>[loupe]</i>
-                <SearchTool />
-            </div>
-        </nav>
-        
-        <nav className='hidden'>
-            {!!navItems?.length && (
-                <ul className="flex flex-wrap gap-x-4 gap-y-1">
-                    {navItems.map((item, index) => (
-                        <li key={index}>
-                            <Link
-                                href={item.href}
-                                className="inline-block px-1.5 py-1 transition hover:opacity-80 sm:px-3 sm:py-2"
-                            >
-                                {item.linkText}
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            )}
-        </nav>
-    </>);
+  return (<Styled>
+    <nav 
+      className="gap-4 pt-6 pb-10" 
+      role="navigation" 
+      aria-label="Main menu"
+    >
+    
+      <Menu />
+      
+      <Link href="/">
+        <Image src={tempLogo} alt="Cadavre exquis" className="w-40"/>
+      </Link>
+      
+      <div>
+        <SearchTool />
+      </div>
+      
+    </nav>
+    
+  </Styled>);
 }

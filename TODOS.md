@@ -2,6 +2,8 @@
 
 - Header : Sticky
 
+- Nav et footer : rassembler en un seul composant ?
+
 - thematiqueFilter : chemin d'url pour chacune des thematiques
 
 - filmPage : intégrer les champs optionels pour la section "voir plus" 
