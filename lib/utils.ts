@@ -1,3 +1,8 @@
+/**
+ * Compares two arrays to find corresponding vocabulary term names
+ * @param {array} fieldTermsArray (one film's term ids) and vocabArray (all available terms ids ans names)
+ * @returns {string} A list of term names separated with coma
+ */
 export function findTermName(fieldTermsArray, vocabArray) {
   const matchingItems = [];
   
@@ -17,6 +22,11 @@ export function findTermName(fieldTermsArray, vocabArray) {
   return matchingItems.join(', ');
 }
 
+/**
+ * Converts a Vimeo URL into a video ID string to use in a Vimeo embeded reader
+ * @param {string} str - The url to convert into an video id
+ * @returns {string} The video ID (one on two series of number with slash)
+ */
 export function getVimeoId(url) {
   // Check if input is valid
   const validUrl = url.startsWith('https://')
@@ -38,38 +48,18 @@ export function getVimeoId(url) {
   return string;
 }
 
-/**
- * Converts a string to a URL-friendly slug while preserving special characters
- * @param {string} str - The string to convert to a slug
- * @returns {string} The URL-encoded slug
- */
-export const slugify = (str) => {
-  if (!str) return '';
-  
-  // First, trim the string
-  const trimmed = str.trim();
-  
-  // Replace spaces with dashes
-  const spacesReplaced = trimmed.replace(/\s+/g, '-');
-  
-  // Encode the string for URL compatibility
-  return encodeURIComponent(spacesReplaced);
-};
 
 /**
  * Converts a slug back to a readable string
  * @param {string} slug - The slug to convert
  * @returns {string} The decoded, human-readable string
  */
-export const unslugify = (slug) => {
-  if (!slug) return '';
-  
+export const uriToString = (uri) => {
+  if (!uri) return '';
   try {
     // Decode the URL-encoded string
-    const decoded = decodeURIComponent(slug);
-    
-    // Replace dashes with spaces
-    return decoded.replace(/-/g, ' ');
+    const decoded = decodeURIComponent(uri);
+    return decoded
   } catch (error) {
     console.error('Error decoding slug:', error);
     return slug; // Return original slug if decoding fails

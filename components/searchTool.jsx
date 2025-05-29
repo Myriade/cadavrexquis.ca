@@ -1,10 +1,9 @@
 'use client'
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation'
-import { slugify } from '../lib/utils.ts';
 import styled from 'styled-components'
 
-const Styled = styled.div`
+const Styled = styled.form`
   
 `
 
@@ -15,8 +14,12 @@ export function SearchTool() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (searchTerms.trim()) {
-      const slug = slugify(searchTerms);
-      router.push(`/films/${slug}`);
+      function stringToUri(str) {
+        const trimmed = str.trim();
+        return encodeURIComponent(trimmed)
+      };
+      const uri = stringToUri(searchTerms);
+      router.push(`/films/${uri}`);
     }
   };
 
@@ -26,7 +29,7 @@ export function SearchTool() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <Styled onSubmit={handleSubmit}>
       <div className="search-container">
         <input
           type='text'
@@ -41,6 +44,6 @@ export function SearchTool() {
           Search
         </button>
       </div>
-    </form>
+    </Styled>
   );
 }

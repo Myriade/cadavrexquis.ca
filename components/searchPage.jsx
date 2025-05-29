@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState, useRef } from 'react'
 import { useFetchAllFilms } from '../lib/fecthDrupalData'
-import { unslugify } from '../lib/utils.ts';
+import { uriToString } from '../lib/utils.ts';
 import { FilmsGrille } from '../components/filmsGrille';
 
 const defautlFilm = {
@@ -26,8 +26,8 @@ export function SearchPage({searchSlug}) {
   
   useEffect(()=>{
     if (!searchTerms) {
-      // Convert slug back to readable string
-      const readableSearchTerms = unslugify(searchSlug);
+      // Convert uri back to readable string
+      const readableSearchTerms = uriToString(searchSlug);
       setSearchTerms(readableSearchTerms)
     }
   },[searchTerms])
