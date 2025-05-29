@@ -4,7 +4,8 @@ import styled from 'styled-components';
 
 const navItems = [
   { linkText: 'À propos', href: '/a-propos' },
-  { linkText: 'Code d’éthique du réemploi', href: 'code-ethique'}
+  { linkText: 'Code d’éthique du réemploi', href: 'code-ethique'},
+  { linkText: 'Bibliographie et ressources documentaires', href: ''}
 ];
 
 const Styled = styled.footer`

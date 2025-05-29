@@ -1,3 +1,8 @@
+/**
+ * Compares two arrays to find corresponding vocabulary term names
+ * @param {array} fieldTermsArray (one film's term ids) and vocabArray (all available terms ids ans names)
+ * @returns {string} A list of term names separated with coma
+ */
 export function findTermName(fieldTermsArray, vocabArray) {
   const matchingItems = [];
   
@@ -17,6 +22,11 @@ export function findTermName(fieldTermsArray, vocabArray) {
   return matchingItems.join(', ');
 }
 
+/**
+ * Converts a Vimeo URL into a video ID string to use in a Vimeo embeded reader
+ * @param {string} str - The url to convert into an video id
+ * @returns {string} The video ID (one on two series of number with slash)
+ */
 export function getVimeoId(url) {
   // Check if input is valid
   const validUrl = url.startsWith('https://')
@@ -37,3 +47,21 @@ export function getVimeoId(url) {
   
   return string;
 }
+
+
+/**
+ * Converts a slug back to a readable string
+ * @param {string} slug - The slug to convert
+ * @returns {string} The decoded, human-readable string
+ */
+export const uriToString = (uri) => {
+  if (!uri) return '';
+  try {
+    // Decode the URL-encoded string
+    const decoded = decodeURIComponent(uri);
+    return decoded
+  } catch (error) {
+    console.error('Error decoding slug:', error);
+    return slug; // Return original slug if decoding fails
+  }
+};

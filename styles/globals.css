@@ -127,5 +127,8 @@ html {
 .button:hover {
   background: black;
   color: white;
-  cursor: pointer;
-}
+  cursor: pointer;}
+
+.button:hover path,
+.button:hover line {
+  stroke: white;}

@@ -1,9 +1,6 @@
 'use client'
-import React, { useState, useRef } from 'react'
-import { Fragment } from 'react';
+import React, { useEffect, useState, useRef } from 'react'
 import styled from 'styled-components';
-import { drupal } from "/lib/drupal.ts"
-import { useFetchAllFilms } from '../lib/fecthDrupalData'
 import { FilmCard } from '../components/filmCard';
 import { ThematiqueFilter } from '../components/thematiqueFilter';
 import { findTermName } from '../lib/utils.ts'
@@ -54,7 +51,7 @@ const breakpointColumnsObj = {
 const couleurs = ['#fd8abd', '#35cdff', '#f5d437', '#19f76b', '#ff8049', '#a081ff']
 const focus = ['left top', 'top', 'right top', 'left center', 'center', 'right center', 'left bottom', 'bottom', 'right bottom']
 
-export function FilmsGrille({random, lazyload}) {
+export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, isSearch}) {
   const [filmsItems, setFilmsItems] = useState([defautlFilm])
   const [selectedThematique, setSelectedThematique] = useState('default')
   const [thematiqueVocab, setThematiqueVocab] = useState()
@@ -67,144 +64,153 @@ export function FilmsGrille({random, lazyload}) {
   const loadModeBtnRef = useRef()
   const gsapContainer = useRef()
   
-  const { data : allFilmsData, isLoading, error } = useFetchAllFilms(defautlFilm)
   gsap.registerPlugin(useGSAP);
   
   // Thématiques vocabulary (l'ensemble de tous les termes présents dans l'ensemble de tous les films)
-  if (!isLoading && !thematiqueVocab) {
-    const result = allFilmsData.included.filter( item => {
-      return item.type === "taxonomy_term--site_categorie"
-    });
-    setThematiqueVocab(result)
-  }
+  useEffect(()=>{
+    if (allFilmsData && !isLoading && !thematiqueVocab) {
+      const result = allFilmsData.included.filter( item => {
+        return item.type === "taxonomy_term--site_categorie"
+      });
+      setThematiqueVocab(result)
+    }
+  },[thematiqueVocab, isLoading, thematiqueVocab])
   
   // Les images (l'ensemble de toutes les images présentes dans l'ensemble de tous les films)
-  if (!isLoading && !allImages) {
-    const result = allFilmsData.included.filter( item => {
-      return item.type === "file--file"
-    });
-    setAllImages(result)
-  }
-  
-  // Set loadBatchQty value to int or false from Lazyload prop
-  function setLoadBatchQty(value) {
-    
-    if (!value) {
-      return false
-    } else {
-      
-      let batchQty = parseInt(value)
-      
-      if (isNaN(batchQty) || batchQty < 2) batchQty = 10; // par défaut
-      
-      // set start and end index for the first lazyload click
-      if (!isDisplayReady.current) {
-        newLoadEnd.current = batchQty * 2;
-      } 
-      
-      return batchQty
+  useEffect(()=>{
+    if (allFilmsData && !isLoading && !allImages) {
+      const result = allFilmsData.included.filter( item => {
+        return item.type === "file--file"
+      });
+      setAllImages(result)
     }
-  }
-  const loadBatchQty = setLoadBatchQty(lazyload);
+  }, [allFilmsData, isLoading, allImages])
+  
+  // Set loadBatchQty value to int or false from Lazyload prop. 
+  // Run only once or at every change ? Or use a ref ?
+  //useEffect(()=>{
+    function setLoadBatchQty(value) {
+      
+      if (!value) {
+        return false
+      } else {
+        
+        let batchQty = parseInt(value)
+        
+        if (isNaN(batchQty) || batchQty < 2) batchQty = 10; // par défaut
+        
+        // set start and end index for the first lazyload click
+        if (!isDisplayReady.current) {
+          newLoadEnd.current = batchQty * 2;
+        } 
+        
+        return batchQty
+      }
+    }
+    const loadBatchQty = setLoadBatchQty(lazyload);
+  //},[])
   
   // Process Data array with prop options and set visible items
-  function processData(filmsArray) {
-    let resultArray = null;
-    
-    // Randomize items order 
-    function randomizeData(array) {
-      const randomizedData = array.sort((a, b) => 0.5 - Math.random());
-      return randomizedData;
-    }
-    
-    if (random) { 
-      resultArray = randomizeData(allFilmsData.data) 
-    } else {
-      resultArray = filmsArray
-    }
-    
-    // Set filmIndex filmThematiques & filmImage attributes
-    resultArray.forEach( (film, index) => {
-      // Index (pour garder le même ordre jusqu'au prochain vrai page load)
-      film.attributes.filmIndex = index
+  useEffect(()=>{
+    function processData(filmsArray) {
+      let resultArray = null;
       
-      // Thématique
-      const thematiquesValueArray = film.relationships.field_site_thematique.data;
+      // Randomize items order if random prop is present
+      function randomizeData(array) {
+        const randomizedData = array.sort((a, b) => 0.5 - Math.random());
+        return randomizedData;
+      }
       
-      if (thematiquesValueArray.length && thematiqueVocab.length) {
-        film.attributes.filmThematiques = {}
-        
-        // Les noms des termes pour affichage sur les cartes (string)
-        const termNames = findTermName(thematiquesValueArray, thematiqueVocab)
-        film.attributes.filmThematiques.noms = termNames
-        
-        // les ID pour pouvoir filtrer les films
-        const termIds = thematiquesValueArray.map( term => term.meta.drupal_internal__target_id)
-        film.attributes.filmThematiques.ids = termIds
+      if (random) { 
+        resultArray = randomizeData(allFilmsData.data) 
       } else {
-        // Si aucune thematique, envoyer les donnees par defaut
-        film.attributes.filmThematiques = defautlFilm.attributes.filmThematiques
+        resultArray = filmsArray
       }
       
-      // Image  
-      let imagePath = null 
-      function findImagePath(imgId, imagesArray) {
-        const matchImage = imagesArray.find( img => {
-          return img.attributes.drupal_internal__fid === imgId
-        });
-        return matchImage.attributes.uri.url
-      }
-      
-      if (film.relationships.field_site_photogramme.data && !imagePath) {
-        const id = film.relationships.field_site_photogramme.data.meta.drupal_internal__target_id
-        imagePath = findImagePath(id, allImages)
-      }
-      
-      if (imagePath)
-        film.attributes.filmImageUrl = imagePath;
-      
-    })
-    
-    // Create random values for filmCard styles
-    function randomStyles() {
-      resultArray.forEach( film => {
-        // height style
-        const randomHeightFactor = Math.random() * (1.5 - 0.75) + 0.3;
-        const height = `calc( var(--ficheWidth) * ${randomHeightFactor})`
-        film.attributes.styles = {}
-        film.attributes.styles.elemHeight = height;
+      // Set filmIndex filmThematiques & filmImage attributes
+      resultArray.forEach( (film, index) => {
+        // Index (pour garder le même ordre jusqu'au prochain vrai page load)
+        film.attributes.filmIndex = index
         
-        // couleur
-        const totalCouleurs = couleurs.length;
-        const randomCouleurIndex = Math.floor(Math.random() * totalCouleurs);
-        film.attributes.styles.couleur = couleurs[randomCouleurIndex];
+        // Thématique
+        const thematiquesValueArray = film.relationships.field_site_thematique.data;
         
-        // focus (image)
-        const totalFocus = focus.length;
-        const randomFocusIndex = Math.floor(Math.random() * totalFocus);
-        film.attributes.styles.focus = focus[randomFocusIndex];
+        if (thematiquesValueArray.length && thematiqueVocab.length) {
+          film.attributes.filmThematiques = {}
+          
+          // Les noms des termes pour affichage sur les cartes (string)
+          const termNames = findTermName(thematiquesValueArray, thematiqueVocab)
+          film.attributes.filmThematiques.noms = termNames
+          
+          // les ID pour pouvoir filtrer les films
+          const termIds = thematiquesValueArray.map( term => term.meta.drupal_internal__target_id)
+          film.attributes.filmThematiques.ids = termIds
+        } else {
+          // Si aucune thematique, envoyer les donnees par defaut
+          film.attributes.filmThematiques = defautlFilm.attributes.filmThematiques
+        }
+        
+        // Image  
+        let imagePath = null 
+        function findImagePath(imgId, imagesArray) {
+          const matchImage = imagesArray.find( img => {
+            return img.attributes.drupal_internal__fid === imgId
+          });
+          return matchImage.attributes.uri.url
+        }
+        
+        if (film.relationships.field_site_photogramme.data && !imagePath) {
+          const id = film.relationships.field_site_photogramme.data.meta.drupal_internal__target_id
+          imagePath = findImagePath(id, allImages)
+        }
+        
+        if (imagePath)
+          film.attributes.filmImageUrl = imagePath;
+        
       })
-    }
-    randomStyles()
-    
-    // Set visible films according to loadBatchQty value
-    function setFirstVisibleItems(arr) {
-      if (loadBatchQty) {
-        setFilmsItems(arr.slice(0, loadBatchQty)) // set first batch
-      } else {
-        setFilmsItems(arr) // set full array
+      
+      // Create random values for filmCard styles (color and height)
+      function randomStyles() {
+        resultArray.forEach( film => {
+          // height style
+          const randomHeightFactor = Math.random() * (1.5 - 0.75) + 0.3;
+          const height = `calc( var(--ficheWidth) * ${randomHeightFactor})`
+          film.attributes.styles = {}
+          film.attributes.styles.elemHeight = height;
+          
+          // couleur
+          const totalCouleurs = couleurs.length;
+          const randomCouleurIndex = Math.floor(Math.random() * totalCouleurs);
+          film.attributes.styles.couleur = couleurs[randomCouleurIndex];
+          
+          // focus (image)
+          const totalFocus = focus.length;
+          const randomFocusIndex = Math.floor(Math.random() * totalFocus);
+          film.attributes.styles.focus = focus[randomFocusIndex];
+        })
       }
+      randomStyles()
+      
+      // Set visible films according to loadBatchQty value
+      function setFirstVisibleItems(arr) {
+        if (loadBatchQty) {
+          setFilmsItems(arr.slice(0, loadBatchQty)) // set first batch
+        } else {
+          setFilmsItems(arr) // set full array
+        }
+      }
+      
+      // Finalize
+      displayableFilms.current = resultArray 
+      setFirstVisibleItems(resultArray)
+      isDisplayReady.current = true
     }
-    
-    // Finalize
-    displayableFilms.current = resultArray 
-    setFirstVisibleItems(resultArray)
-    isDisplayReady.current = true
-  }
-  if (!isLoading && thematiqueVocab && !isDisplayReady.current && !displayableFilms.current.length) {
-    //console.log(displayableFilms.current.length)
-    processData(allFilmsData.data)
-  }
+    if (!isLoading && thematiqueVocab && !isDisplayReady.current && !displayableFilms.current.length) {
+      //console.log(displayableFilms.current.length)
+      processData(allFilmsData.data)
+    }
+  },[allFilmsData, isLoading, thematiqueVocab])
+  
   
   // GSAP
   const gsapInstance = useGSAP( async () => {
@@ -285,11 +291,11 @@ export function FilmsGrille({random, lazyload}) {
     newLoadEnd.current = filmsItems.length
   }
   
-  return (<>
-    <ThematiqueFilter 
+  return allFilmsData ? (<>
+    { !isSearch ? <ThematiqueFilter 
       allThematiques={thematiqueVocab} 
       onThematiqueChange={thematiqueChangeHandler} 
-    />
+    /> : ''}
     <Styled
       className='mt-8' 
       ref={gsapContainer}
@@ -323,5 +329,5 @@ export function FilmsGrille({random, lazyload}) {
         </button>
       ) : ''}
     </Styled>
-  </>);
+  </>) : (<p>...</p>);
 };
