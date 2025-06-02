@@ -28,6 +28,12 @@ const Styled = styled.section`
 	.film-type, .infos {
 		color: var(--color-rouge);}
 		
+	.description {
+		p {
+			margin-bottom: 1em
+		}
+	}
+		
 	dt, dd {
 		display: inline;}
 		
@@ -230,7 +236,7 @@ export function FilmPage( {path} ) {
 					} : { 
 						__html: 's.o. (Champ « Descriptions et résumés de l’équipe de Cadavre exquis »)'
 					}}
-					className='texte text-lg font-serif mb-6'
+					className='description text-lg font-serif mb-6'
 				></div>
 				
 				<dl className='mb-6'>
