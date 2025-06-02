@@ -74,7 +74,7 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
       });
       setThematiqueVocab(result)
     }
-  },[thematiqueVocab, isLoading, thematiqueVocab])
+  },[thematiqueVocab, isLoading])
   
   // Les images (l'ensemble de toutes les images présentes dans l'ensemble de tous les films)
   useEffect(()=>{

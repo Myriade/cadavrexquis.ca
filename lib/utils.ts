@@ -8,9 +8,11 @@ export function findTermName(fieldTermsArray, vocabArray) {
   
   fieldTermsArray.forEach( fieldTerm => {
     const idMatch = vocabArray.find( vocabTerm => {
-        return vocabTerm.attributes.termid === fieldTerm.meta.drupal_internal__target_id
-      }
-    );
+      const ref1 = vocabTerm.attributes.termid
+      const ref2 = vocabTerm.attributes.drupal_internal__tid 
+      const test = fieldTerm.meta.drupal_internal__target_id
+      return ref1 === test || ref2 === test
+    });
     
     // If a match is found, add its name to the array
     if (idMatch && idMatch.attributes.name) {

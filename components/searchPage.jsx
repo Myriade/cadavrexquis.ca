@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState, useRef } from 'react'
 import { useFetchAllFilms } from '../lib/fecthDrupalData'
-import { uriToString } from '../lib/utils.ts';
+import { uriToString, findTermName } from '../lib/utils.ts';
 import { FilmsGrille } from '../components/filmsGrille';
 
 const defautlFilm = {
@@ -22,6 +22,7 @@ export function SearchPage({searchSlug}) {
   const [searchTerms, setSearchTerms] = useState()
   const [filteredData, setFilteredData] = useState(null)
   const [hasNoResult, setHasNoResult] = useState(null)
+  const [vocabs, setVocabs] = useState(null)
   const { data, error } = useFetchAllFilms(defautlFilm, true)
   
   useEffect(()=>{
@@ -32,14 +33,62 @@ export function SearchPage({searchSlug}) {
     }
   },[searchTerms])
   
+  // Set vocab references obj
+  useEffect( () => {
+    if (!vocabs && data) {
+      const result = {}
+      
+      // Vedette matiere
+      const vedettematieres = data.included.filter( item => {
+        return item.type === "taxonomy_term--vedette_matiere"
+      });
+      result.vedettematieres = vedettematieres
+      
+      // realisation
+      const realisations = data.included.filter( item => {
+        return item.type === "taxonomy_term--realisation"
+      });
+      result.realisations = realisations
+      
+      setVocabs(result)
+    }
+    
+  },[vocabs, data])
+  
   useEffect(()=>{
-    if (searchTerms && data && !filteredData && !isLoading && hasNoResult === null) {
+    if (searchTerms && vocabs && !filteredData && !isLoading && hasNoResult === null) {
+      
+      const allMatch = []
       
       // Loop through Titles
-      const matchFilms = data.data.filter(
+      const matchTitles = data.data.filter(
         item => item.attributes.title.toLowerCase().includes(searchTerms.toLowerCase())
       );
-      //console.log('matchFilms', match Films)
+      matchTitles.forEach( item => { allMatch.push(item) })
+      
+      // Loop through Description
+      const matchDescr = data.data.filter(
+        item => item.attributes.field_descriptions_cadavrexquis[0].value.toLowerCase().includes(searchTerms.toLowerCase())
+      );
+      matchDescr.forEach( item => { allMatch.push(item) }) 
+      
+      // Loop through vedettes-matières
+      const matchVedettes = data.data.filter( item => {
+        const termNames = findTermName( item.relationships.field_vedettes_matiere.data, vocabs.vedettematieres);
+        return termNames.toLowerCase().includes(searchTerms.toLowerCase())
+      })
+      matchVedettes.forEach( item => { allMatch.push(item) })
+      
+      // Loop through realisations
+      const matchReal = data.data.filter( item => {
+        const termNames = findTermName( item.relationships.field_realisation.data, vocabs.realisations);
+        return termNames.toLowerCase().includes(searchTerms.toLowerCase())
+      })
+      matchReal.forEach( item => { allMatch.push(item) })
+      
+      // Remove duplicates
+      let set = new Set(allMatch);
+      const matchFilms = [...set]
       
       // Set Filtered Data 
       if (!matchFilms.length) {
@@ -54,7 +103,7 @@ export function SearchPage({searchSlug}) {
         setFilteredData(dataObj)
       }
     }
-  },[searchTerms, data, filteredData, isLoading, hasNoResult])
+  },[searchTerms, vocabs, filteredData, isLoading, hasNoResult])
   
   useEffect(()=>{
     if ( (filteredData || hasNoResult) && !isLoading) {
