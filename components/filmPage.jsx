@@ -274,11 +274,6 @@ export function FilmPage( {path} ) {
 					</div>
 				</dl>
 				
-				<button className='button'>Voir plus + </button>
-				<dl className='mb-6'>
-					<dd>[ Au clic sur voir +, les autres champs s&apos;afficheront au cas par cas, visibles seulement si contient une donné ]</dd>
-				</dl>
-				
 			</Styled>
 			
 			<Curated className='mb-6'>
@@ -289,3 +284,11 @@ export function FilmPage( {path} ) {
 		</>
 	);
 };
+
+
+/* Pour phase 2 : bouton Voir +
+<button className='button'>Voir plus + </button>
+<dl className='mb-6'>
+	<dd>[ Au clic sur voir +, les autres champs s&apos;afficheront au cas par cas, visibles seulement si contient une donné ]</dd>
+</dl> 
+*/

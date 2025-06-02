@@ -211,7 +211,6 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
     }
   },[allFilmsData, isLoading, thematiqueVocab])
   
-  
   // GSAP
   const gsapInstance = useGSAP( async () => {
     function setCardsToLoad() {
@@ -315,7 +314,8 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
       
       <p className='text-center mb-0'>
         {selectedThematique !== 'default' ? `${selectedThematique} : ` : ''}
-        {isLoading ? '...' : `${filmsItems.length} films sur ${allFilmsData.data.length}`}
+        {isLoading && '...'}
+        {!isSearch && `${filmsItems.length} films sur ${allFilmsData.data.length}`}
       </p>
       
       {lazyload ? (

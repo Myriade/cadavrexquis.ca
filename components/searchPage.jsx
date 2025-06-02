@@ -50,6 +50,12 @@ export function SearchPage({searchSlug}) {
       });
       result.realisations = realisations
       
+      // thematiques
+      const thematiques = data.included.filter( item => {
+        return item.type === "taxonomy_term--site_categorie"
+      });
+      result.thematiques = thematiques
+      
       setVocabs(result)
     }
     
@@ -86,6 +92,13 @@ export function SearchPage({searchSlug}) {
       })
       matchReal.forEach( item => { allMatch.push(item) })
       
+      // Loop through thematiques
+      const matchThematiques = data.data.filter( item => {
+        const termNames = findTermName( item.relationships.field_site_thematique.data, vocabs.thematiques);
+        return termNames.toLowerCase().includes(searchTerms.toLowerCase())
+      })
+      matchThematiques.forEach( item => { allMatch.push(item) })
+      
       // Remove duplicates
       let set = new Set(allMatch);
       const matchFilms = [...set]
@@ -113,20 +126,25 @@ export function SearchPage({searchSlug}) {
   
   if (hasNoResult && !isLoading) {
     return (
-      <p className='mb-6 text-3xl md:text-4xl'>Aucun résultat pour {searchTerms}</p>
+      <div>
+        <p className='mb-6 text-3xl md:text-4xl'>Aucun résultat pour « {searchTerms} »</p>
+        <p>La recherche est effectuée dans les champs titre, description, réalisation, thématique et vedette-matière.</p>
+      </div>
     )
   }
   
   if (filteredData && !isLoading) {
     return (
       <>
-        <h1>Résultats pour « {searchTerms} »</h1>
+        <h1>Recherche pour « {searchTerms} »</h1>
+        {filteredData.data ? (<p>Résultat : {filteredData.data.length} films sur {data.data.length}</p>) : ''}
         <FilmsGrille
           allFilmsData={filteredData} 
           isLoading={isLoading} 
           error={error} 
           isSearch
         ></FilmsGrille>
+        <p>La recherche est effectuée dans les champs titre, description, réalisation, thématique et vedette-matière.</p>
       </>
     )
   }

@@ -2,13 +2,9 @@
 
 - Header : Sticky
 
-- Résultat de Recherche : nombre de résultat au bas, trouver une autre formulation...
-
 - Nav et footer : rassembler en un seul composant ?
 
 - thematiqueFilter : chemin d'url pour chacune des thematiques
-
-- filmPage : intégrer les champs optionels pour la section "voir plus" 
 
 - Page 404 pour les paths de films et en général
 
@@ -26,3 +22,5 @@
 	- SelectedThematique = SelectedThematiqueNom
 	- prefix underscore pour les fictions et variables internes
 
+### Phase 2
+- filmPage : intégrer les champs optionels pour la section "voir plus" 
