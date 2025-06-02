@@ -2,6 +2,8 @@
 
 - Header : Sticky
 
+- Résultat de Recherche : nombre de résultat au bas, trouver une autre formulation...
+
 - Nav et footer : rassembler en un seul composant ?
 
 - thematiqueFilter : chemin d'url pour chacune des thematiques
@@ -9,6 +11,10 @@
 - filmPage : intégrer les champs optionels pour la section "voir plus" 
 
 - Page 404 pour les paths de films et en général
+
+- Handle errors in fetch functions to display a custo message
+
+- FilmGrille : while isLoading, return a default gray film Card
 
 
 ### Optimisations
