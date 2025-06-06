@@ -1,8 +1,12 @@
 'use client'
 import React, { useRef } from 'react'
+import Image from 'next/image'
 import styled from 'styled-components';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+
+import collectionIcone from 'public/images/picto-collection.svg'
+import cadavIcone from 'public/images/picto-remontage.svg'
 
 const Styled = styled.div`
   --padding: 1.25rem;
@@ -29,6 +33,22 @@ const Styled = styled.div`
     display: grid;
     align-content: space-between;
     break-inside: avoid-column;}
+    
+  .card__footer {
+    display: grid;
+    gap: 0.5em;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    font-size: 1rem;
+    line-height: 1.2;}
+    
+  .card__icone {
+    padding-block: 0.2em;
+    img {
+      display: block;
+      height: 2rem;
+    }
+  }
     
   h2 {
     font-weight: normal;
@@ -82,22 +102,11 @@ export function FilmCard({filmdata, shouldwait}) {
     
   if (!filmdata) {
     return (
-      <Styled
-        className='card'
-      >
+      <Styled className='card'>
         <div className='card__inner'>
-          <div 
-            className='card__infos'
-          >
+          <div className='card__infos'>
             <h2>... chargement</h2>
-            <div>
-              <p><br/>
-              </p>
-            </div>
           </div>
-          <div 
-            className='card__image' 
-          ></div>
         </div>
       </Styled>
     )
@@ -116,9 +125,19 @@ export function FilmCard({filmdata, shouldwait}) {
           href={ filmAlias }
         >
           <h2>{filmdata.title}</h2>
-          <div>
+          <div className='card__footer'>
             <p>{filmdata.field_annees_de_sortie}<br/>
             {filmdata.filmThematiques ? filmdata.filmThematiques.noms : ''}</p>
+            {filmdata.field_site_collection ? (
+              <div className='card__icone'>
+              {filmdata.field_site_collection === 'collection' ? 
+                <Image src={collectionIcone} title="Film de la collection" alt="Film de la collection" /> 
+              : ''}
+              {filmdata.field_site_collection === 'cadavre_exquis' ? 
+                <Image src={cadavIcone} title="Film de remontage" alt="Film de remontage"/>
+              : ''}
+              </div>
+            ) : ''}
           </div>
         </a>
         <div 

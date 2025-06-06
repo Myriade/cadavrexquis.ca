@@ -1,10 +1,11 @@
 ## TODOS 
 
-- Iconographie 
-
 - Nav et footer : rassembler en un seul composant ?
 
-- Header : Sticky; Réparer z-index conflit avec filmcards
+- Header : 
+	- Sticky; 
+	- Réparer z-index conflit avec filmcards;
+	- Remplacer logo temp par svg
 
 - Pied de page 
 
