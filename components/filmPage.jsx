@@ -135,7 +135,7 @@ export function FilmPage( {path} ) {
 	const [ processedFields, setProcessedFields ] = useState(null)
 	const [ relatedFilms, setRelatedFilms ] = useState(null)
 	const { data : allFilmsPaths, isLoading, error } = useFetchFilmsPaths(defautlFilm)
-	const { data : allFilms, error : relatedError } = useFetchAllFilms()
+	const { data : allFilms, isLoading : allFilmsIsLoading, error : allFilmsError } = useFetchAllFilms()
 	
 	// Fetch film node id in Drupal DB
 	useEffect(() => {
@@ -211,9 +211,7 @@ export function FilmPage( {path} ) {
 	
 	// Films reliés, À voir aussi
 	useEffect(() => {
-		if (film.field_films_relies && allFilms.data.length && !relatedFilms) {
-			//console.log('relatedFilms', relatedFilms)
-			//console.log('field_films_relies', film.field_films_relies);
+		if (film.field_films_relies && !relatedFilms && !allFilmsIsLoading && allFilms) {
 			
 			const films = allFilms.data.filter(item => 
 				film.field_films_relies.some(selection => 
@@ -226,7 +224,7 @@ export function FilmPage( {path} ) {
 				data: films
 			});
 		}
-	}, [film, allFilms, relatedFilms])
+	}, [film, relatedFilms, allFilmsIsLoading, allFilms ])
 	
 	return (
 		<>
@@ -305,7 +303,8 @@ export function FilmPage( {path} ) {
 					<h2>À voir aussi</h2>
 					<FilmsGrille 
 						allFilmsData={relatedFilms}
-						error={relatedError}
+						error={allFilmsError}
+						isLoading={allFilmsIsLoading}
 						isRelated
 					>
 					</FilmsGrille>
