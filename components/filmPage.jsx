@@ -3,11 +3,12 @@ import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components';
 import Script from 'next/script'
 import { drupal } from "/lib/drupal.ts"
-import { useFetchFilmsPaths } from '../lib/fecthDrupalData'
-import { getVimeoId } from '../lib/utils.ts'
+import { useFetchFilmsPaths, useFetchAllFilms } from '../lib/fecthDrupalData'
+import { getVimeoId, findTermName } from '../lib/utils.ts'
 
+import { FilmsGrille } from '../components/filmsGrille'
 
-const Styled = styled.section`
+const Main = styled.main`
 
 	.vimeo {
 		background-color: black;
@@ -50,7 +51,7 @@ const Styled = styled.section`
 	
 `;
 
-const Curated = styled.section``
+const Curated = styled.aside``
 
 const defautlFilm = {
 	"id": null,
@@ -126,12 +127,15 @@ const incluedRelationFields = [
 	'field_consultants',
 	'field_pays_origine',
 	'field_vedettes_matiere',
+	'field_films_relies',
 ]
 	
 export function FilmPage( {path} ) {
 	const [ film, setFilm ] = useState(defautlFilm)
 	const [ processedFields, setProcessedFields ] = useState(null)
+	const [ relatedFilms, setRelatedFilms ] = useState(null)
 	const { data : allFilmsPaths, isLoading, error } = useFetchFilmsPaths(defautlFilm)
+	const { data : allFilms, error : relatedError } = useFetchAllFilms()
 	
 	// Fetch film node id in Drupal DB
 	useEffect(() => {
@@ -150,7 +154,7 @@ export function FilmPage( {path} ) {
 					node[0].id,
 					{
 						params: {
-							include: relationships
+							include: relationships,
 						}
 					}
 				)
@@ -205,9 +209,28 @@ export function FilmPage( {path} ) {
 		}
 	}, [film, processedFields])
 	
+	// Films reliés, À voir aussi
+	useEffect(() => {
+		if (film.field_films_relies && allFilms.data.length && !relatedFilms) {
+			//console.log('relatedFilms', relatedFilms)
+			//console.log('field_films_relies', film.field_films_relies);
+			
+			const films = allFilms.data.filter(item => 
+				film.field_films_relies.some(selection => 
+					selection.drupal_internal__nid === item.attributes.drupal_internal__nid
+				)
+			);
+			
+			setRelatedFilms({
+				...allFilms,
+				data: films
+			});
+		}
+	}, [film, allFilms, relatedFilms])
+	
 	return (
 		<>
-			<Styled>
+			<Main>
 				{ processedFields && processedFields.vimeoSource ? (
 					<div className='vimeo mb-6'>
 						<iframe src={processedFields.vimeoSource} frameBorder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" title=""></iframe>
@@ -274,13 +297,21 @@ export function FilmPage( {path} ) {
 					</div>
 				</dl>
 				
-			</Styled>
+			</Main>
 			
-			<Curated className='mb-6'>
-				<hr className='mb-6' />
-				<h2>À voir aussi</h2>
-				<p><i>[ Fiches d&apos;autres films liés (curation) ]</i></p>
-			</Curated>
+			{ relatedFilms ?
+				<Curated className='mb-6'>
+					<hr className='mb-6' />
+					<h2>À voir aussi</h2>
+					<FilmsGrille 
+						allFilmsData={relatedFilms}
+						error={relatedError}
+						isRelated
+					>
+					</FilmsGrille>
+					
+				</Curated>
+			: ''}
 		</>
 	);
 };
