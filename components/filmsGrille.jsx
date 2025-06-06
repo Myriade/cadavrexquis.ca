@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import styled from 'styled-components';
 import { FilmCard } from '../components/filmCard';
 import { ThematiqueFilter } from '../components/thematiqueFilter';
-import { findTermName } from '../lib/utils.ts'
+import { findTermName, createRandomStyles } from '../lib/utils.ts'
 
 import Masonry from 'react-masonry-css'
 import gsap from 'gsap';
@@ -48,10 +48,7 @@ const breakpointColumnsObj = {
   825: 2
 };
 
-const couleurs = ['#fd8abd', '#35cdff', '#f5d437', '#19f76b', '#ff8049', '#a081ff']
-const focus = ['left top', 'top', 'right top', 'left center', 'center', 'right center', 'left bottom', 'bottom', 'right bottom']
-
-export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, isSearch}) {
+export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, isSearch, isRelated}) {
   const [filmsItems, setFilmsItems] = useState([defautlFilm])
   const [selectedThematique, setSelectedThematique] = useState('default')
   const [thematiqueVocab, setThematiqueVocab] = useState()
@@ -74,7 +71,7 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
       });
       setThematiqueVocab(result)
     }
-  },[thematiqueVocab, isLoading])
+  },[thematiqueVocab, isLoading, isRelated])
   
   // Les images (l'ensemble de toutes les images présentes dans l'ensemble de tous les films)
   useEffect(()=>{
@@ -116,10 +113,14 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
       let resultArray = null;
       
       // Randomize items order if random prop is present
-      function randomizeData(array) {
-        const randomizedData = array.sort((a, b) => 0.5 - Math.random());
-        return randomizedData;
-      }
+      function randomizeData(arr) {
+        const array = [...arr];
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      };
       
       if (random) { 
         resultArray = randomizeData(allFilmsData.data) 
@@ -169,27 +170,8 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
         
       })
       
-      // Create random values for filmCard styles (color and height)
-      function randomStyles() {
-        resultArray.forEach( film => {
-          // height style
-          const randomHeightFactor = Math.random() * (1.5 - 0.75) + 0.3;
-          const height = `calc( var(--ficheWidth) * ${randomHeightFactor})`
-          film.attributes.styles = {}
-          film.attributes.styles.elemHeight = height;
-          
-          // couleur
-          const totalCouleurs = couleurs.length;
-          const randomCouleurIndex = Math.floor(Math.random() * totalCouleurs);
-          film.attributes.styles.couleur = couleurs[randomCouleurIndex];
-          
-          // focus (image)
-          const totalFocus = focus.length;
-          const randomFocusIndex = Math.floor(Math.random() * totalFocus);
-          film.attributes.styles.focus = focus[randomFocusIndex];
-        })
-      }
-      randomStyles()
+      // Create random values for filmCard styles (color and height)      
+      createRandomStyles(resultArray)
       
       // Set visible films according to loadBatchQty value
       function setFirstVisibleItems(arr) {
@@ -291,7 +273,7 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
   }
   
   return allFilmsData ? (<>
-    { !isSearch ? <ThematiqueFilter 
+    { !isSearch && !isRelated ? <ThematiqueFilter 
       allThematiques={thematiqueVocab} 
       onThematiqueChange={thematiqueChangeHandler} 
     /> : ''}
@@ -312,11 +294,13 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
         ))}  
       </Masonry>
       
-      <p className='text-center mb-0'>
-        {selectedThematique !== 'default' ? `${selectedThematique} : ` : ''}
-        {isLoading && '...'}
-        {!isSearch && `${filmsItems.length} films sur ${allFilmsData.data.length}`}
-      </p>
+      { !isRelated ? 
+        <p className='text-center mb-0'>
+          {selectedThematique !== 'default' ? `${selectedThematique} : ` : ''}
+          {isLoading && '...'}
+          {!isSearch && `${filmsItems.length} films sur ${allFilmsData.data.length}`}
+        </p>
+      : '' }
       
       {lazyload ? (
         <button 

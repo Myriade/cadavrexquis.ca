@@ -26,7 +26,7 @@ export function findTermName(fieldTermsArray, vocabArray) {
 
 /**
  * Converts a Vimeo URL into a video ID string to use in a Vimeo embeded reader
- * @param {string} str - The url to convert into an video id
+ * @param {string} url - The url to convert into an video id
  * @returns {string} The video ID (one on two series of number with slash)
  */
 export function getVimeoId(url) {
@@ -53,7 +53,7 @@ export function getVimeoId(url) {
 
 /**
  * Converts a slug back to a readable string
- * @param {string} slug - The slug to convert
+ * @param {string} uri - The slug to convert
  * @returns {string} The decoded, human-readable string
  */
 export const uriToString = (uri) => {
@@ -67,3 +67,35 @@ export const uriToString = (uri) => {
     return slug; // Return original slug if decoding fails
   }
 };
+
+/**
+  * Create random values for filmCard styles (color, height and bg image focus)
+  * @param {array} filmsArray - array of objects, data for all the films to be presented in cards - 
+  * @returns {string} the array of objects with aditionnal styles values
+ */
+export function createRandomStyles(filmsArray) {
+  const couleurs = ['#fd8abd', '#35cdff', '#f5d437', '#19f76b', '#ff8049', '#a081ff']
+  const focus = ['left top', 'top', 'right top', 'left center', 'center', 'right center', 'left bottom', 'bottom', 'right bottom']
+  filmsArray.forEach( film => {
+    // prepare object for new values
+    if (!film.attributes) {
+      film.attributes = {}
+    }
+    film.attributes.styles = {}
+    
+    // height style
+    const randomHeightFactor = Math.random() * (1.5 - 0.75) + 0.3;
+    const height = `calc( var(--ficheWidth) * ${randomHeightFactor})`
+    film.attributes.styles.elemHeight = height;
+    
+    // couleur
+    const totalCouleurs = couleurs.length;
+    const randomCouleurIndex = Math.floor(Math.random() * totalCouleurs);
+    film.attributes.styles.couleur = couleurs[randomCouleurIndex];
+    
+    // focus (image)
+    const totalFocus = focus.length;
+    const randomFocusIndex = Math.floor(Math.random() * totalFocus);
+    film.attributes.styles.focus = focus[randomFocusIndex];
+  })
+}
