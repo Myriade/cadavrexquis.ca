@@ -39,4 +39,13 @@ netlify dev
 
 If your browser doesn't navigate to the site automatically, visit [localhost:8888](http://localhost:8888).
 
+5. Linting, to detect potential bugs before deployment
+```
+npm run lint
+```
+
+## Deploy
+GIT push to main on Github repo. It triggers a Netlify deployment.
+
+
 

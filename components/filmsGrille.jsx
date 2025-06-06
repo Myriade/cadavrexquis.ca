@@ -53,6 +53,7 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
   const [selectedThematique, setSelectedThematique] = useState('default')
   const [thematiqueVocab, setThematiqueVocab] = useState()
   const [allImages, setAllImages] = useState()
+  const [loadBatchQty, setLoadBatchQty] = useState()
   
   const displayableFilms = useRef([])
   const newLoadStart = useRef(0)
@@ -65,163 +66,162 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
   
   // Thématiques vocabulary (l'ensemble de tous les termes présents dans l'ensemble de tous les films)
   useEffect(()=>{
-    if ( !error && allFilmsData && !isLoading && !thematiqueVocab ) {
+    if ( allFilmsData && !error && !isLoading && !thematiqueVocab ) {
       const result = allFilmsData.included.filter( item => {
         return item.type === "taxonomy_term--site_categorie"
       });
       setThematiqueVocab(result)
     }
-  },[thematiqueVocab, isLoading, isRelated, error])
+  },[allFilmsData, error, isLoading, thematiqueVocab ])
   
   // Les images (l'ensemble de toutes les images présentes dans l'ensemble de tous les films)
   useEffect(()=>{
-    if ( !error && allFilmsData && !isLoading && !allImages) {
+    if ( allFilmsData && !error && !isLoading && !allImages) {
       const result = allFilmsData.included.filter( item => {
         return item.type === "file--file"
       });
       setAllImages(result)
     }
-  }, [allFilmsData, isLoading, allImages, error])
+  }, [allFilmsData, error, isLoading, allImages])
   
   // Set loadBatchQty value to int or false from Lazyload prop. 
-  // Run only once or at every change ? Or use a ref ?
-  //useEffect(()=>{
-    function setLoadBatchQty(value) {
-      
-      if (!value) {
-        return false
-      } else {
-        
-        let batchQty = parseInt(value)
-        
-        if (isNaN(batchQty) || batchQty < 2) batchQty = 10; // par défaut
-        
-        // set start and end index for the first lazyload click
-        if (!isDisplayReady.current) {
-          newLoadEnd.current = batchQty * 2;
-        } 
-        
-        return batchQty
+  useEffect(() => {
+    if (allFilmsData && !error && !loadBatchQty) {
+      function batchQtySetValue(prop) {
+        if (!prop) {
+          return false
+        } else {
+          
+          let batchQty = parseInt(prop)
+          
+          if (isNaN(batchQty) || batchQty < 2) batchQty = 10; // par défaut
+          
+          // set start and end index for the first lazyload click
+          if (!isDisplayReady.current) {
+            newLoadEnd.current = batchQty * 2;
+          } 
+          
+          return batchQty
+        }
       }
+      const qty = batchQtySetValue(lazyload);
+      setLoadBatchQty(qty)
     }
-    const loadBatchQty = setLoadBatchQty(lazyload);
-  //},[])
+  },[allFilmsData, error, lazyload, loadBatchQty])
   
   // Process Data array with prop options and set visible items
   useEffect(()=>{
-    function processData(filmsArray) {
-      let resultArray = null;
-      
-      // Randomize items order if random prop is present
-      function randomizeData(arr) {
-        const array = [...arr];
-        for (let i = array.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-      };
-      
-      if (random) { 
-        resultArray = randomizeData(allFilmsData.data) 
-      } else {
-        resultArray = filmsArray
-      }
-      
-      // Set filmIndex filmThematiques & filmImage attributes
-      resultArray.forEach( (film, index) => {
-        // Index (pour garder le même ordre jusqu'au prochain vrai page load)
-        film.attributes.filmIndex = index
+    if ( allFilmsData && !error && !isLoading && thematiqueVocab && !isDisplayReady.current && !displayableFilms.current.length) {
+      function processData(filmsArray) {
+        let resultArray = null;
         
-        // Thématique
-        const thematiquesValueArray = film.relationships.field_site_thematique.data;
+        // Randomize items order if random prop is present
+        function randomizeData(arr) {
+          const array = [...arr];
+          for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+          }
+          return array;
+        };
         
-        if (thematiquesValueArray.length && thematiqueVocab.length) {
-          film.attributes.filmThematiques = {}
-          
-          // Les noms des termes pour affichage sur les cartes (string)
-          const termNames = findTermName(thematiquesValueArray, thematiqueVocab)
-          film.attributes.filmThematiques.noms = termNames
-          
-          // les ID pour pouvoir filtrer les films
-          const termIds = thematiquesValueArray.map( term => term.meta.drupal_internal__target_id)
-          film.attributes.filmThematiques.ids = termIds
+        if (random) { 
+          resultArray = randomizeData(allFilmsData.data) 
         } else {
-          // Si aucune thematique, envoyer les donnees par defaut
-          film.attributes.filmThematiques = defautlFilm.attributes.filmThematiques
+          resultArray = filmsArray
         }
         
-        // Image  
-        let imagePath = null 
-        function findImagePath(imgId, imagesArray) {
-          const matchImage = imagesArray.find( img => {
-            return img.attributes.drupal_internal__fid === imgId
-          });
-          return matchImage.attributes.uri.url
+        // Set filmIndex filmThematiques & filmImage attributes
+        resultArray.forEach( (film, index) => {
+          // Index (pour garder le même ordre jusqu'au prochain vrai page load)
+          film.attributes.filmIndex = index
+          
+          // Thématique
+          const thematiquesValueArray = film.relationships.field_site_thematique.data;
+          
+          if (thematiquesValueArray.length && thematiqueVocab.length) {
+            film.attributes.filmThematiques = {}
+            
+            // Les noms des termes pour affichage sur les cartes (string)
+            const termNames = findTermName(thematiquesValueArray, thematiqueVocab)
+            film.attributes.filmThematiques.noms = termNames
+            
+            // les ID pour pouvoir filtrer les films
+            const termIds = thematiquesValueArray.map( term => term.meta.drupal_internal__target_id)
+            film.attributes.filmThematiques.ids = termIds
+          } else {
+            // Si aucune thematique, envoyer les donnees par defaut
+            film.attributes.filmThematiques = defautlFilm.attributes.filmThematiques
+          }
+          
+          // Image  
+          let imagePath = null 
+          function findImagePath(imgId, imagesArray) {
+            const matchImage = imagesArray.find( img => {
+              return img.attributes.drupal_internal__fid === imgId
+            });
+            return matchImage.attributes.uri.url
+          }
+          
+          if (film.relationships.field_site_photogramme.data && !imagePath) {
+            const id = film.relationships.field_site_photogramme.data.meta.drupal_internal__target_id
+            imagePath = findImagePath(id, allImages)
+          }
+          
+          if (imagePath)
+            film.attributes.filmImageUrl = imagePath;
+        })
+        
+        // Create random values for filmCard styles (color and height)      
+        createRandomStyles(resultArray)
+        
+        // Set visible films according to loadBatchQty value
+        function setFirstVisibleItems(arr) {
+          if (loadBatchQty) {
+            setFilmsItems(arr.slice(0, loadBatchQty)) // set first batch
+          } else {
+            setFilmsItems(arr) // set full array
+          }
         }
         
-        if (film.relationships.field_site_photogramme.data && !imagePath) {
-          const id = film.relationships.field_site_photogramme.data.meta.drupal_internal__target_id
-          imagePath = findImagePath(id, allImages)
-        }
-        
-        if (imagePath)
-          film.attributes.filmImageUrl = imagePath;
-        
-      })
-      
-      // Create random values for filmCard styles (color and height)      
-      createRandomStyles(resultArray)
-      
-      // Set visible films according to loadBatchQty value
-      function setFirstVisibleItems(arr) {
-        if (loadBatchQty) {
-          setFilmsItems(arr.slice(0, loadBatchQty)) // set first batch
-        } else {
-          setFilmsItems(arr) // set full array
-        }
+        // Finalize
+        displayableFilms.current = resultArray 
+        setFirstVisibleItems(resultArray)
+        isDisplayReady.current = true
       }
-      
-      // Finalize
-      displayableFilms.current = resultArray 
-      setFirstVisibleItems(resultArray)
-      isDisplayReady.current = true
-    }
-    if ( !error && !isLoading && thematiqueVocab && !isDisplayReady.current && !displayableFilms.current.length) {
-      //console.log(displayableFilms.current.length)
       processData(allFilmsData.data)
     }
-  },[allFilmsData, isLoading, thematiqueVocab, error])
+  }, [allFilmsData, error, isLoading, allImages, loadBatchQty, random, thematiqueVocab])
   
   // GSAP
   const gsapInstance = useGSAP( async () => {
-    function setCardsToLoad() {
-      const all = gsapContainer.current.querySelectorAll('.card__inner');
-      let result = null
+    if ( !error && filmsItems.length > 1) {
       
-      if (all.length > 1) {
+      function setCardsToLoad() {
+        const all = gsapContainer.current.querySelectorAll('.card__inner');
+        let result = null
         
-        if (selectedThematique === 'default' && loadBatchQty) {
-          const startIndex = newLoadStart.current
-          let endIndex = startIndex + loadBatchQty
-          all.forEach( elem => {
-            const num = parseInt(elem.dataset.cardindex);
-            if (num >= startIndex && num <= endIndex) {
-              elem.classList.add('loaded');
-            } else {
-              elem.classList.remove('loaded');
-            }
-          })
-          result = gsapContainer.current.querySelectorAll('.card__inner.loaded');
-        } else {
-          result = all
+        if (all.length > 1) {
+          if (selectedThematique === 'default' && loadBatchQty) {
+            const startIndex = newLoadStart.current
+            let endIndex = startIndex + loadBatchQty
+            all.forEach( elem => {
+              const num = parseInt(elem.dataset.cardindex);
+              if (num >= startIndex && num <= endIndex) {
+                elem.classList.add('loaded');
+              } else {
+                elem.classList.remove('loaded');
+              }
+            })
+            result = gsapContainer.current.querySelectorAll('.card__inner.loaded');
+          } else {
+            result = all
+          }
         }
+        
+        return result 
       }
       
-      return result 
-    }
-    
-    if ( !error && filmsItems.length > 1) {
       const cardsToLoad = await setCardsToLoad();
       gsap.from(cardsToLoad, {
         height: 0,
@@ -230,7 +230,7 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
         }
       });
     }
-  }, { dependencies: [filmsItems, error], scope: gsapContainer });
+  }, { dependencies: [filmsItems, error, selectedThematique, loadBatchQty], scope: gsapContainer });
   
   // event handlers
   function loadMoreClick() {

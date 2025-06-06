@@ -18,7 +18,7 @@ export function SearchPage({searchSlug}) {
       const readableSearchTerms = uriToString(searchSlug);
       setSearchTerms(readableSearchTerms)
     }
-  },[searchTerms])
+  },[searchSlug, searchTerms])
   
   // Set vocab references obj
   useEffect( () => {
@@ -49,7 +49,7 @@ export function SearchPage({searchSlug}) {
   },[vocabs, data])
   
   useEffect(()=>{
-    if (searchTerms && vocabs && !filteredData && !isLoading && hasNoResult === null) {
+    if (data && searchTerms && vocabs && !filteredData && !isLoading && hasNoResult === null) {
       
       const allMatch = []
       
@@ -103,7 +103,7 @@ export function SearchPage({searchSlug}) {
         setFilteredData(dataObj)
       }
     }
-  },[searchTerms, vocabs, filteredData, isLoading, hasNoResult])
+  },[searchTerms, vocabs, filteredData, isLoading, hasNoResult, data])
   
   useEffect(()=>{
     if ( (filteredData || hasNoResult) && !isLoading) {

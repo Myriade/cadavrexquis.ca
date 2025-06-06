@@ -1,14 +1,16 @@
 ## TODOS 
 
-- Handle errors in fetch functions to display a custom message
+- Page film : thematique pas en italic; Consultants: retirer si aucune donnée (pas de s.o. pour celui-là)
 
-- FilmGrille : while isLoading, return a default gray film Card
-
-- Header : Sticky
+- Iconographie 
 
 - Nav et footer : rassembler en un seul composant ?
 
-- thematiqueFilter : chemin d'url pour chacune des thematiques
+- Header : Sticky; Réparer z-index conflit avec filmcards
+
+- Pied de page 
+
+- Version mobile 
 
 - Page 404 pour les paths de films et en général
 
@@ -23,4 +25,5 @@
 	- prefix underscore pour les fonctions et variables internes
 
 ### Phase 2
-- filmPage : intégrer les champs optionels pour la section "voir plus" 
+- thematiqueFilter : chemin d'url pour chacune des thématiques
+- filmPage : intégrer les champs optionnels pour la section "voir plus" 
