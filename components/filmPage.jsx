@@ -186,7 +186,7 @@ export function FilmPage( {path} ) {
 			joinTerms(film.field_production, 'production')
 			joinTerms(film.field_realisation, 'realisation')
 			joinTerms(film.field_langues, 'langues')
-			joinTerms(film.field_consultants, 'consultants')
+			joinTerms(film.field_consultants, 'consultants', true)
 			joinTerms(film.field_pays_origine, 'pays')
 			joinTerms(film.field_vedettes_matiere, 'matiere')
 			
@@ -246,9 +246,7 @@ export function FilmPage( {path} ) {
 				
 				<p className='infos text-xl font-sans mb-6'>
 					{film.field_annees_de_sortie ? film.field_annees_de_sortie : 's.o. (annee de sortie)'}
-					{processedFields && processedFields.thematique ? (
-						<> / <i>{processedFields.thematique}</i></>
-					) : ''}
+					{processedFields && processedFields.thematique ? <span> / {processedFields.thematique}</span> : ''}
 				</p>
 				
 				<div 
@@ -269,10 +267,12 @@ export function FilmPage( {path} ) {
 						<dt>Réalisation: </dt>
 						<dd>{ processedFields ? processedFields.realisation : '...' }</dd>
 					</div>
-					<div>
-						<dt>Consultants: </dt>
-						<dd>{ processedFields ? processedFields.consultants : '...' }</dd>
-					</div>
+					{ processedFields && processedFields.consultants ? (
+						<div>
+							<dt>Consultants: </dt>
+							<dd>{processedFields.consultants}</dd>
+						</div>
+					) : '' }
 					<div>
 						<dt>Année de sortie: </dt>
 						<dd>{film.field_annees_de_sortie ? film.field_annees_de_sortie : 's.o.'}</dd>
