@@ -4,26 +4,13 @@ import { useFetchAllFilms } from '../lib/fecthDrupalData'
 import { uriToString, findTermName } from '../lib/utils.ts';
 import { FilmsGrille } from '../components/filmsGrille';
 
-const defautlFilm = {
-  attributes: {
-    drupal_internal__nid: 0,
-    title: 'chargement',
-    field_annees_de_sortie: '...',
-    filmThematiques: {noms: '', ids: []},
-    styles: {
-      elemHeight: 'var(--ficheWidth)',
-      couleur: '#eee',
-    }
-  }
-}
-
 export function SearchPage({searchSlug}) {
   const [isLoading, setIsloading] = useState()
   const [searchTerms, setSearchTerms] = useState()
   const [filteredData, setFilteredData] = useState(null)
   const [hasNoResult, setHasNoResult] = useState(null)
   const [vocabs, setVocabs] = useState(null)
-  const { data, error } = useFetchAllFilms(defautlFilm, true)
+  const { data, isloading, error } = useFetchAllFilms(true)
   
   useEffect(()=>{
     if (!searchTerms) {
@@ -133,19 +120,17 @@ export function SearchPage({searchSlug}) {
     )
   }
   
-  if (filteredData && !isLoading) {
-    return (
-      <>
-        <h1>Recherche pour « {searchTerms} »</h1>
-        {filteredData.data ? (<p>Résultat : {filteredData.data.length} films sur {data.data.length}</p>) : ''}
-        <FilmsGrille
-          allFilmsData={filteredData} 
-          isLoading={isLoading} 
-          error={error} 
-          isSearch
-        ></FilmsGrille>
-        <p>La recherche est effectuée dans les champs titre, description, réalisation, thématique et vedette-matière.</p>
-      </>
-    )
-  }
+  return (
+    <>
+      <h1>Recherche pour « {searchTerms} »</h1>
+      {filteredData ? (<p>Résultat : {filteredData.data.length} films sur {data.data.length}</p>) : ''}
+      <FilmsGrille
+        allFilmsData={filteredData} 
+        isLoading={isLoading} 
+        error={error} 
+        isSearch
+      ></FilmsGrille>
+      <p>La recherche est effectuée dans les champs titre, description, réalisation, thématique et vedette-matière.</p>
+    </>
+  )
 }

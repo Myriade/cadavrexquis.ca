@@ -118,6 +118,10 @@ html {
   font-family: var(--font-serif);
 }
 
+.error {
+  color: var(--color-rouge)
+}
+
 /* Reusables */
 .button {
   border: 1px solid black;

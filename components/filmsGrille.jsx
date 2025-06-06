@@ -65,23 +65,23 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
   
   // Thématiques vocabulary (l'ensemble de tous les termes présents dans l'ensemble de tous les films)
   useEffect(()=>{
-    if (allFilmsData && !isLoading && !thematiqueVocab) {
+    if ( !error && allFilmsData && !isLoading && !thematiqueVocab ) {
       const result = allFilmsData.included.filter( item => {
         return item.type === "taxonomy_term--site_categorie"
       });
       setThematiqueVocab(result)
     }
-  },[thematiqueVocab, isLoading, isRelated])
+  },[thematiqueVocab, isLoading, isRelated, error])
   
   // Les images (l'ensemble de toutes les images présentes dans l'ensemble de tous les films)
   useEffect(()=>{
-    if (allFilmsData && !isLoading && !allImages) {
+    if ( !error && allFilmsData && !isLoading && !allImages) {
       const result = allFilmsData.included.filter( item => {
         return item.type === "file--file"
       });
       setAllImages(result)
     }
-  }, [allFilmsData, isLoading, allImages])
+  }, [allFilmsData, isLoading, allImages, error])
   
   // Set loadBatchQty value to int or false from Lazyload prop. 
   // Run only once or at every change ? Or use a ref ?
@@ -187,11 +187,11 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
       setFirstVisibleItems(resultArray)
       isDisplayReady.current = true
     }
-    if (!isLoading && thematiqueVocab && !isDisplayReady.current && !displayableFilms.current.length) {
+    if ( !error && !isLoading && thematiqueVocab && !isDisplayReady.current && !displayableFilms.current.length) {
       //console.log(displayableFilms.current.length)
       processData(allFilmsData.data)
     }
-  },[allFilmsData, isLoading, thematiqueVocab])
+  },[allFilmsData, isLoading, thematiqueVocab, error])
   
   // GSAP
   const gsapInstance = useGSAP( async () => {
@@ -221,7 +221,7 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
       return result 
     }
     
-    if (filmsItems.length > 1) {
+    if ( !error && filmsItems.length > 1) {
       const cardsToLoad = await setCardsToLoad();
       gsap.from(cardsToLoad, {
         height: 0,
@@ -230,7 +230,7 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
         }
       });
     }
-  }, { dependencies: [filmsItems], scope: gsapContainer });
+  }, { dependencies: [filmsItems, error], scope: gsapContainer });
   
   // event handlers
   function loadMoreClick() {
@@ -270,6 +270,14 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
     
     newLoadStart.current = 0
     newLoadEnd.current = filmsItems.length
+  }
+  
+  if (error) {
+    return (
+      <div className='grid absolute inset-0 content-center text-center'>
+        <p className='error'>Une erreur de chargement sest produite. Vérifiez votre connexion internet, ou avisez-nous si le problème persite.</p>
+      </div>
+    )
   }
   
   return allFilmsData ? (<>
@@ -313,5 +321,10 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
         </button>
       ) : ''}
     </Styled>
-  </>) : (<p>...</p>);
+  </>) : (
+    <FilmCard 
+      key={0}
+      filmdata={defautlFilm.attributes}
+    ></FilmCard>
+  );
 };

@@ -82,7 +82,24 @@ export function FilmCard({filmdata, shouldwait}) {
     
   if (!filmdata) {
     return (
-      <p>...</p>
+      <Styled
+        className='card'
+      >
+        <div className='card__inner'>
+          <div 
+            className='card__infos'
+          >
+            <h2>... chargement</h2>
+            <div>
+              <p><br/>
+              </p>
+            </div>
+          </div>
+          <div 
+            className='card__image' 
+          ></div>
+        </div>
+      </Styled>
     )
   }
   

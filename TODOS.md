@@ -1,5 +1,7 @@
 ## TODOS 
 
+- Handle errors in fetch functions to display a custom message
+
 - FilmGrille : while isLoading, return a default gray film Card
 
 - Header : Sticky
@@ -9,8 +11,6 @@
 - thematiqueFilter : chemin d'url pour chacune des thematiques
 
 - Page 404 pour les paths de films et en général
-
-- Handle errors in fetch functions to display a custo message
 
 
 ### Optimisations
