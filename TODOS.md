@@ -1,5 +1,7 @@
 ## TODOS 
 
+- FilmGrille : while isLoading, return a default gray film Card
+
 - Header : Sticky
 
 - Nav et footer : rassembler en un seul composant ?
@@ -10,8 +12,6 @@
 
 - Handle errors in fetch functions to display a custo message
 
-- FilmGrille : while isLoading, return a default gray film Card
-
 
 ### Optimisations
 - Vérifier si l'appel au fichier drupal.ts est redondant dans les différents fichiers de hook et de composant
@@ -20,7 +20,7 @@
 - Utils fieldTerm : accepter un nombre représentant l'id.
 - FilmGrille : renommer les states et autres pour plus de clareté. Comme :
 	- SelectedThematique = SelectedThematiqueNom
-	- prefix underscore pour les fictions et variables internes
+	- prefix underscore pour les fonctions et variables internes
 
 ### Phase 2
 - filmPage : intégrer les champs optionels pour la section "voir plus" 

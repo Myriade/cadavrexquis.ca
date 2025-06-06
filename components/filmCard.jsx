@@ -46,12 +46,6 @@ export function FilmCard({filmdata, shouldwait}) {
   const gsapCardContainer = useRef()
   const imageElemRef = useRef()
   
-  if (!filmdata) {
-    return (
-      <p>...</p>
-    )
-  }
-  
   const filmAlias = filmdata.path ? `/film${filmdata.path.alias}` : '#'
   const photogrammeUrl = filmdata.filmImageUrl ? `https://database.cadavrexquis.ca/${filmdata.filmImageUrl}` : ''
   
@@ -85,6 +79,12 @@ export function FilmCard({filmdata, shouldwait}) {
       }
     }, waitTime)
   }, { dependencies: [imageElemRef], scope: gsapCardContainer })
+    
+  if (!filmdata) {
+    return (
+      <p>...</p>
+    )
+  }
   
   return (
     <Styled
