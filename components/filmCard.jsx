@@ -46,6 +46,12 @@ export function FilmCard({filmdata, shouldwait}) {
   const gsapCardContainer = useRef()
   const imageElemRef = useRef()
   
+  if (!filmdata) {
+    return (
+      <p>...</p>
+    )
+  }
+  
   const filmAlias = filmdata.path ? `/film${filmdata.path.alias}` : '#'
   const photogrammeUrl = filmdata.filmImageUrl ? `https://database.cadavrexquis.ca/${filmdata.filmImageUrl}` : ''
   
@@ -83,28 +89,28 @@ export function FilmCard({filmdata, shouldwait}) {
   return (
     <Styled
       className='card'
-      style={{minHeight: filmdata.styles.elemHeight}}
+      style={ filmdata.styles ? {minHeight: filmdata.styles.elemHeight} : {}}
       ref={gsapCardContainer}
     >
       <div className='card__inner' data-cardindex={filmdata.filmIndex}>
         <a 
           className='card__infos'
-          style={{background: filmdata.styles.couleur}}
+          style={ filmdata.styles ? {background: filmdata.styles.couleur} : {background: 'var(--color-rouge)'}}
           href={ filmAlias }
         >
           <h2>{filmdata.title}</h2>
           <div>
             <p>{filmdata.field_annees_de_sortie}<br/>
-            {filmdata.filmThematiques.noms}</p>
+            {filmdata.filmThematiques ? filmdata.filmThematiques.noms : ''}</p>
           </div>
         </a>
         <div 
           className='card__image' 
           ref={imageElemRef}
-          style={{ 
+          style={ filmdata.styles ? { 
             backgroundImage: `url(${photogrammeUrl})`, 
             backgroundPosition: filmdata.styles.focus
-          }} 
+          } : {}} 
         ></div>
       </div>
     </Styled>
