@@ -5,8 +5,8 @@ import styled from 'styled-components';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 
-import collectionIcone from 'public/images/picto-collection.svg'
-import cadavIcone from 'public/images/picto-remontage.svg'
+import collectionIcone from 'assets/picto-collection.svg'
+import cadavIcone from 'assets/picto-remontage.svg'
 
 const Styled = styled.div`
   --padding: 1.25rem;

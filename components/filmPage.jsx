@@ -2,11 +2,12 @@
 import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components';
 import { notFound } from 'next/navigation'
-import { drupal } from "/lib/drupal.ts"
 import { useFetchUniqueFilm, useFetchAllFilms } from '../lib/fecthDrupalData'
 import { getVimeoId, findTermName } from '../lib/utils.ts'
 
 import { FilmsGrille } from '../components/filmsGrille'
+import collectionIcone from 'assets/picto-collection.svg'
+import cadavIcone from 'assets/picto-remontage.svg'
 
 const Main = styled.main`
 
