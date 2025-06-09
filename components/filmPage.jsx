@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components';
-import Script from 'next/script'
+import { notFound } from 'next/navigation'
 import { drupal } from "/lib/drupal.ts"
 import { useFetchUniqueFilm, useFetchAllFilms } from '../lib/fecthDrupalData'
 import { getVimeoId, findTermName } from '../lib/utils.ts'
@@ -169,7 +169,7 @@ export function FilmPage( {path} ) {
 	
 	// Films reliés, À voir aussi
 	useEffect(() => {
-		if (film.field_films_relies.length && !relatedFilms && !allFilmsIsLoading && allFilms) {
+		if (film.id && film.field_films_relies.length && !relatedFilms && !allFilmsIsLoading && allFilms) {
 			
 			const films = allFilms.data.filter(item => 
 				film.field_films_relies.some(selection => 
@@ -183,6 +183,10 @@ export function FilmPage( {path} ) {
 			});
 		}
 	}, [film, relatedFilms, allFilmsIsLoading, allFilms ])
+	
+	if (film === 'not-found') {
+		return notFound()
+	}
 	
 	if (error) {
 		return (
@@ -198,7 +202,6 @@ export function FilmPage( {path} ) {
 				{ processedFields && processedFields.vimeoSource ? (
 					<div className='vimeo mb-6'>
 						<iframe src={processedFields.vimeoSource} frameBorder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" title=""></iframe>
-						<Script src="https://third-party-script.js"></Script>
 					</div>
 				) : ( 
 					<div className='vimeo mb-6 loading'><span className='text-6xl'>...</span></div>
