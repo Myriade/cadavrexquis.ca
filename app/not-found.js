@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function NotFound() {
 	return (
 		<main className="text-center grid absolute inset-0 content-center justify-center">
@@ -5,12 +7,12 @@ export default function NotFound() {
 			<p className="text-3xl text-muted-foreground mb-6">
 				Page non trouvée
 			</p>
-			<a 
+			<Link 
 				href="/" 
 				className="button"
 			>
 				Accueil
-			</a>
+			</Link>
 		</main>
 	)
 }

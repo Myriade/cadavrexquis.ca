@@ -11,8 +11,6 @@
 
 - Version mobile 
 
-- Page 404 pour les paths de films et en général
-
 - Optimiser les images avec le composant Image de Next https://nextjs.org/docs/app/getting-started/images
 
 
