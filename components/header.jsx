@@ -2,13 +2,14 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import styled from 'styled-components'
-import { Menu } from '../components/menu'
+import { OffCanvas } from '../components/offCanvas'
 import { SearchTool } from '../components/searchTool'
 import tempLogo from 'public/images/cadavre-exquis-logo.svg'
 
-const Styled = styled.div`
-  nav {
-    display: grid;
+const Styled = styled.header`
+  z-index: 50;
+  
+  .header__container {
     grid-template-columns: 1fr 1fr 1fr;
     align-items: center;
     justify-items: center;
@@ -21,13 +22,8 @@ const Styled = styled.div`
 
 export function Header() {
   return (<Styled>
-    <nav 
-      className="gap-4 pt-6 pb-10" 
-      role="navigation" 
-      aria-label="Main menu"
-    >
-    
-      <Menu />
+    <div className="header__container grid gap-4 pt-6 pb-10">
+      <OffCanvas />
       
       <Link href="/">
         <Image src={tempLogo} alt="Cadavre exquis" className="w-40"/>
@@ -37,7 +33,6 @@ export function Header() {
         <SearchTool />
       </div>
       
-    </nav>
-    
+    </div>
   </Styled>);
 }

@@ -1,137 +1,110 @@
 'use client'
 import React, { useState } from 'react';
 import Link from 'next/link'
+import Image from 'next/image'
 import styled from 'styled-components'
 
-const HamburgerIcon = () => {
-	return (
-		<svg
-			width="30"
-			height="17"
-			viewBox="0 0 29.95 16.91"
-			aria-hidden="true"
-		>
-			<line className="hamburger-line" y1=".5" x2="29.95" y2=".5"/>
-			<line className="hamburger-line" y1="8.45" x2="29.95" y2="8.45"/>
-			<line className="hamburger-line" y1="16.41" x2="29.95" y2="16.41"/>
-		</svg>
-	);
-};
+import pictoCollection from 'assets/picto-collection.svg'
+import cadavIcone from 'assets/picto-remontage.svg'
+import docIcone from 'assets/picto-document.svg'
 
-const CloseIcon = () => {
-	return (
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 15">
-			<line className="close-line" x1="15" y1="0" x2="0" y2="15"/>
-			<line className="close-line" x1="0" y1="0" x2="15" y2="15"/>
-		</svg>
-	)
-};
-
-const navItems = [
-	{ linkText: 'À propos', href: '/a-propos' },
-	{ linkText: 'Code d’éthique du réemploi', href: 'code-ethique'},
-	{ linkText: 'Bibliographie et ressources documentaires', href: ''}
+const primaryNavItems = [
+	{ 
+		titre: 'Collection', 
+		sousTitre: 'Ensemble des films de la collection', 
+		icone: pictoCollection, 
+		href: '/films/collection',
+	}, 
+	{ 
+		titre: 'Cadavres exquis', 
+		sousTitre: 'Films de remontage', 
+		icone: cadavIcone, 
+		href: '/films/cadavres-exquis'
+	},
+	{ 
+		titre: 'Documentation', 
+		sousTitre: 'Textes et dossier d’archives', 
+		icone: pictoCollection, 
+		href: '/films/documents'
+	}
 ];
 
-const Styled = styled.div`
-	button:hover {
-		cursor: pointer;}
+console.log('primaryNavItems', primaryNavItems)
+
+const secondaryNavItems = [
+	{ linkText: 'À propos', href: '/a-propos' },
+	{ linkText: 'Code d’éthique du réemploi', href: '/code-ethique'},
+	{ linkText: 'Événements', href: 'https://horschamp.qc.ca/calendrier'},
+	{ linkText: 'Bibliographie et ressources documentaires', href: '/bibliographie'}
+];
+
+const Styled = styled.nav`
+	width: 100%;
+	display: grid;
+	gap: calc(var(--spacing) * 8);
 	
-	button.hamburger:hover {
-		background: #eee;
-		outline: #eee solid 5px;}
+	.primary-nav {
+		display: grid;
+		gap: calc(var(--spacing) * 4) calc(var(--spacing) * 8);
 		
-	.hamburger-line {
-		fill: none;
-		stroke: #000;
-		stroke-miterlimit: 10;}
-		
-	button.close {
-		width: 15px;
-		height: 15px;}
-		
-	.close-line {
-		fill: none;
-		stroke: #fff;
-		stroke-miterlimit: 10;}
-		
-	button.close:hover line {
-		stroke: #000;}
-		
-	.menu__banniere {
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		background: var(--color-rouge);
-		color: #fff;}
-		
-		.menu__container {
+		.lien {
 			display: grid;
-			gap: 2rem;
-			justify-items: left;}
+			grid-template-columns: auto 1fr;
+			gap: 0.5rem;
+			font-size: 1.25rem;
+			line-height: 1.25;
+			img {
+				height: 2.25em;}
+			&__titre {
+				text-transform: uppercase;
+			}
+		}
 		
-		hr {
-			width: 100%;}
-		
-		.primary-nav {}
-		
-		.secondary-nav {}
+		&--horizontal {
+			display: flex;
+			flex-wrap: wrap;}
 	}
+		
+	.secondary-nav {}
 `
 
-export function Menu() {
-	// State to track if the banner is open or closed
-	const [isOpen, setIsOpen] = useState(false);
-	
-	// Toggle function for opening/closing the banner
-	const toggleBanner = () => {
-		setIsOpen(!isOpen);
-	};
-	
-	// Function to close the banner
-	const closeBanner = () => {
-		setIsOpen(false);
-	};
+export function Menu({horizontal, pictoCouleur}) {
 	
 	return (
 		<Styled>
-			<button 
-				aria-expanded={isOpen} 
-				onClick={toggleBanner}
-				className='hamburger'
-			>
-				<HamburgerIcon />
-			</button>
+		
+			<hr/>
 			
-			<div className={`menu__banniere ${isOpen ? '' : 'hidden'}`}>
-				<div className='menu__container max-w-7xl mx-auto py-12 grow'>
-				
-					<button className="close" onClick={closeBanner}>
-					<CloseIcon />
-					</button>
-					
-					<hr />
-					
-					<div className='primary-nav'>
-						<p>[Navigation principale]</p>
-					</div>
-					
-					<hr />
-					
-					<ul className="secondary-nav">
-						{navItems.map((item, index) => (
-							<li key={index}> 
-								<Link
-									href={item.href}
-								>
-									{item.linkText}
-								</Link>
-							</li>
-						))}
-					</ul>
-				</div>
+			<div className='primary-nav'>
+				<h3>Explorez</h3>
+				<ul className={horizontal ? 'primary-nav primary-nav--horizontal' : 'primary-nav'}>
+					{primaryNavItems.map((item, index) => (
+						<li key={index}> 
+							<Link href={item.href} className='lien'>
+								<Image src={item.icone} alt={item.titre} />
+								<div>
+									<div className='lien__titre'>{item.titre}</div>
+									{item.sousTitre}
+								</div>
+							</Link>
+						</li>
+					))}
+				</ul>
 			</div>
+			
+			<hr/>
+		
+			<ul className="secondary-nav">
+				{secondaryNavItems.map((item, index) => (
+					<li key={index}> 
+						<Link
+							href={item.href}
+						>
+							{item.linkText}
+						</Link>
+					</li>
+				))}
+			</ul>
 		</Styled>
 	);
 };
