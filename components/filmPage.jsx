@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components';
 import Script from 'next/script'
 import { drupal } from "/lib/drupal.ts"
-import { useFetchFilmsPaths, useFetchAllFilms } from '../lib/fecthDrupalData'
+import { useFetchUniqueFilm, useFetchAllFilms } from '../lib/fecthDrupalData'
 import { getVimeoId, findTermName } from '../lib/utils.ts'
 
 import { FilmsGrille } from '../components/filmsGrille'
@@ -76,7 +76,7 @@ const defautlFilm = {
 	"field_duree": null,
 	"field_edge_code": null,
 	"field_emplacements": [],
-	"field_liens_avec_d_autres_films": [],
+	"field_films_relies": [],
 	"field_lieux": [],
 	"field_longueur_metrage": null,
 	"field_longueur_nombre_de_bobines": null,
@@ -118,58 +118,16 @@ const defautlFilm = {
 	"field_type_d_image": null,
 	"field_vedettes_matiere": []
 }
-
-const incluedRelationFields = [ 
-	'field_site_thematique', 
-	'field_realisation',
-	'field_production',
-	'field_langue',
-	'field_consultants',
-	'field_pays_origine',
-	'field_vedettes_matiere',
-	'field_films_relies',
-]
 	
 export function FilmPage( {path} ) {
-	const [ film, setFilm ] = useState(defautlFilm)
+	const { film, isLoading, error } = useFetchUniqueFilm(defautlFilm, path)
 	const [ processedFields, setProcessedFields ] = useState(null)
 	const [ relatedFilms, setRelatedFilms ] = useState(null)
-	const { data : allFilmsPaths, isLoading, error } = useFetchFilmsPaths(defautlFilm)
-	const { data : allFilms, isLoading : allFilmsIsLoading, error : allFilmsError } = useFetchAllFilms()
-	
-	// Fetch film node id in Drupal DB
-	useEffect(() => {
-		if (allFilmsPaths && !film.id) {
-			console.log('Fetching film node data')
-			async function fetchFilm() {
-				// trouver le nid du node qui a le path.alias === path prop
-				const node = await allFilmsPaths.data.filter( node => node.attributes.path.alias === `/${path}`);
-				
-				// Monter le string pour la parametre include avec les relations
-				const relationships = incluedRelationFields.join(',')
-				
-				// get le node complet avec le nid
-				const filmData = await drupal.getResource(
-					"node--film",
-					node[0].id,
-					{
-						params: {
-							include: relationships,
-						}
-					}
-				)
-				
-				if (filmData.id) {
-					setFilm(filmData);
-				}
-			}
-			fetchFilm();
-		}
-	}, [allFilmsPaths, film, path])
+	const { data : allFilms, isLoading : allFilmsIsLoading, error : allFilmsError } = useFetchAllFilms();
 	
 	// Process fields for presentation
 	useEffect(() => {
-		if (film.id && !processedFields) {
+		if (film.id && !isLoading && !error && !processedFields) {
 			const _fields = {}
 			function joinTerms(fieldSource, fieldOutput, optional) {
 				if (fieldSource.length) {
@@ -207,11 +165,11 @@ export function FilmPage( {path} ) {
 			
 			setProcessedFields(_fields)
 		}
-	}, [film, processedFields])
+	}, [film, isLoading, error, processedFields])
 	
 	// Films reliés, À voir aussi
 	useEffect(() => {
-		if (film.field_films_relies && !relatedFilms && !allFilmsIsLoading && allFilms) {
+		if (film.field_films_relies.length && !relatedFilms && !allFilmsIsLoading && allFilms) {
 			
 			const films = allFilms.data.filter(item => 
 				film.field_films_relies.some(selection => 
@@ -225,6 +183,14 @@ export function FilmPage( {path} ) {
 			});
 		}
 	}, [film, relatedFilms, allFilmsIsLoading, allFilms ])
+	
+	if (error) {
+		return (
+			<div className='grid absolute inset-0 content-center text-center'>
+				<p className='error'>Une erreur de chargement sest produite. Vérifiez votre connexion internet, ou avisez-nous si le problème persite.</p>
+			</div>
+		)
+	}
 	
 	return (
 		<>
