@@ -6,10 +6,10 @@ export const metadata = {
 
 export default async function Page() {
   return (
-    <>
+    <main>
       <h1>Code d’éthique du réemploi</h1>
       <DrupalPage nid={46}></DrupalPage>
-    </>
+    </main>
   );
 }
 

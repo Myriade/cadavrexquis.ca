@@ -200,9 +200,9 @@ export function FilmPage( {path} ) {
 	
 	if (error) {
 		return (
-			<div className='grid absolute inset-0 content-center text-center'>
+			<main className='grid content-center text-center'>
 				<p className='error'>Une erreur de chargement sest produite. Vérifiez votre connexion internet, ou avisez-nous si le problème persite.</p>
-			</div>
+			</main>
 		)
 	}
 	

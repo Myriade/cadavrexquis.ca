@@ -274,13 +274,13 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
   
   if (error) {
     return (
-      <div className='grid absolute inset-0 content-center text-center'>
+      <main className='grid content-center text-center'>
         <p className='error'>Une erreur de chargement sest produite. Vérifiez votre connexion internet, ou avisez-nous si le problème persite.</p>
-      </div>
+      </main>
     )
   }
   
-  return allFilmsData ? (<>
+  return allFilmsData ? (<main>
     { !isSearch && !isRelated ? <ThematiqueFilter 
       allThematiques={thematiqueVocab} 
       onThematiqueChange={thematiqueChangeHandler} 
@@ -321,10 +321,12 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
         </button>
       ) : ''}
     </Styled>
-  </>) : (
-    <FilmCard 
-      key={0}
-      filmdata={defautlFilm.attributes}
-    ></FilmCard>
+  </main>) : (
+    <main>
+      <FilmCard 
+        key={0}
+        filmdata={defautlFilm.attributes}
+      ></FilmCard>
+    </main>
   );
 };

@@ -7,7 +7,7 @@ export default function AccueilPage() {
   const { data, isLoading, error } = useFetchAllFilms()
   
   return (
-    <>
+    <main>
       <FilmsGrille 
         allFilmsData={data} 
         isLoading={isLoading} 
@@ -16,6 +16,6 @@ export default function AccueilPage() {
         lazyload={10}
       >
       </FilmsGrille>
-    </>
+    </main>
   );
 }

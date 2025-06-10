@@ -122,6 +122,10 @@ html {
   color: var(--color-rouge)
 }
 
+/* Mise en page */
+main {
+  min-height: 55vh;}
+
 /* Reusables */
 .button {
   border: 1px solid black;
