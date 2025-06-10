@@ -6,33 +6,27 @@
 @layer base {
   h1 {
     @apply mb-6 text-4xl md:text-5xl;
-    font-family: var(--font-serif)
-  }
+    font-family: var(--font-serif)}
   h2 {
     @apply mb-6 text-2xl tracking-tight;
     line-height: 1.1;
-    font-family: var(--font-sans)
-  }
-}
+    font-family: var(--font-sans)}}
 
 h1 {
   line-height: 1.25;}
 
 a:hover {
-  @apply underline
-}
+  @apply underline}
 
 .markdown {
-  @apply mb-1;
-}
+  @apply mb-1;}
 
 .markdown p {
-  @apply mb-3;
-}
+  @apply mb-3;}
 
 .btn:disabled {
-  @apply text-neutral-400 bg-neutral-700;
-}
+  @apply text-neutral-400 bg-neutral-700;}
+
 
 /* Variables */
 html {
@@ -50,81 +44,70 @@ html {
 }
 
 @media (min-with: 1080px) {
-  --ficheWidth: 400px;
-}
+  --ficheWidth: 400px;}
 
 /* Typography */
 @font-face {
   font-family: "Circular";
   src: url("fontes/CircularStd-Book.otf") format('truetype');
   font-weight: normal;
-  font-style: normal;
-}
+  font-style: normal;}
 
 @font-face {
   font-family: "Circular";
   src: url("fontes/CircularStd-Bold.otf") format('truetype');
   font-weight: bold;
-  font-style: normal;
-}
+  font-style: normal;}
 
 @font-face {
   font-family: "Circular";
   src: url("fontes/CircularStd-BookItalic.otf") format('truetype');
   font-weight: normal;
-  font-style: italic;
-}
+  font-style: italic;}
 
 @font-face {
   font-family: "Circular";
   src: url("fontes/CircularStd-BookItalic.otf") format('truetype');
   font-weight: bold;
-  font-style: italic;
-}
+  font-style: italic;}
 
 @font-face {
   font-family: "Caslon";
   src: url("fontes/LibreCaslonText-Regular.ttf") format('truetype');
   font-weight: normal;
-  font-style: normal;
-}
+  font-style: normal;}
 
 @font-face {
   font-family: "Caslon";
   src: url("fontes/LibreCaslonText-Regular.ttf") format('truetype');
   font-weight: bold;
-  font-style: normal;
-}
+  font-style: normal;}
 
 @font-face {
   font-family: "Caslon";
   src: url("fontes/LibreCaslonText-Italic.ttf") format('truetype');
   font-weight: normal;
-  font-style: italic;
-}
+  font-style: italic;}
 
 @font-face {
   font-family: "Caslon";
   src: url("fontes/LibreCaslonText-Italic.ttf");
   font-weight: bold;
-  font-style: italic;
-}
+  font-style: italic;}
 
 .font-sans {
-  font-family: var(--font-sans);
-}
+  font-family: var(--font-sans);}
 
 .font-serif {
-  font-family: var(--font-serif);
-}
+  font-family: var(--font-serif);}
 
 .error {
-  color: var(--color-rouge)
-}
+  color: var(--color-rouge)}
 
 /* Mise en page */
 main {
-  min-height: 55vh;}
+  min-height: 55vh;
+  margin-top: 5vh;}
 
 /* Reusables */
 .button {
