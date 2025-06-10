@@ -1,7 +1,9 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Menu } from '../components/menu'
 import styled from 'styled-components'
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
 const HamburgerIcon = () => {
 	return (
@@ -54,7 +56,6 @@ const Styled = styled.div`
 		
 	.off-canvas {
 		position: absolute;
-		top: 0;
 		left: 0;
 		right: 0;
 		padding-inline: 5vw;
@@ -68,7 +69,6 @@ const Styled = styled.div`
 		
 		&__content {
 			width: 100%;}
-		
 	}
 	
 	hr {
@@ -79,8 +79,10 @@ const Styled = styled.div`
 `
 
 export function OffCanvas() {
-	// State to track if the banner is open or closed
-	const [isOpen, setIsOpen] = useState(false);
+	const [isOpen, setIsOpen] = useState(null);
+	const gsapContainer = useRef()
+	const elemRef = useRef();
+	gsap.registerPlugin(useGSAP);
 	
 	// Toggle function for opening/closing the banner
 	const toggleBanner = () => {
@@ -92,8 +94,45 @@ export function OffCanvas() {
 		setIsOpen(false);
 	};
 	
+	// GSAP : slide top open
+	const gsapCardInstance = useGSAP(() => {
+		const elem = elemRef.current
+		
+		const duree = 0.4
+		const opacite = 0.8
+		
+		if (isOpen === null) {
+				gsap.set(elem, {
+				yPercent: -120,
+				opacity: opacite
+			})
+		}
+		
+		if (isOpen) {
+			gsap.to(elem, {
+				yPercent: -20, 
+				opacity: 1,
+				duration: duree,
+				ease: 'none',
+			});
+		}
+		
+		if (isOpen === false) {
+			console.log('isOpen === false')
+			gsap.to(elem, {
+				yPercent: -120, 
+				opacity: opacite,
+				duration: duree,
+				ease: 'none',
+			});
+		}
+		
+	}, { dependencies: [elemRef, isOpen], scope: gsapContainer })
+	
 	return (
-		<Styled>
+		<Styled
+			ref={gsapContainer}
+		>
 			<button 
 				aria-expanded={isOpen} 
 				onClick={toggleBanner}
@@ -102,7 +141,10 @@ export function OffCanvas() {
 				<HamburgerIcon />
 			</button>
 			
-			<div className={`off-canvas ${isOpen ? '' : 'hidden'}`}>
+			<div 
+				className='off-canvas'
+				ref={elemRef}
+			>
 				<div className='off-canvas__container max-w-7xl mx-auto py-12 grow'>
 				
 					<button className="close" onClick={closeBanner}>

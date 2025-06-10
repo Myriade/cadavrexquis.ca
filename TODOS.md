@@ -2,7 +2,6 @@
 
 - Header : 
 	- Sticky
-	- Off canvas animé
 	- Remplacer logo temp par svg
 	
 - Pages de type Collection et Remontage
@@ -17,6 +16,7 @@
 
 
 ### Optimisations
+- DrupalPage : catch les erreurs de fetch avec une boucle try
 
 ### Phase 2
 - thematiqueFilter : chemin d'url pour chacune des thématiques
