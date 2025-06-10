@@ -6,8 +6,7 @@ import { useFetchUniqueFilm, useFetchAllFilms } from '../lib/fecthDrupalData'
 import { getVimeoId, findTermName } from '../lib/utils.ts'
 
 import { FilmsGrille } from '../components/filmsGrille'
-import collectionIcone from 'assets/picto-collection.svg'
-import cadavIcone from 'assets/picto-remontage.svg'
+import Icone from '../components/icone'
 
 const Main = styled.main`
 
@@ -29,6 +28,16 @@ const Main = styled.main`
 
 	.film-type, .infos {
 		color: var(--color-rouge);}
+		
+	.film-type {
+		display: flex;
+		gap: 0.5em;
+		align-items: end;}
+	
+	i {
+		width: 1.35em;
+		padding-bottom: 0.35em;
+	}
 		
 	.description {
 		p {
@@ -209,6 +218,12 @@ export function FilmPage( {path} ) {
 				)}
 				
 				<p className='film-type text-xl mb-6'>
+					{film.field_site_collection === 'collection' ? 
+						<Icone nom='collection' couleur='var(--color-rouge)' />
+					: ''}
+					{film.field_site_collection === 'cadavre_exquis' ? 
+						<Icone nom='remontage' couleur='var(--color-rouge)' />
+					: ''}
 					{processedFields && processedFields.filmType ? processedFields.filmType : '... chargement'}
 				</p>
 				

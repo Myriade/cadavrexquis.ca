@@ -57,13 +57,19 @@ const Styled = styled.div`
 		top: 0;
 		left: 0;
 		right: 0;
+		padding-inline: 5vw;
 		background: var(--color-rouge);
-		color: #fff;}
+		color: #fff;
 		
-	.off-canvas__container {
-		display: grid;
-		gap: 2rem;
-		justify-items: left;}
+		&__container {
+			display: grid;
+			gap: 2rem;
+			justify-items: left;}
+		
+		&__content {
+			width: 100%;}
+		
+	}
 	
 	hr {
 		width: 100%;}
@@ -100,10 +106,12 @@ export function OffCanvas() {
 				<div className='off-canvas__container max-w-7xl mx-auto py-12 grow'>
 				
 					<button className="close" onClick={closeBanner}>
-					<CloseIcon />
+						<CloseIcon />
 					</button>
 					
-					<Menu horizontal />
+					<div className='off-canvas__content' onClick={closeBanner}>
+						<Menu horizontal pictoCouleur='white' />
+					</div>
 					
 				</div>
 			</div>

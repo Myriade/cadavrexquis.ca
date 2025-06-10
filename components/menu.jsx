@@ -3,33 +3,28 @@ import React, { useState } from 'react';
 import Link from 'next/link'
 import Image from 'next/image'
 import styled from 'styled-components'
-
-import pictoCollection from 'assets/picto-collection.svg'
-import cadavIcone from 'assets/picto-remontage.svg'
-import docIcone from 'assets/picto-document.svg'
+import Icone from '../components/icone'
 
 const primaryNavItems = [
 	{ 
 		titre: 'Collection', 
 		sousTitre: 'Ensemble des films de la collection', 
-		icone: pictoCollection, 
-		href: '/films/collection',
+		icone: 'collection', 
+		href: '/collection',
 	}, 
 	{ 
 		titre: 'Cadavres exquis', 
 		sousTitre: 'Films de remontage', 
-		icone: cadavIcone, 
-		href: '/films/cadavres-exquis'
+		icone: 'remontage', 
+		href: '/remontage'
 	},
 	{ 
 		titre: 'Documentation', 
 		sousTitre: 'Textes et dossier d’archives', 
-		icone: pictoCollection, 
-		href: '/films/documents'
+		icone: 'document', 
+		href: '/documents'
 	}
 ];
-
-console.log('primaryNavItems', primaryNavItems)
 
 const secondaryNavItems = [
 	{ linkText: 'À propos', href: '/a-propos' },
@@ -44,28 +39,46 @@ const Styled = styled.nav`
 	gap: calc(var(--spacing) * 8);
 	
 	.primary-nav {
+		
+		h3 {
+			font-weight: bold;}
+		
 		display: grid;
 		gap: calc(var(--spacing) * 4) calc(var(--spacing) * 8);
 		
 		.lien {
 			display: grid;
 			grid-template-columns: auto 1fr;
-			gap: 0.5rem;
-			font-size: 1.25rem;
+			align-items: top;
+			gap: 1rem;
+			font-size: 1.2rem;
 			line-height: 1.25;
-			img {
-				height: 2.25em;}
+			text-decoration-line: none;
+			
+			svg {
+				height: 2.3rem;
+				width: auto;
+				margin-top: 0.25em;}
+				
 			&__titre {
-				text-transform: uppercase;
+				text-transform: uppercase;}
+				
+			&:hover .lien__titre {
+				text-decoration: underline;
 			}
-		}
+		}	
 		
 		&--horizontal {
 			display: flex;
+			justify-content: space-between;
 			flex-wrap: wrap;}
 	}
 		
-	.secondary-nav {}
+	.secondary-nav {
+		a {
+			font-weight: bold;
+		}
+	}
 `
 
 export function Menu({horizontal, pictoCouleur}) {
@@ -81,10 +94,10 @@ export function Menu({horizontal, pictoCouleur}) {
 					{primaryNavItems.map((item, index) => (
 						<li key={index}> 
 							<Link href={item.href} className='lien'>
-								<Image src={item.icone} alt={item.titre} />
+								<Icone nom={item.icone} couleur={pictoCouleur} />
 								<div>
 									<div className='lien__titre'>{item.titre}</div>
-									{item.sousTitre}
+									<div className='lien__sous-titre'>{item.sousTitre}</div>
 								</div>
 							</Link>
 						</li>
