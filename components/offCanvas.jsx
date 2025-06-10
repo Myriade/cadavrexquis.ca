@@ -67,7 +67,6 @@ const Styled = styled.div`
 		width: 100vw;
 		padding-inline: 5vw;
 		background: var(--color-rouge);
-		color: #fff;
 		
 		&__container {
 			display: grid;
@@ -84,7 +83,8 @@ const Styled = styled.div`
 		}
 		
 		&__content {
-			width: 100%;}
+			width: 100%;
+			color: #fff;}
 	}
 	
 	hr {
@@ -114,31 +114,45 @@ export function OffCanvas() {
 	const gsapCardInstance = useGSAP(() => {
 		const elem = elemRef.current
 		
-		const duree = 0.4
-		const opacite = 0.7
+		const duree = 0.5
 		
+		// Setting at laod, avoid glitch
 		if (isOpen === null) {
-				gsap.set(elem, {
+			gsap.set(elem, {
 				yPercent: -100,
-				opacity: opacite
 			})
-		}
-		
-		if (isOpen) {
-			gsap.to(elem, {
-				yPercent: 0, 
-				opacity: 1,
-				duration: duree,
-				ease: 'none',
+			
+			gsap.set('.off-canvas__content a', {
+				opacity: 0,
 			});
 		}
 		
+		// Opening
+		if (isOpen) {
+			gsap.to(elem, {
+				yPercent: 0, 
+				duration: duree * 1.25,
+				ease: 'none',	
+			});
+			
+			gsap.to('.off-canvas__content a', {
+				opacity: 1,
+				duration: duree * 2.5,
+			});
+		}
+		
+		// Closing
 		if (isOpen === false) {
 			gsap.to(elem, {
 				yPercent: -100, 
-				opacity: opacite,
+				color: 'var(--color-rouge)',
 				duration: duree,
 				ease: 'none',
+			});
+			
+			gsap.to('.off-canvas__content a', {
+				opacity: 0,
+				duration: duree,
 			});
 		}
 		
