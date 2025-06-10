@@ -1,8 +1,7 @@
-import AccueilPage from '../components/accueilPage';
+import ContentLoader from '../components/contentLoader';
 
 export default function Page() {
-  
   return (
-    <AccueilPage></AccueilPage>
+    <ContentLoader/>
   );
 }
