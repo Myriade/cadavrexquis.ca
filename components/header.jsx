@@ -4,7 +4,7 @@ import Link from 'next/link'
 import styled from 'styled-components'
 import { OffCanvas } from '../components/offCanvas'
 import { SearchTool } from '../components/searchTool'
-import tempLogo from 'public/images/cadavre-exquis-logo.svg'
+import logo from 'assets/cadavre-exquis-logo.svg'
 
 const Styled = styled.header`
   z-index: 25;
@@ -34,7 +34,7 @@ export function Header() {
         <OffCanvas />
         
         <Link href="/">
-          <Image src={tempLogo} alt="Cadavre exquis" className="w-40"/>
+          <Image src={logo} alt="Cadavre exquis" className="w-40"/>
         </Link>
         
         <div>

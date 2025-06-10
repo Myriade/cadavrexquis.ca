@@ -1,9 +1,12 @@
 'use client'
 import React, { useState, useRef } from 'react';
+import Link from 'next/link'
 import { Menu } from '../components/menu'
+import Icone from '../components/icone'
 import styled from 'styled-components'
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import logo from 'assets/cadavre-exquis-logo.svg'
 
 const HamburgerIcon = () => {
 	return (
@@ -70,6 +73,15 @@ const Styled = styled.div`
 			display: grid;
 			gap: 2rem;
 			justify-items: left;}
+			
+		&__header {
+			width: 100%;
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+			a {
+				margin-inline: auto;
+				width: clamp(80px ,7vw, 250px)}
+		}
 		
 		&__content {
 			width: 100%;}
@@ -133,9 +145,7 @@ export function OffCanvas() {
 	}, { dependencies: [elemRef, isOpen], scope: gsapContainer })
 	
 	return (
-		<Styled
-			ref={gsapContainer}
-		>
+		<Styled ref={gsapContainer}>
 			<button 
 				aria-expanded={isOpen} 
 				onClick={toggleBanner}
@@ -151,9 +161,15 @@ export function OffCanvas() {
 			>
 				<div className='off-canvas__container max-w-7xl mx-auto py-12 grow'>
 				
-					<button className="close" onClick={closeBanner}>
-						<CloseIcon />
-					</button>
+					<div className='off-canvas__header'>
+						<button className="close" onClick={closeBanner}>
+							<CloseIcon />
+						</button>
+						
+						<Link href="/" onClick={closeBanner}>
+							<Icone nom='logo' titre="Cadavre exquis" couleur='white' />
+						</Link>
+					</div>
 					
 					<div className='off-canvas__content' onClick={closeBanner}>
 						<Menu horizontal pictoCouleur='white' />

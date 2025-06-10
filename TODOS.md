@@ -1,7 +1,4 @@
 ## TODOS 
-
-- Header : 
-	- Remplacer logo temp par svg
 	
 - Pages de type Collection et Remontage
 
