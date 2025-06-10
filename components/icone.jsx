@@ -29,9 +29,9 @@ const Styled = styled.i`
     max-height: 50px}
 `
 
-export default function Icone({nom, couleur}) {
+export default function Icone({nom, couleur, title}) {
   return (
-    <Styled style={{fill: couleur}}>
+    <Styled style={{fill: couleur}} title={title}>
       {allSvg[nom]}
     </Styled>
   )

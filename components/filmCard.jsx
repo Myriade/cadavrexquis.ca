@@ -4,9 +4,7 @@ import Image from 'next/image'
 import styled from 'styled-components';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-
-import collectionIcone from 'assets/picto-collection.svg'
-import cadavIcone from 'assets/picto-remontage.svg'
+import Icone from '../components/icone'
 
 const Styled = styled.div`
   --padding: 1.25rem;
@@ -44,9 +42,9 @@ const Styled = styled.div`
     
   .card__icone {
     padding-block: 0.2em;
-    img {
+    i {
       display: block;
-      height: 2rem;
+      width: 1.6em;
     }
   }
     
@@ -131,10 +129,10 @@ export function FilmCard({filmdata, shouldwait}) {
             {filmdata.field_site_collection ? (
               <div className='card__icone'>
               {filmdata.field_site_collection === 'collection' ? 
-                <Image src={collectionIcone} title="Film de la collection" alt="Film de la collection" /> 
+                <Icone nom='collection' title='Film de la collection' />
               : ''}
               {filmdata.field_site_collection === 'cadavre_exquis' ? 
-                <Image src={cadavIcone} title="Film de remontage" alt="Film de remontage"/>
+                <Icone nom='remontage' title='Film de remontage' />              
               : ''}
               </div>
             ) : ''}
