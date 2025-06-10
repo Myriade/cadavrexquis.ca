@@ -7,7 +7,14 @@ import { SearchTool } from '../components/searchTool'
 import tempLogo from 'public/images/cadavre-exquis-logo.svg'
 
 const Styled = styled.header`
-  z-index: 50;
+  z-index: 25;
+  position: sticky;
+  top: 0;
+  right: 0;
+  left: 0;
+  background: white;
+  padding-block: 2vh;
+  margin-top: 2vh;
   
   .header__container {
     grid-template-columns: 1fr 1fr 1fr;
@@ -21,18 +28,20 @@ const Styled = styled.header`
 `
 
 export function Header() {
-  return (<Styled>
-    <div className="header__container grid gap-4 pt-6 pb-10">
-      <OffCanvas />
-      
-      <Link href="/">
-        <Image src={tempLogo} alt="Cadavre exquis" className="w-40"/>
-      </Link>
-      
-      <div>
-        <SearchTool />
+  return (
+    <Styled>
+      <div className="header__container grid gap-4 max-w-7xl mx-auto">
+        <OffCanvas />
+        
+        <Link href="/">
+          <Image src={tempLogo} alt="Cadavre exquis" className="w-40"/>
+        </Link>
+        
+        <div>
+          <SearchTool />
+        </div>
+        
       </div>
-      
-    </div>
-  </Styled>);
+    </Styled>
+  );
 }

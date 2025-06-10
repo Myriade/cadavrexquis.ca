@@ -30,6 +30,8 @@ const CloseIcon = () => {
 };
 
 const Styled = styled.div`
+	z-index: 50;
+	
 	button:hover {
 		cursor: pointer;}
 	
@@ -56,8 +58,10 @@ const Styled = styled.div`
 		
 	.off-canvas {
 		position: absolute;
-		left: 0;
-		right: 0;
+		top: -2vh;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 100vw;
 		padding-inline: 5vw;
 		background: var(--color-rouge);
 		color: #fff;
@@ -99,18 +103,18 @@ export function OffCanvas() {
 		const elem = elemRef.current
 		
 		const duree = 0.4
-		const opacite = 0.8
+		const opacite = 0.7
 		
 		if (isOpen === null) {
 				gsap.set(elem, {
-				yPercent: -120,
+				yPercent: -100,
 				opacity: opacite
 			})
 		}
 		
 		if (isOpen) {
 			gsap.to(elem, {
-				yPercent: -20, 
+				yPercent: 0, 
 				opacity: 1,
 				duration: duree,
 				ease: 'none',
@@ -118,9 +122,8 @@ export function OffCanvas() {
 		}
 		
 		if (isOpen === false) {
-			console.log('isOpen === false')
 			gsap.to(elem, {
-				yPercent: -120, 
+				yPercent: -100, 
 				opacity: opacite,
 				duration: duree,
 				ease: 'none',
@@ -137,6 +140,7 @@ export function OffCanvas() {
 				aria-expanded={isOpen} 
 				onClick={toggleBanner}
 				className='hamburger'
+				title='Ouvrir le menu'
 			>
 				<HamburgerIcon />
 			</button>

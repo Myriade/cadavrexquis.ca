@@ -1,7 +1,6 @@
 ## TODOS 
 
 - Header : 
-	- Sticky
 	- Remplacer logo temp par svg
 	
 - Pages de type Collection et Remontage
