@@ -39,28 +39,40 @@ const SearchIcon = () => {
 };
 
 const Styled = styled.form`
-  border: 1px solid black;
   display: flex;
-  gap: 1rem;
+  gap: 0.25rem;
+  
+  &.focus {
+    border: 1px solid black;}
   
   input {
-    width: 10ch;
+    width: 0;
+    max-width: 0;
     padding: 0.25em 0.5em;
-    max-width: 10ch;
     transition: width 0.4s;}
   
+  &.focus input,
   input:focus {
-    max-width: 30ch;
-    width: 30ch;}
+    width: 30ch;
+    max-width: 60vw;}
   
   button {
     padding-inline: 0.5em;
+    
   &:hover {
     cursor: pointer;
     background: #000;
     path, line {
       stroke: #fff;}
   }}
+  
+  @media (min-width: 500px) { 
+    border: 1px solid black;
+    gap: 1rem;
+    input {
+     width: 10ch;
+     max-width: 10ch;}
+  }
 `
 
 export function SearchTool() {
@@ -70,12 +82,16 @@ export function SearchTool() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (searchTerms.trim()) {
+      e.target[0].classList.remove('focus')
       function stringToUri(str) {
         const trimmed = str.trim();
         return encodeURIComponent(trimmed)
       };
       const uri = stringToUri(searchTerms);
       router.push(`/films/${uri}`);
+      setSearchTerms('')
+    } else {
+      e.target.classList.toggle('focus')
     }
   };
 
