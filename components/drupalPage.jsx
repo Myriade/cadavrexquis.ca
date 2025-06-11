@@ -1,10 +1,34 @@
 'use client'
 import React, { useState, useRef } from 'react'
 import styled from 'styled-components';
-import { drupal } from "/lib/drupal.ts"
+import { useFetchPageNode } from '../lib/fecthDrupalData'
 
 const Styled = styled.section`
+
+  p, ul, ol {
+    margin-bottom: 1em;}
+    
+  h2, h3 {
+    margin-block: 1.5em 0.25em}
+
+  ul {
+    margin-left: 1em;
+    list-style-type: circle;}
+    
+  ol {
+    margin-left: 2em;
+    list-style-type: number;}
+    
+  a {
+    text-decoration: underline;
+    &:hover {
+      background-color: var(--color-grispale);}}
+      
+  blockquote {
+    border-left: 4px solid var(--color-grispale);
+    padding-left: 1em;}
   
+    
   @container (min-width: 250px) { }
     
   @container (min-width: 500px) { }
@@ -16,29 +40,25 @@ const Styled = styled.section`
 `;
 
 export function DrupalPage( {nid} ) {
-  const [body, setBody] = useState('... chargement')
-  const isDataReady = useRef(false);
+  const { data, isLoading, error } = useFetchPageNode(nid)
   
-  async function fetchData() {
-    const fetchedData = await drupal.getResourceCollection("node--page", {
-      params: {
-        "filter[nid]": nid,
-      },
-      deserialize: false,
-    })
-    
-    if (!isDataReady.current) {
-      // console.log(fetchedData.data[0]);
-      setBody(fetchedData.data[0].attributes.body.value)
-      isDataReady.current = true
-    }
+  // if (data && !isLoading) {
+  //   console.log('data', data)
+  // }
+  
+  if (error) {
+    return (
+      <main className='grid content-center text-center'>
+        <p className='error'>Une erreur de chargement sest produite. Vérifiez votre connexion internet, ou avisez-nous si le problème persite.</p>
+      </main>
+    )
   }
-  
-  fetchData();
   
   return (
     <>
-      <Styled dangerouslySetInnerHTML={{__html: body}}></Styled>
+      <Styled dangerouslySetInnerHTML={{__html: 
+        !isLoading ? data.attributes.body.processed : '... chargement'
+      }}></Styled>
     </>
   );
 };

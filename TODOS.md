@@ -1,14 +1,18 @@
 ## TODOS 
 	
-- Pages de type Collection et Remontage
-
-- Page Bibliographie
+- Formatage du texte sur les pages Drupal Nodes 
 	
 - Pied de page 
 	
 - Optimiser les images avec le composant Image de Next https://nextjs.org/docs/app/getting-started/images
 
+- SEO de base (title and meta tags)
+
+- Maquette : vérifier presque tout
+
 - Version mobile : réviser tout
+
+- Compatibilté avec les navigateurs 
 
 
 ### Optimisations
