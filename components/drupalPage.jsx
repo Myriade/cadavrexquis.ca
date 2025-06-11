@@ -2,6 +2,7 @@
 import React, { useState, useRef } from 'react'
 import styled from 'styled-components';
 import { useFetchPageNode } from '../lib/fecthDrupalData'
+import { modifyImageSources } from '../lib/utils'
 
 const Styled = styled.section`
 
@@ -27,7 +28,27 @@ const Styled = styled.section`
   blockquote {
     border-left: 4px solid var(--color-grispale);
     padding-left: 1em;}
+    
+  figure.caption-img {
+    display: table;
+    width: max-content;}
   
+  figure.caption-img img {
+    display: block;}
+  
+  figure.caption-img figcaption {
+    display: table-caption;
+    caption-side: bottom;
+    padding: 0.5em 0;
+    font-size: 0.9em;}
+    
+  figure.align-left {
+    float: left;
+    margin-right: 1.5em;}
+  
+  figure.align-right {
+    float: right;
+    margin-left: 1.5em;}
     
   @container (min-width: 250px) { }
     
@@ -41,10 +62,7 @@ const Styled = styled.section`
 
 export function DrupalPage( {nid} ) {
   const { data, isLoading, error } = useFetchPageNode(nid)
-  
-  // if (data && !isLoading) {
-  //   console.log('data', data)
-  // }
+  let body = null
   
   if (error) {
     return (
@@ -54,10 +72,20 @@ export function DrupalPage( {nid} ) {
     )
   }
   
+  // Process images : change relative src path to absolutes
+  if ( !isLoading && data ) {
+    const rawBody = data.attributes.body.processed
+    if (rawBody.includes('<img ') ) {
+      body = modifyImageSources(rawBody)
+    } else {
+      body = rawBody
+    }
+  }
+  
   return (
     <>
       <Styled dangerouslySetInnerHTML={{__html: 
-        !isLoading ? data.attributes.body.processed : '... chargement'
+        !isLoading && body ? body : '... chargement'
       }}></Styled>
     </>
   );

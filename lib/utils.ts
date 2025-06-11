@@ -99,3 +99,27 @@ export function createRandomStyles(filmsArray) {
     film.attributes.styles.focus = focus[randomFocusIndex];
   })
 }
+
+/**
+  * Images in page body : Replace relative src attributes in body html strings with absolute paths
+  * @param {string} htmlString - the body.value from Drupal page data fetch
+  * @returns {string} The new string with absolutes path for each image.
+ */
+export function modifyImageSources(htmlString) {
+  // Regular expression to match img tags with src attributes
+  // This pattern looks for src="..." within img tags
+  const regex = /<img[^>]*src="([^"]*)"[^>]*>/g;
+  
+  // Replace each occurrence with the modified src attribute
+  return htmlString.replace(regex, (match, srcValue) => {
+    // Check if the src starts with "/sites/default/files"
+    if (srcValue.startsWith('/sites/default/files')) {
+      // Replace the src value with the new URL
+      const newSrc = `https://database.cadavrexquis.ca${srcValue}`;
+      // Replace the old src with the new src in the original match
+      return match.replace(`src="${srcValue}"`, `src="${newSrc}"`);
+    }
+    // If the src doesn't match our pattern, return the original match
+    return match;
+  });
+}
