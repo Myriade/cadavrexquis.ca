@@ -114,7 +114,7 @@ export function OffCanvas() {
 	const gsapCardInstance = useGSAP(() => {
 		const elem = elemRef.current
 		
-		const duree = 0.5
+		const duree = 0.4
 		
 		// Setting at laod, avoid glitch
 		if (isOpen === null) {
