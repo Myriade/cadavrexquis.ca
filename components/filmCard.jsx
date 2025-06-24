@@ -6,6 +6,8 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import Icone from '../components/icone'
 
+const zoomFactor = 4;
+
 const Styled = styled.div`
   --padding: 1.25rem;
   
@@ -21,9 +23,18 @@ const Styled = styled.div`
   
   .card__image {
     grid-area: 1 / 1;
-    display: grid;
-    background-size: 300%;
-    background-repeat: no-repeat;}
+    max-width: calc(var(--ficheWidth) * ${zoomFactor});
+    position: relative;
+    overflow: hidden;
+    img {
+      display:block;
+      height: auto !important;
+      transform: scale(${zoomFactor})}
+    .card__bgimage {
+      position: absolute;
+      inset: 0;
+      background: transparent;
+    }}
   
   .card__infos {
     grid-area: 1 / 1;
@@ -66,7 +77,7 @@ export function FilmCard({filmdata, shouldwait}) {
   gsap.registerPlugin(useGSAP);
   
   const filmAlias = filmdata.path ? `/film${filmdata.path.alias}` : '#'
-  const photogrammeUrl = filmdata.filmImageUrl ? `https://database.cadavrexquis.ca/${filmdata.filmImageUrl}` : ''
+  const photogrammeUrl = filmdata.filmImageUrl ? `https://database.cadavrexquis.ca${filmdata.filmImageUrl}` : ''
   
   // GSAP
   const gsapCardInstance = useGSAP(() => {
@@ -140,14 +151,35 @@ export function FilmCard({filmdata, shouldwait}) {
           </div>
         </a>
         <div 
-          className='card__image' 
+          className='card__image'
           ref={imageElemRef}
-          style={ filmdata.styles ? { 
-            backgroundImage: `url(${photogrammeUrl})`, 
-            backgroundPosition: filmdata.styles.focus
-          } : {}} 
-        ></div>
+        >
+          { photogrammeUrl && filmdata.styles ? (
+            <>
+              <Image 
+                src={photogrammeUrl}
+                fill 
+                alt=""
+              />
+              <div className='card__bgimage'></div>
+            </>
+          ): ''}
+        </div>
       </div>
     </Styled>
   );
 };
+
+
+/*
+
+<div 
+  className='card__image' 
+  ref={imageElemRef}
+  style={ filmdata.styles ? { 
+    backgroundImage: `url(${photogrammeUrl})`, 
+    backgroundPosition: filmdata.styles.focus
+  } : {}} 
+></div>
+
+*/
