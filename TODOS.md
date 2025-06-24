@@ -1,16 +1,16 @@
 ## TODOS 
-- Maquette et compatibilité navigateurs : vérifier tout 
+- Optimiser les images avec le composant Image de Next https://nextjs.org/docs/app/getting-started/images
+
+- Maquette et compatibilité navigateurs et version mobile : vérifier tout 
 	- Footer
 	- Header
 	- Accueil
 	- Page film
+	- Page recherche
+	- Page remontage/collection
 	- Page texte
 
-- Optimiser les images avec le composant Image de Next https://nextjs.org/docs/app/getting-started/images
-
 - SEO de base (title and meta tags)
-
-- Version mobile : réviser tout
 
 
 ### Optimisations

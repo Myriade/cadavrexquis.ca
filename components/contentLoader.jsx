@@ -37,7 +37,7 @@ export default function ContentLoader({isCollection, isRemontage, isDocments}) {
   }
   
   return (
-    <main>
+    <main className='content-loader'>
       {title}
       <FilmsGrille 
         allFilmsData={content} 

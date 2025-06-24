@@ -274,59 +274,61 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
   
   if (error) {
     return (
-      <main className='grid content-center text-center'>
+      <div className='film-grille grid content-center text-center'>
         <p className='error'>Une erreur de chargement sest produite. Vérifiez votre connexion internet, ou avisez-nous si le problème persite.</p>
-      </main>
+      </div>
     )
   }
   
-  return allFilmsData ? (<main>
-    { !isSearch && !isRelated ? <ThematiqueFilter 
-      allThematiques={thematiqueVocab} 
-      onThematiqueChange={thematiqueChangeHandler} 
-    /> : ''}
-    <Styled
-      className='mt-8' 
-      ref={gsapContainer}
-    >
-      <Masonry
-        breakpointCols={breakpointColumnsObj}
-        className="grille"
-        columnClassName="grille__column">
-        {filmsItems.map( (item, index) => (
-          <FilmCard 
-            key={item.attributes.drupal_internal__nid}
-            filmdata={item.attributes}
-            shouldwait={lazyload ? 700 : 0}
-          ></FilmCard>
-        ))}  
-      </Masonry>
-      
-      { !isRelated ? 
-        <p className='text-center mb-0'>
-          {selectedThematique !== 'default' ? `${selectedThematique} : ` : ''}
-          {isLoading && '...'}
-          {!isSearch && `${filmsItems.length} films sur ${allFilmsData.data.length}`}
-        </p>
-      : '' }
-      
-      {lazyload ? (
-        <button 
-          id='load-more' 
-          className='button' 
-          onClick={loadMoreClick}
-          ref={loadModeBtnRef}
-        >
-          Charger plus de films
-        </button>
-      ) : ''}
-    </Styled>
-  </main>) : (
-    <main>
+  return allFilmsData ? (
+    <div className='film-grille'>
+      { !isSearch && !isRelated ? <ThematiqueFilter 
+        allThematiques={thematiqueVocab} 
+        onThematiqueChange={thematiqueChangeHandler} 
+      /> : ''}
+      <Styled
+        className='mt-8' 
+        ref={gsapContainer}
+      >
+        <Masonry
+          breakpointCols={breakpointColumnsObj}
+          className="grille"
+          columnClassName="grille__column">
+          {filmsItems.map( (item, index) => (
+            <FilmCard 
+              key={item.attributes.drupal_internal__nid}
+              filmdata={item.attributes}
+              shouldwait={lazyload ? 700 : 0}
+            ></FilmCard>
+          ))}  
+        </Masonry>
+        
+        { !isRelated ? 
+          <p className='text-center mb-0'>
+            {selectedThematique !== 'default' ? `${selectedThematique} : ` : ''}
+            {isLoading && '...'}
+            {!isSearch && `${filmsItems.length} films sur ${allFilmsData.data.length}`}
+          </p>
+        : '' }
+        
+        {lazyload ? (
+          <button 
+            id='load-more' 
+            className='button' 
+            onClick={loadMoreClick}
+            ref={loadModeBtnRef}
+          >
+            Charger plus de films
+          </button>
+        ) : ''}
+      </Styled>
+    </div>
+  ) : (
+    <div className='film-grille'>
       <FilmCard 
         key={0}
         filmdata={defautlFilm.attributes}
       ></FilmCard>
-    </main>
+    </div>
   );
 };
