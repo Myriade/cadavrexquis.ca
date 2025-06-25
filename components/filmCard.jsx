@@ -6,7 +6,7 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import Icone from '../components/icone'
 
-const zoomFactor = 4;
+const zoomFactor = 1.75;
 
 const Styled = styled.div`
   --padding: 1.25rem;
@@ -23,18 +23,19 @@ const Styled = styled.div`
   
   .card__image {
     grid-area: 1 / 1;
-    max-width: calc(var(--ficheWidth) * ${zoomFactor});
     position: relative;
-    overflow: hidden;
-    img {
-      display:block;
-      height: auto !important;
-      transform: scale(${zoomFactor})}
-    .card__bgimage {
-      position: absolute;
-      inset: 0;
-      background: transparent;
-    }}
+    overflow: hidden;}
+    
+  .image-wrapper {
+    position: absolute;
+    inset: 0;
+    transform: scale(${zoomFactor});}
+  
+  .image-wrapper > img {
+    position: absolute;
+    width: 100%;
+    height: 90%;
+    object-fit: none;}
   
   .card__infos {
     grid-area: 1 / 1;
@@ -155,31 +156,18 @@ export function FilmCard({filmdata, shouldwait}) {
           ref={imageElemRef}
         >
           { photogrammeUrl && filmdata.styles ? (
-            <>
+            <div className='image-wrapper'>
               <Image 
                 src={photogrammeUrl}
-                fill 
+                width={400}
+                height={700}
                 alt=""
+                style={{ objectPosition: filmdata.styles.focus }}
               />
-              <div className='card__bgimage'></div>
-            </>
+            </div>
           ): ''}
         </div>
       </div>
     </Styled>
   );
 };
-
-
-/*
-
-<div 
-  className='card__image' 
-  ref={imageElemRef}
-  style={ filmdata.styles ? { 
-    backgroundImage: `url(${photogrammeUrl})`, 
-    backgroundPosition: filmdata.styles.focus
-  } : {}} 
-></div>
-
-*/
