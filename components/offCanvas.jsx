@@ -63,10 +63,12 @@ const Styled = styled.div`
 		position: absolute;
 		top: -2vh;
 		left: 50%;
-		transform: translateX(-50%);
-		width: 100vw;
-		padding-inline: 5vw;
-		background: var(--color-rouge);
+		transform: translateX(-51%);
+		width: 101vw;
+		
+		&__wrapper {			
+			padding-inline: 5vw;
+			background: var(--color-rouge);}
 		
 		&__container {
 			display: grid;
@@ -133,6 +135,7 @@ export function OffCanvas() {
 				yPercent: 0, 
 				duration: duree * 1.25,
 				ease: 'none',	
+				height: '100vh'
 			});
 			
 			gsap.to('.off-canvas__content a', {
@@ -172,23 +175,24 @@ export function OffCanvas() {
 			<div 
 				className='off-canvas'
 				ref={elemRef}
+				onClick={closeBanner}
 			>
-				<div className='off-canvas__container max-w-7xl mx-auto py-12 grow'>
-				
-					<div className='off-canvas__header'>
-						<button className="close" onClick={closeBanner}>
-							<CloseIcon />
-						</button>
+				<div className='off-canvas__wrapper'>
+					<div className='off-canvas__container max-w-7xl mx-auto py-12 grow'>
+						<div className='off-canvas__header'>
+							<button className="close">
+								<CloseIcon />
+							</button>
+							
+							<Link href="/">
+								<Icone nom='logo' titre="Cadavre exquis" couleur='white' />
+							</Link>
+						</div>
 						
-						<Link href="/" onClick={closeBanner}>
-							<Icone nom='logo' titre="Cadavre exquis" couleur='white' />
-						</Link>
+						<div className='off-canvas__content'>
+							<Menu horizontal pictoCouleur='white' />
+						</div>
 					</div>
-					
-					<div className='off-canvas__content' onClick={closeBanner}>
-						<Menu horizontal pictoCouleur='white' />
-					</div>
-					
 				</div>
 			</div>
 		</Styled>

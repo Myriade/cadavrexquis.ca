@@ -51,12 +51,12 @@ const Styled = styled.nav`
 			grid-template-columns: auto 1fr;
 			align-items: top;
 			gap: 1rem;
-			font-size: 1.2rem;
-			line-height: 1.25;
+			font-size: 1rem;
+			line-height: 1.3;
 			text-decoration-line: none;
 			
 			svg {
-				height: 2.3rem;
+				height: 2rem;
 				width: auto;
 				margin-top: 0.25em;}
 				
@@ -72,12 +72,6 @@ const Styled = styled.nav`
 			display: flex;
 			justify-content: space-between;
 			flex-wrap: wrap;}
-	}
-		
-	.secondary-nav {
-		a {
-			font-weight: bold;
-		}
 	}
 `
 

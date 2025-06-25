@@ -1,9 +1,9 @@
 ## TODOS 
-- Optimiser les images avec le composant Image de Next https://nextjs.org/docs/app/getting-started/images
-
-- Maquette et compatibilité navigateurs et version mobile : vérifier tout 
-	- Footer
-	- Header
+- Conformité maquette, Compatibilité navigateurs, Version mobile :
+	- ~~Footer~~
+	- ~~Menu~~
+	- ~Header (sticky)~
+	- ~Off Canvas (close on click everywhere and outside)~
 	- Accueil
 	- Page film
 	- Page recherche
@@ -14,6 +14,7 @@
 
 
 ### Optimisations
+- Off Canvas (block scroll)
 
 ### Phase 2
 - thematiqueFilter : chemin d'url pour chacune des thématiques
