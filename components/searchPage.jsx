@@ -61,7 +61,11 @@ export function SearchPage({searchSlug}) {
       
       // Loop through Description
       const matchDescr = data.data.filter(
-        item => item.attributes.field_descriptions_cadavrexquis[0].value.toLowerCase().includes(searchTerms.toLowerCase())
+        item => {
+          if (item.attributes.field_descriptions_cadavrexquis[0]) {
+            return item.attributes.field_descriptions_cadavrexquis[0].value.toLowerCase().includes(searchTerms.toLowerCase())
+          }
+        }
       );
       matchDescr.forEach( item => { allMatch.push(item) }) 
       
