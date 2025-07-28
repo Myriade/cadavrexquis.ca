@@ -111,7 +111,7 @@ html {
 /* Mise en page */
 main {
   min-height: 55vh;
-  margin-top: 5vh;}
+  margin-top: calc(var(--spacing) * 4);}
 
 /* Reusables */
 .button {

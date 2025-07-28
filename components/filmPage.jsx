@@ -9,11 +9,9 @@ import { FilmsGrille } from '../components/filmsGrille'
 import Icone from '../components/icone'
 
 const Main = styled.main`
-
 	.vimeo {
 		background-color: black;
-		transition: all 0.5s;
-		min-height: 500px;}
+		transition: all 0.5s;}
 			
 	.vimeo.loading {
 		background-color: #777;
@@ -21,29 +19,27 @@ const Main = styled.main`
 		align-content: center;
 		justify-content: center;
 		color: white;}
-	
-	.vimeo iframe {
-		min-height: 500px;
-		width: 100%;}
+		
+	h1 {
+		max-width: 35ch;}
 
 	.film-type, .infos {
 		color: var(--color-rouge);}
 		
 	.film-type {
+		text-transform: uppercase;
+		margin-bottom: 0.7em;
 		display: flex;
 		gap: 0.5em;
 		align-items: end;}
 	
 	i {
 		width: 1.35em;
-		padding-bottom: 0.35em;
-	}
+		padding-bottom: 0.35em;}
 		
 	.description {
 		p {
-			margin-bottom: 1em
-		}
-	}
+			margin-bottom: 1em}}
 		
 	dt, dd {
 		display: inline;}
@@ -210,11 +206,17 @@ export function FilmPage( {path} ) {
 		<>
 			<Main>
 				{ processedFields && processedFields.vimeoSource ? (
-					<div className='vimeo mb-6'>
-						<iframe src={processedFields.vimeoSource} frameBorder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" title=""></iframe>
+					<div className='vimeo mb-10'>
+						<iframe 
+							src={processedFields.vimeoSource} 
+							frameBorder="0" 
+							allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" 
+							title=""
+							className='w-full min-h-60 md:min-h-80 lg:min-h-[65vh]'
+						></iframe>
 					</div>
 				) : ( 
-					<div className='vimeo mb-6 loading'><span className='text-6xl'>...</span></div>
+					<div className='vimeo min-h-60 md:min-h-80 lg:min-h-[65vh] mb-6 loading'><span className='text-6xl'>...</span></div>
 				)}
 				
 				<p className='film-type text-xl mb-6'>
@@ -227,9 +229,9 @@ export function FilmPage( {path} ) {
 					{processedFields && processedFields.filmType ? processedFields.filmType : '... chargement'}
 				</p>
 				
-				<h1 className='mb-6'>{film.title}</h1>
+				<h1 className='mb-8'>{film.title}</h1>
 				
-				<p className='infos text-xl font-sans mb-6'>
+				<p className='infos text-xl font-sans mb-4'>
 					{film.field_annees_de_sortie ? film.field_annees_de_sortie : 's.o. (annee de sortie)'}
 					{processedFields && processedFields.thematique ? <span> / {processedFields.thematique}</span> : ''}
 				</p>

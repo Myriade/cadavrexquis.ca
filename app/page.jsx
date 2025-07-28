@@ -26,7 +26,7 @@ export default function Page() {
           frameBorder="0" 
           allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" 
           title=""
-          className="vimeo w-full min-h-[40vh] lg:h-full"
+          className="vimeo w-full min-h-[40vh] lg:h-full lg:min-h-auto"
         ></iframe>
         <h1 className='text-4xl'>Cadavre exquis,<br/>«&nbsp;ouvroir de cinéma potentiel&nbsp;», est un laboratoire de valorisation patrimonial et de création expérimentale dédié au cinéma scientifique et éducatif.</h1>
       </div>
