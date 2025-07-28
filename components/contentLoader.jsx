@@ -31,8 +31,8 @@ export default function ContentLoader({isCollection, isRemontage, isDocments}) {
   }
   if (isRemontage) {
     title = (<>
-      <h1>Les cadavres exquis</h1>
-      <p>Films de remontage</p>
+      <h1 className='mb-0'>Les cadavres exquis</h1>
+      <p className='mb-4'>Films de remontage</p>
     </>)
   }
   
