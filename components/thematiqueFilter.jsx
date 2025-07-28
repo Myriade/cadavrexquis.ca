@@ -14,6 +14,12 @@ const Styled = styled.section`
       color: #fff;
     }
   }
+  
+  @media (max-width: 500px) {
+    gap: 0.25em;
+    .button {
+      padding: 0 0.5em;}
+  }
 `;
 
 export function ThematiqueFilter({ allThematiques, onThematiqueChange }) {

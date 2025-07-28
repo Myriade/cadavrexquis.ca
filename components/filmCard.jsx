@@ -70,6 +70,13 @@ const Styled = styled.div`
   
   a:hover {
     text-decoration: none;}
+    
+  @media (max-width: 500px) {
+    h2 {
+      font-size: var(--text-xl)}
+    .card__footer {
+      font-size: 0.9rem}
+  }
 `;
 
 export function FilmCard({filmdata, shouldwait}) {
