@@ -1,8 +1,8 @@
 import { DrupalPage } from '../../components/drupalPage';
 
-export const metadata = {
-  title: 'Bibliographie et ressources documentaires'
-};
+// export const metadata = {
+//   title: 'Bibliographie et ressources documentaires'
+// };
 
 export default async function Page() {
   return (

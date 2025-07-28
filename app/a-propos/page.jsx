@@ -1,8 +1,8 @@
 import { DrupalPage } from '../../components/drupalPage';
 
-export const metadata = {
-  title: 'À propos'
-};
+// export const metadata = {
+//   title: 'À propos'
+// };
 
 export default async function Page() {
     
