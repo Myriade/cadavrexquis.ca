@@ -19,7 +19,7 @@ export default function Page() {
     <ContentLoader/>
     <hr/>
     <Styled className='mt-8 mb-10' id='mission'>
-      <h3 className='mb-10'>Notre Mission</h3>
+      <h3 className='mb-10'>Notre mission</h3>
       <div className='grid lg:grid-cols-2 gap-10'>
         <iframe 
           src="https://player.vimeo.com/video/1102788773?h=86739cff75&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" 
@@ -28,7 +28,7 @@ export default function Page() {
           title=""
           className="vimeo w-full min-h-[40vh] lg:h-full lg:min-h-auto"
         ></iframe>
-        <h1 className='text-4xl'>Cadavre exquis,<br/>«&nbsp;ouvroir de cinéma potentiel&nbsp;», est un laboratoire de valorisation patrimonial et de création expérimentale dédié au cinéma scientifique et éducatif.</h1>
+        <h1 className='text-4xl'>Cadavre exquis,<br/>«&nbsp;ouvroir de cinéma potentiel&nbsp;», est un laboratoire de valorisation patrimoniale et de création expérimentale dédié au cinéma scientifique et éducatif.</h1>
       </div>
     </Styled>
   </>);

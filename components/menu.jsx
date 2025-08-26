@@ -19,7 +19,7 @@ const primaryNavItems = [
 		href: '/remontage'
 	},
 	{ 
-		titre: 'Documentation', 
+		titre: 'Documents', 
 		sousTitre: 'Textes et dossier d’archives', 
 		icone: 'document', 
 		href: '/documents'
@@ -29,7 +29,7 @@ const primaryNavItems = [
 const secondaryNavItems = [
 	{ linkText: 'À propos', href: '/a-propos' },
 	{ linkText: 'Code d’éthique du réemploi', href: '/code-ethique'},
-	{ linkText: 'Événements', href: 'https://horschamp.qc.ca/calendrier'},
+	{ linkText: 'Événements', href: 'https://horschamp.qc.ca/programmation/cadavre-exquis'},
 	{ linkText: 'Bibliographie et ressources documentaires', href: '/bibliographie'}
 ];
 
