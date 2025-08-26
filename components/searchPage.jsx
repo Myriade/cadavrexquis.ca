@@ -65,6 +65,9 @@ export function SearchPage({searchSlug}) {
           if (item.attributes.field_descriptions_cadavrexquis[0]) {
             return item.attributes.field_descriptions_cadavrexquis[0].value.toLowerCase().includes(searchTerms.toLowerCase())
           }
+          if (item.attributes.field_resume_de_l_institution_de) {
+            return item.attributes.field_resume_de_l_institution_de.value.toLowerCase().includes(searchTerms.toLowerCase())
+          }
         }
       );
       matchDescr.forEach( item => { allMatch.push(item) }) 

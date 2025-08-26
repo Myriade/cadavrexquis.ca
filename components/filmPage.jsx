@@ -239,11 +239,16 @@ export function FilmPage( {path} ) {
 				<div 
 					dangerouslySetInnerHTML={ film.field_descriptions_cadavrexquis.length ? { 
 						__html: film.field_descriptions_cadavrexquis[0].processed 
-					} : { 
-						__html: 's.o. (Champ « Descriptions et résumés de l’équipe de Cadavre exquis »)'
-					}}
+					} : null}
 					className='description text-lg font-serif mb-6'
 				></div>
+				<div 
+					dangerouslySetInnerHTML={ film.field_resume_de_l_institution_de ? { 
+						__html: film.field_resume_de_l_institution_de.processed 
+					} : null}
+					className='description text-lg font-serif mb-6'
+				></div>
+				
 				
 				<dl className='mb-6'>
 					<div>
