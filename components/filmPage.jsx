@@ -153,6 +153,7 @@ export function FilmPage( {path} ) {
 			joinTerms(film.field_consultants, 'consultants', true)
 			joinTerms(film.field_pays_origine, 'pays')
 			joinTerms(film.field_vedettes_matiere, 'matiere')
+			joinTerms(film.field_format, 'format')
 			
 			// Vimeo
 			if (film.field_url_interne.length && film.field_url_interne[0] !== null) {  
@@ -189,6 +190,11 @@ export function FilmPage( {path} ) {
 			});
 		}
 	}, [film, relatedFilms, allFilmsIsLoading, allFilms ])
+	
+	// Event handlers
+	function voirPlusToggle() {
+		console.log('Voir plus clicked');
+	}
 	
 	if (film === 'not-found') {
 		return notFound()
@@ -287,6 +293,16 @@ export function FilmPage( {path} ) {
 					</div>
 				</dl>
 				
+				<button className='button mb-6' onClick={voirPlusToggle}>Voir plus + </button>
+				<dl id='voir-plus' className='mb-6'>
+					{film.field_numero_identification ? 
+						<div>
+							<dt>Numéro d’identification&nbsp;: </dt>
+							<dd>{film.field_numero_identification}</dd>
+						</div>
+					: ''}
+				</dl> 
+				
 			</Main>
 			
 			{ relatedFilms ?
@@ -306,11 +322,3 @@ export function FilmPage( {path} ) {
 		</>
 	);
 };
-
-
-/* Pour phase 2 : bouton Voir +
-<button className='button'>Voir plus + </button>
-<dl className='mb-6'>
-	<dd>[ Au clic sur voir +, les autres champs s&apos;afficheront au cas par cas, visibles seulement si contient une donné ]</dd>
-</dl> 
-*/
