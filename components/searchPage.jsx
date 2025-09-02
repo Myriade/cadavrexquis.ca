@@ -12,6 +12,38 @@ export function SearchPage({searchSlug}) {
   const [vocabs, setVocabs] = useState(null)
   const { data, isloading, error } = useFetchAllFilms(true)
   
+  // Taxonomy Search fields
+  const taxoFields = [
+    {
+      fieldName: 'field_site_thematique',
+      vocabName: 'site_categorie'
+    }, 
+    {
+      fieldName: 'field_realisation',
+      vocabName: 'realisation'
+    },
+    {
+      fieldName: 'field_vedettes_matiere',
+      vocabName: 'vedette_matiere'
+    },
+    {
+      fieldName: 'field_langue',
+      vocabName: 'langue'
+    },
+    {
+      fieldName: 'field_production',
+      vocabName: 'production'
+    },
+    {
+      fieldName: 'field_consultants',
+      vocabName: 'consultant'
+    },
+    {
+      fieldName: 'field_pays_origine',
+      vocabName: 'pays'
+    }
+  ]
+  
   useEffect(()=>{
     if (!searchTerms) {
       // Convert uri back to readable string
@@ -23,12 +55,6 @@ export function SearchPage({searchSlug}) {
   // Set vocab references obj
   useEffect( () => {
     if (!vocabs && data) {
-      const vocabularyNames = [
-        "site_categorie",
-        "realisation",
-        "vedette_matiere",
-        "langue"
-      ]
       const result = {}
       
       const getTermNamesByVocab = (vocabularyName) => {
@@ -38,8 +64,8 @@ export function SearchPage({searchSlug}) {
         result[vocabularyName] = terms
       }
       
-      vocabularyNames.forEach( vocab => {
-        getTermNamesByVocab(vocab)
+      taxoFields.forEach( vocab => {
+        getTermNamesByVocab(vocab.vocabName)
       })
       
       setVocabs(result)
@@ -83,26 +109,6 @@ export function SearchPage({searchSlug}) {
       data.data.forEach( (item, index) => {
         rechercherValeur(item.attributes, searchTerms, index)
       })
-      
-      // Taxonomy Search fields
-      const taxoFields = [
-        {
-          fieldName: 'field_site_thematique',
-          vocabName: 'site_categorie'
-        }, 
-        {
-          fieldName: 'field_realisation',
-          vocabName: 'realisation'
-        },
-        {
-          fieldName: 'field_vedettes_matiere',
-          vocabName: 'vedette_matiere'
-        },
-        {
-          fieldName: 'field_langue',
-          vocabName: 'langue'
-        }
-      ]
       
       function loopThroughVocabTerms(fieldName, vocabName) {
         const match = data.data.filter( item => {
