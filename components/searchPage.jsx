@@ -23,25 +23,24 @@ export function SearchPage({searchSlug}) {
   // Set vocab references obj
   useEffect( () => {
     if (!vocabs && data) {
+      const vocabularyNames = [
+        "site_categorie",
+        "realisation",
+        "vedette_matiere",
+        "langue"
+      ]
       const result = {}
       
-      // Vedette matiere
-      const vedettematieres = data.included.filter( item => {
-        return item.type === "taxonomy_term--vedette_matiere"
-      });
-      result.vedettematieres = vedettematieres
+      const getTermNamesByVocab = (vocabularyName) => {
+        const terms =  data.included.filter( item => {
+          return item.type === `taxonomy_term--${vocabularyName}`
+        })
+        result[vocabularyName] = terms
+      }
       
-      // realisation
-      const realisations = data.included.filter( item => {
-        return item.type === "taxonomy_term--realisation"
-      });
-      result.realisations = realisations
-      
-      // thematiques
-      const thematiques = data.included.filter( item => {
-        return item.type === "taxonomy_term--site_categorie"
-      });
-      result.thematiques = thematiques
+      vocabularyNames.forEach( vocab => {
+        getTermNamesByVocab(vocab)
+      })
       
       setVocabs(result)
     }
@@ -53,45 +52,69 @@ export function SearchPage({searchSlug}) {
       
       const allMatch = []
       
-      // Loop through Titles
-      const matchTitles = data.data.filter(
-        item => item.attributes.title.toLowerCase().includes(searchTerms.toLowerCase())
-      );
-      matchTitles.forEach( item => { allMatch.push(item) })
-      
-      // Loop through Description
-      const matchDescr = data.data.filter(
-        item => {
-          if (item.attributes.field_descriptions_cadavrexquis[0]) {
-            return item.attributes.field_descriptions_cadavrexquis[0].value.toLowerCase().includes(searchTerms.toLowerCase())
+      // Loop through all Attribute object values recursively
+      function rechercherValeur(objet, valeurRecherchee, index) {
+        const lowerCaseRecherche = valeurRecherchee.toLowerCase();
+        
+        // Recherche récursive dans les propriétés de type string uniquement
+        function chercherDansChaines(elementToTest) {
+          if (typeof elementToTest === 'string') {
+            const elemLowerCase = elementToTest.toLowerCase()
+            if (elemLowerCase.includes(lowerCaseRecherche)) {
+              return true
+            }
           }
-          if (item.attributes.field_resume_de_l_institution_de) {
-            return item.attributes.field_resume_de_l_institution_de.value.toLowerCase().includes(searchTerms.toLowerCase())
+          else if (Array.isArray(elementToTest)) {
+            return elementToTest.some(item => chercherDansChaines(item));
           }
+          else if (typeof elementToTest === 'object' && elementToTest !== null) {
+            return Object.values(elementToTest).some(valeur => chercherDansChaines(valeur));
+          }
+          return false;
         }
-      );
-      matchDescr.forEach( item => { allMatch.push(item) }) 
+        
+        const hasTerm = chercherDansChaines(objet)
+        
+        if (hasTerm) {
+          allMatch.push(data.data[index])
+        }
+      }
       
-      // Loop through vedettes-matières
-      const matchVedettes = data.data.filter( item => {
-        const termNames = findTermName( item.relationships.field_vedettes_matiere.data, vocabs.vedettematieres);
-        return termNames.toLowerCase().includes(searchTerms.toLowerCase())
+      data.data.forEach( (item, index) => {
+        rechercherValeur(item.attributes, searchTerms, index)
       })
-      matchVedettes.forEach( item => { allMatch.push(item) })
       
-      // Loop through realisations
-      const matchReal = data.data.filter( item => {
-        const termNames = findTermName( item.relationships.field_realisation.data, vocabs.realisations);
-        return termNames.toLowerCase().includes(searchTerms.toLowerCase())
-      })
-      matchReal.forEach( item => { allMatch.push(item) })
+      // Taxonomy Search fields
+      const taxoFields = [
+        {
+          fieldName: 'field_site_thematique',
+          vocabName: 'site_categorie'
+        }, 
+        {
+          fieldName: 'field_realisation',
+          vocabName: 'realisation'
+        },
+        {
+          fieldName: 'field_vedettes_matiere',
+          vocabName: 'vedette_matiere'
+        },
+        {
+          fieldName: 'field_langue',
+          vocabName: 'langue'
+        }
+      ]
       
-      // Loop through thematiques
-      const matchThematiques = data.data.filter( item => {
-        const termNames = findTermName( item.relationships.field_site_thematique.data, vocabs.thematiques);
-        return termNames.toLowerCase().includes(searchTerms.toLowerCase())
+      function loopThroughVocabTerms(fieldName, vocabName) {
+        const match = data.data.filter( item => {
+          const termNames = findTermName( item.relationships[fieldName].data, vocabs[vocabName]);
+          return termNames.toLowerCase().includes(searchTerms.toLowerCase())
+        })
+        match.forEach( item => { allMatch.push(item) })
+      }
+      
+      taxoFields.forEach( item => {
+        loopThroughVocabTerms(item.fieldName, item.vocabName)
       })
-      matchThematiques.forEach( item => { allMatch.push(item) })
       
       // Remove duplicates
       let set = new Set(allMatch);
@@ -122,7 +145,6 @@ export function SearchPage({searchSlug}) {
     return (
       <div>
         <p className='mb-6 text-3xl md:text-4xl'>Aucun résultat pour « {searchTerms} »</p>
-        <p>La recherche est effectuée dans les champs titre, description, réalisation, thématique et vedette-matière.</p>
       </div>
     )
   }
@@ -137,7 +159,6 @@ export function SearchPage({searchSlug}) {
         error={error} 
         isSearch
       ></FilmsGrille>
-      <p>La recherche est effectuée dans les champs titre, description, réalisation, thématique et vedette-matière.</p>
     </>
   )
 }
