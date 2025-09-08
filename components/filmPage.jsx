@@ -46,6 +46,13 @@ const Main = styled.main`
 		
 	dt {
 		font-weight: bold;}
+		
+	#voir-plus {
+		&.hidden {
+			display: none;}
+		&.visible {
+			display: block;}
+	}
 	
 	@container (min-width: 250px) { }
 		
@@ -129,6 +136,7 @@ export function FilmPage( {path} ) {
 	const { film, isLoading, error } = useFetchUniqueFilm(defautlFilm, path)
 	const [ processedFields, setProcessedFields ] = useState(null)
 	const [ relatedFilms, setRelatedFilms ] = useState(null)
+	const [voirPlus, setVoirPlus] = useState(false)
 	const { data : allFilms, isLoading : allFilmsIsLoading, error : allFilmsError } = useFetchAllFilms();
 	
 	// Process fields for presentation
@@ -136,25 +144,36 @@ export function FilmPage( {path} ) {
 		if (film.id && !isLoading && !error && !processedFields) {
 			const _fields = {}
 			function joinTerms(fieldSource, fieldOutput, optional) {
-				if (fieldSource.length) {
-					const array = fieldSource.map( item => item.name )
-					_fields[fieldOutput] = array.join(', ')
-				} else if (!optional) {
-					_fields[fieldOutput] = 's.o.'
+				if (fieldSource) {
+					if (Array.isArray(fieldSource) && fieldSource.length) {
+						const array = fieldSource.map( item => item.name )
+						_fields[fieldOutput] = array.join(', ')
+					} else if (typeof fieldSource === 'object' && !Array.isArray(fieldSource)) {
+						_fields[fieldOutput] = fieldSource.name
+					} else if (!optional) {
+						_fields[fieldOutput] = 's.o.'
+					}
+				} else {
+					console.log('!! ', fieldOutput, ' est inexistant')
 				}
-				// TODO : optional fields pourla section "voir plus"
+				
 			}
 			
 			// Taxonomies
 			joinTerms(film.field_site_thematique, 'thematique')
 			joinTerms(film.field_production, 'production')
 			joinTerms(film.field_realisation, 'realisation')
-			joinTerms(film.field_langues, 'langues')
+			joinTerms(film.field_langue, 'langue')
 			joinTerms(film.field_consultants, 'consultants', true)
 			joinTerms(film.field_pays_origine, 'pays')
 			joinTerms(film.field_vedettes_matiere, 'matiere')
-			joinTerms(film.field_format, 'format')
+			joinTerms(film.field_format, 'format', true)
+			joinTerms(film.field_son, 'son', true)
+			joinTerms(film.field_langues, 'langues', true)
+			joinTerms(film.field_fabricant, 'fabricant', true)
 			
+			console.log('film.field_langue', film.field_langue)
+				
 			// Vimeo
 			if (film.field_url_interne.length && film.field_url_interne[0] !== null) {  
 				const vimeoId = getVimeoId(film.field_url_interne[0].uri)
@@ -191,9 +210,17 @@ export function FilmPage( {path} ) {
 		}
 	}, [film, relatedFilms, allFilmsIsLoading, allFilms ])
 	
-	// Event handlers
+	// Voir Plus click event handlers
 	function voirPlusToggle() {
 		console.log('Voir plus clicked');
+		if (!voirPlus) {
+			setVoirPlus(true)
+			return
+		}
+		if (voirPlus) {
+			setVoirPlus(false)
+			return
+		}
 	}
 	
 	if (film === 'not-found') {
@@ -203,7 +230,7 @@ export function FilmPage( {path} ) {
 	if (error) {
 		return (
 			<main className='grid content-center text-center'>
-				<p className='error'>Une erreur de chargement sest produite. Vérifiez votre connexion internet, ou avisez-nous si le problème persite.</p>
+				<p className='error'>Une erreur de chargement s'est produite. Vérifiez votre connexion internet, ou avisez-nous si le problème persite.</p>
 			</main>
 		)
 	}
@@ -255,7 +282,6 @@ export function FilmPage( {path} ) {
 					className='description text-lg font-serif mb-6'
 				></div>
 				
-				
 				<dl className='mb-6'>
 					<div>
 						<dt>Production: </dt>
@@ -281,11 +307,11 @@ export function FilmPage( {path} ) {
 					</div>
 					<div>
 						<dt>Langues: </dt>
-						<dd>{ processedFields ? processedFields.langues : '...' }</dd>
+						<dd>{ processedFields ? processedFields.langue : '...' }</dd>
 					</div>
 					<div>
 						<dt>Durée: </dt>
-						<dd>{ film.field_duree ? film.field_duree : 's.o.' }</dd>
+						<dd>{ film.field_duree ? film.field_duree : '...' }</dd>
 					</div>
 					<div>
 						<dt>Vedettes-matières sujet: </dt>
@@ -293,12 +319,36 @@ export function FilmPage( {path} ) {
 					</div>
 				</dl>
 				
-				<button className='button mb-6' onClick={voirPlusToggle}>Voir plus + </button>
-				<dl id='voir-plus' className='mb-6'>
+				<button className='button mb-6' onClick={voirPlusToggle}>Voir {voirPlus ? 'moins -' : 'plus +'} </button>
+				<dl id='voir-plus' className={ !voirPlus ? `hidden mb-6` : `visible mb-6`}>
 					{film.field_numero_identification ? 
 						<div>
 							<dt>Numéro d’identification&nbsp;: </dt>
 							<dd>{film.field_numero_identification}</dd>
+						</div>
+					: ''}
+					{processedFields && processedFields.format ? 
+						<div>
+							<dt>Format&nbsp;: </dt>
+							<dd>{processedFields.format}</dd>
+						</div>
+					: ''}
+					{processedFields && processedFields.son ? 
+						<div>
+							<dt>Son&nbsp;: </dt>
+							<dd>{processedFields.son}</dd>
+						</div>
+					: ''}
+					{processedFields && processedFields.langues ? 
+						<div>
+							<dt>Langues de la copie&nbsp;: </dt>
+							<dd>{processedFields.langues}</dd>
+						</div>
+					: ''}
+					{processedFields && processedFields.fabricant ? 
+						<div>
+							<dt>Fabricant de la pellicule&nbsp;: </dt>
+							<dd>{processedFields.fabricant}</dd>
 						</div>
 					: ''}
 				</dl> 
