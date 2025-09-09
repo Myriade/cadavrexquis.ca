@@ -134,46 +134,57 @@ const defautlFilm = {
 	
 export function FilmPage( {path} ) {
 	const { film, isLoading, error } = useFetchUniqueFilm(defautlFilm, path)
-	const [ processedFields, setProcessedFields ] = useState(null)
+	const [ primaryFields, setPrimaryFields ] = useState(null)
+	const [ secondaryFields, setSecondaryFields ] = useState(null)
+	const [ hasHyperlinks, setHasHyperlinks] = useState(false)
+	const [ voirPlusOpen, setVoirPlusOpen ] = useState(false)
 	const [ relatedFilms, setRelatedFilms ] = useState(null)
-	const [voirPlus, setVoirPlus] = useState(false)
 	const { data : allFilms, isLoading : allFilmsIsLoading, error : allFilmsError } = useFetchAllFilms();
 	
-	// Process fields for presentation
-	useEffect(() => {
-		if (film.id && !isLoading && !error && !processedFields) {
-			const _fields = {}
-			function joinTerms(fieldSource, fieldOutput, optional) {
-				if (fieldSource) {
-					if (Array.isArray(fieldSource) && fieldSource.length) {
-						const array = fieldSource.map( item => item.name )
-						_fields[fieldOutput] = array.join(', ')
-					} else if (typeof fieldSource === 'object' && !Array.isArray(fieldSource)) {
-						_fields[fieldOutput] = fieldSource.name
-					} else if (!optional) {
-						_fields[fieldOutput] = 's.o.'
-					}
-				} else {
-					console.log('!! ', fieldOutput, ' est inexistant')
-				}
+	function formatField(fieldSource, visibleIfEmpty) {
+		
+		if (fieldSource) {
+			
+			if (Array.isArray(fieldSource) && fieldSource.length) {
+				// if source is a non empty array of taxonomy term, join terms
+				// TODO : Check if taxonomy terms has links to view more related content
+				const array = fieldSource.map( item => item.name )
+				return array.join(', ') 
+			} 
 				
+			else if (typeof fieldSource === 'object' && !Array.isArray(fieldSource)) {
+				// if source is an object o just one taxonomy term
+				return fieldSource.name 
+			} 
+			
+			else if (typeof fieldSource === 'string') {
+				// if source is a string, output it as is
+				return fieldSource
 			}
-			
-			// Taxonomies
-			joinTerms(film.field_site_thematique, 'thematique')
-			joinTerms(film.field_production, 'production')
-			joinTerms(film.field_realisation, 'realisation')
-			joinTerms(film.field_langue, 'langue')
-			joinTerms(film.field_consultants, 'consultants', true)
-			joinTerms(film.field_pays_origine, 'pays')
-			joinTerms(film.field_vedettes_matiere, 'matiere')
-			joinTerms(film.field_format, 'format', true)
-			joinTerms(film.field_son, 'son', true)
-			joinTerms(film.field_langues, 'langues', true)
-			joinTerms(film.field_fabricant, 'fabricant', true)
-			
-			console.log('film.field_langue', film.field_langue)
 				
+			else if (visibleIfEmpty) {
+				// if source is empty but must be presented anyway, output s.o.
+				return 's.o.'
+			}
+		} 
+	}
+	
+	// Format primary visibles fields for presentation
+	useEffect(() => {
+		if (film.id && !isLoading && !error && !primaryFields) {
+			const _fields = {}
+			
+			// Standards fields //
+			// Todo : function to loop in standards fields
+			_fields.thematique = formatField(film.field_site_thematique, true)
+			_fields.production = formatField(film.field_production, true)
+			_fields.realisation = formatField(film.field_realisation,  true)
+			_fields.langue = formatField(film.field_langue, true)
+			_fields.consultants = formatField(film.field_consultants)
+			_fields.pays = formatField(film.field_pays_origine, true)
+			_fields.matiere = formatField(film.field_vedettes_matiere, true)
+			
+			// Special fields //
 			// Vimeo
 			if (film.field_url_interne.length && film.field_url_interne[0] !== null) {  
 				const vimeoId = getVimeoId(film.field_url_interne[0].uri)
@@ -189,9 +200,25 @@ export function FilmPage( {path} ) {
 				_fields.filmType = 's.o.'
 			}
 			
-			setProcessedFields(_fields)
+			setPrimaryFields(_fields)
 		}
-	}, [film, isLoading, error, processedFields])
+	}, [film, isLoading, error, primaryFields])
+	
+	// Format and aggregate Secondary "Voir plus" fields 
+	useEffect(() => {
+		if (primaryFields && !secondaryFields) {
+			const _fields = {}
+			//const _markup = null;
+			
+			_fields.format = formatField(film.field_format)
+			_fields.son = formatField(film.field_son)
+			_fields.langues = formatField(film.field_langues)
+			_fields.fabricant = formatField(film.field_fabricant)
+			
+			setSecondaryFields(_fields)
+		}
+	}, [primaryFields, secondaryFields])
+	
 	
 	// Films reliés, À voir aussi
 	useEffect(() => {
@@ -213,12 +240,12 @@ export function FilmPage( {path} ) {
 	// Voir Plus click event handlers
 	function voirPlusToggle() {
 		console.log('Voir plus clicked');
-		if (!voirPlus) {
-			setVoirPlus(true)
+		if (!voirPlusOpen) {
+			setVoirPlusOpen(true)
 			return
 		}
-		if (voirPlus) {
-			setVoirPlus(false)
+		if (voirPlusOpen) {
+			setVoirPlusOpen(false)
 			return
 		}
 	}
@@ -238,10 +265,10 @@ export function FilmPage( {path} ) {
 	return (
 		<>
 			<Main>
-				{ processedFields && processedFields.vimeoSource ? (
+				{ primaryFields && primaryFields.vimeoSource ? (
 					<div className='vimeo mb-10'>
 						<iframe 
-							src={processedFields.vimeoSource} 
+							src={primaryFields.vimeoSource} 
 							frameBorder="0" 
 							allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" 
 							title=""
@@ -259,14 +286,14 @@ export function FilmPage( {path} ) {
 					{film.field_site_collection === 'cadavre_exquis' ? 
 						<Icone nom='remontage' couleur='var(--color-rouge)' />
 					: ''}
-					{processedFields && processedFields.filmType ? processedFields.filmType : '... chargement'}
+					{primaryFields && primaryFields.filmType ? primaryFields.filmType : '... chargement'}
 				</p>
 				
 				<h1 className='mb-8'>{film.title}</h1>
 				
 				<p className='infos text-xl font-sans mb-4'>
 					{film.field_annees_de_sortie ? film.field_annees_de_sortie : 's.o. (annee de sortie)'}
-					{processedFields && processedFields.thematique ? <span> / {processedFields.thematique}</span> : ''}
+					{primaryFields && primaryFields.thematique ? <span> / {primaryFields.thematique}</span> : ''}
 				</p>
 				
 				<div 
@@ -285,16 +312,16 @@ export function FilmPage( {path} ) {
 				<dl className='mb-6'>
 					<div>
 						<dt>Production: </dt>
-						<dd>{ processedFields ? processedFields.production : '...' }</dd>
+						<dd>{ primaryFields ? primaryFields.production : '...' }</dd>
 					</div>
 					<div>
 						<dt>Réalisation: </dt>
-						<dd>{ processedFields ? processedFields.realisation : '...' }</dd>
+						<dd>{ primaryFields ? primaryFields.realisation : '...' }</dd>
 					</div>
-					{ processedFields && processedFields.consultants ? (
+					{ primaryFields && primaryFields.consultants ? (
 						<div>
 							<dt>Consultants: </dt>
-							<dd>{processedFields.consultants}</dd>
+							<dd>{primaryFields.consultants}</dd>
 						</div>
 					) : '' }
 					<div>
@@ -303,11 +330,11 @@ export function FilmPage( {path} ) {
 					</div>
 					<div>
 						<dt>Pays d’origine: </dt>
-						<dd>{processedFields ? processedFields.pays : '...'}</dd>
+						<dd>{primaryFields ? primaryFields.pays : '...'}</dd>
 					</div>
 					<div>
 						<dt>Langues: </dt>
-						<dd>{ processedFields ? processedFields.langue : '...' }</dd>
+						<dd>{ primaryFields ? primaryFields.langue : '...' }</dd>
 					</div>
 					<div>
 						<dt>Durée: </dt>
@@ -315,40 +342,40 @@ export function FilmPage( {path} ) {
 					</div>
 					<div>
 						<dt>Vedettes-matières sujet: </dt>
-						<dd>{ processedFields ? processedFields.matiere : '...' }</dd>
+						<dd>{ primaryFields ? primaryFields.matiere : '...' }</dd>
 					</div>
 				</dl>
 				
-				<button className='button mb-6' onClick={voirPlusToggle}>Voir {voirPlus ? 'moins -' : 'plus +'} </button>
-				<dl id='voir-plus' className={ !voirPlus ? `hidden mb-6` : `visible mb-6`}>
+				<button className='button mb-6' onClick={voirPlusToggle}>Voir {voirPlusOpen ? 'moins -' : 'plus +'} </button>
+				<dl id='voir-plus' className={ !voirPlusOpen ? `hidden mb-6` : `visible mb-6`}>
 					{film.field_numero_identification ? 
 						<div>
 							<dt>Numéro d’identification&nbsp;: </dt>
 							<dd>{film.field_numero_identification}</dd>
 						</div>
 					: ''}
-					{processedFields && processedFields.format ? 
+					{secondaryFields && secondaryFields.format ? 
 						<div>
 							<dt>Format&nbsp;: </dt>
-							<dd>{processedFields.format}</dd>
+							<dd>{secondaryFields.format}</dd>
 						</div>
 					: ''}
-					{processedFields && processedFields.son ? 
+					{secondaryFields && secondaryFields.son ? 
 						<div>
 							<dt>Son&nbsp;: </dt>
-							<dd>{processedFields.son}</dd>
+							<dd>{secondaryFields.son}</dd>
 						</div>
 					: ''}
-					{processedFields && processedFields.langues ? 
+					{secondaryFields && secondaryFields.langues ? 
 						<div>
 							<dt>Langues de la copie&nbsp;: </dt>
-							<dd>{processedFields.langues}</dd>
+							<dd>{secondaryFields.langues}</dd>
 						</div>
 					: ''}
-					{processedFields && processedFields.fabricant ? 
+					{secondaryFields && secondaryFields.fabricant ? 
 						<div>
 							<dt>Fabricant de la pellicule&nbsp;: </dt>
-							<dd>{processedFields.fabricant}</dd>
+							<dd>{secondaryFields.fabricant}</dd>
 						</div>
 					: ''}
 				</dl> 
