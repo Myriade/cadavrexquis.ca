@@ -136,7 +136,8 @@ export function FilmPage( {path} ) {
 	const { film, isLoading, error } = useFetchUniqueFilm(defautlFilm, path)
 	const [ primaryFields, setPrimaryFields ] = useState(null)
 	const [ secondaryFields, setSecondaryFields ] = useState(null)
-	const [ hasHyperlinks, setHasHyperlinks] = useState(false)
+	const [ fieldConfigs, setFieldConfigs ] = useState(null)
+	const [ secondaryFieldsReady, setSecondaryFieldsReady] = useState(false)
 	const [ voirPlusOpen, setVoirPlusOpen ] = useState(false)
 	const [ relatedFilms, setRelatedFilms ] = useState(null)
 	const { data : allFilms, isLoading : allFilmsIsLoading, error : allFilmsError } = useFetchAllFilms();
@@ -210,6 +211,7 @@ export function FilmPage( {path} ) {
 			const _fields = {}
 			//const _markup = null;
 			
+			_fields.numero = formatField(film.field_numero_identification)
 			_fields.format = formatField(film.field_format)
 			_fields.son = formatField(film.field_son)
 			_fields.langues = formatField(film.field_langues)
@@ -219,6 +221,17 @@ export function FilmPage( {path} ) {
 		}
 	}, [primaryFields, secondaryFields])
 	
+	useEffect(() => {
+		if (secondaryFields && !fieldConfigs) {
+			setFieldConfigs([{
+				label: 'Numéro d\'identification', value: secondaryFields.numero },{
+				label: 'Format', value: secondaryFields.format },{
+				label: 'Son', value: secondaryFields.son },{
+				label: 'Langues de la copie', value: secondaryFields.langues },{
+				label: 'Fabricant de la pellicule', value: secondaryFields.fabricant }
+			])
+		}
+	}, [secondaryFields, fieldConfigs])
 	
 	// Films reliés, À voir aussi
 	useEffect(() => {
@@ -348,36 +361,14 @@ export function FilmPage( {path} ) {
 				
 				<button className='button mb-6' onClick={voirPlusToggle}>Voir {voirPlusOpen ? 'moins -' : 'plus +'} </button>
 				<dl id='voir-plus' className={ !voirPlusOpen ? `hidden mb-6` : `visible mb-6`}>
-					{film.field_numero_identification ? 
-						<div>
-							<dt>Numéro d’identification&nbsp;: </dt>
-							<dd>{film.field_numero_identification}</dd>
-						</div>
-					: ''}
-					{secondaryFields && secondaryFields.format ? 
-						<div>
-							<dt>Format&nbsp;: </dt>
-							<dd>{secondaryFields.format}</dd>
-						</div>
-					: ''}
-					{secondaryFields && secondaryFields.son ? 
-						<div>
-							<dt>Son&nbsp;: </dt>
-							<dd>{secondaryFields.son}</dd>
-						</div>
-					: ''}
-					{secondaryFields && secondaryFields.langues ? 
-						<div>
-							<dt>Langues de la copie&nbsp;: </dt>
-							<dd>{secondaryFields.langues}</dd>
-						</div>
-					: ''}
-					{secondaryFields && secondaryFields.fabricant ? 
-						<div>
-							<dt>Fabricant de la pellicule&nbsp;: </dt>
-							<dd>{secondaryFields.fabricant}</dd>
-						</div>
-					: ''}
+					{ fieldConfigs ? fieldConfigs.map( (field, index) => {
+						return field.value ? (
+							<div key={index}>
+								<dt>{field.label}:</dt>
+								<dd>{field.value}</dd>
+							</div> 
+						) : ''
+					}) : '...' }
 				</dl> 
 				
 			</Main>
