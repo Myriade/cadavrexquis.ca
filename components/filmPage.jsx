@@ -316,7 +316,7 @@ export function FilmPage( {path} ) {
 	if (error) {
 		return (
 			<main className='grid content-center text-center'>
-				<p className='error'>Une erreur de chargement s'est produite. Vérifiez votre connexion internet, ou avisez-nous si le problème persite.</p>
+				<p className='error'>Une erreur de chargement s&apos;est produite. Vérifiez votre connexion internet, ou avisez-nous si le problème persite.</p>
 			</main>
 		)
 	}
