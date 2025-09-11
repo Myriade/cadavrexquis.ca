@@ -41,11 +41,22 @@ const Main = styled.main`
 		p {
 			margin-bottom: 1em}}
 		
-	dt, dd {
-		display: inline;}
+	dl > div {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: 0.5ch;}
 		
 	dt {
 		font-weight: bold;}
+		
+	dd {
+		overflow: hidden;
+		a {
+			display: block;
+			max-width: 100%;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;}}
 		
 	#voir-plus {
 		&.hidden {
@@ -128,10 +139,20 @@ export function FilmPage( {path} ) {
 				return array.join(', ') 
 			} 
 			
+			if (typeof fieldSource === 'object' && 'first' in fieldSource ) {
+				// if source is an object from a drupal double string field (with a first key)
+				const resultat = Object.values(fieldSource).reduce((acc, valeur) => acc + " - " + valeur);
+				return resultat
+			} 
+			
 			else if (typeof fieldSource === 'object' && "uri" in fieldSource) {
 				// if source is a URL field
-				console.log('field_url', fieldSource)
-				return (<a href={fieldSource.uri} target='_blank'>{fieldSource.uri}</a>)
+				return (<a href={fieldSource.uri} target='_blank' title={fieldSource.uri}>{fieldSource.uri}</a>)
+			}
+			
+			else if (typeof fieldSource === 'object' && "processed" in fieldSource) {
+				// si source is a rich html text field
+				return (<div dangerouslySetInnerHTML={ { __html: fieldSource.processed } } />)
 			}
 				
 			else if (visibleIfEmpty) {
@@ -206,8 +227,14 @@ export function FilmPage( {path} ) {
 			_fields.musique = formatField(film.field_musique)
 			_fields.montage = formatField(film.field_montage),
 			_fields.effets = formatField(film.field_effets_speciaux_et_animati)
-			_fields.jeu = formatField(film.field_jeu)
-			//_fields. = formatField(film.)
+			_fields.jeu = formatField(film.field_jeu),
+			_fields.participation = formatField(film.field_participation)
+			_fields.autre = formatField(film.field_autres)
+			_fields.anneesProd = formatField(film.field_annees_de_production)
+			_fields.formatProd = formatField(film.field_format_de_production)
+			_fields.lieux = formatField(film.field_lieux)
+			_fields.personnes = formatField(film.field_personnes)
+			_fields.commentaires = formatField(film.field_commentaires)
 			
 			setSecondaryFields(_fields)
 		}
@@ -240,7 +267,14 @@ export function FilmPage( {path} ) {
 				label: 'Musique', value: secondaryFields.musique },{
 				label: 'Montage', value: secondaryFields.montage },{
 				label: 'Effets spéciaux et animation', value: secondaryFields.effets}, {
-				label: 'Jeu', value: secondaryFields.jeu }
+				label: 'Jeu', value: secondaryFields.jeu },{
+				label: 'Participation', value: secondaryFields.participation },{
+				label: 'Autre', value: secondaryFields.autre },{
+				label: 'Années de production', value: secondaryFields.anneesProd },{
+				label: 'Format de production', value: secondaryFields.formatProd },{
+				label: 'Lieux', value: secondaryFields.lieux },{
+				label: 'Personnes', value: secondaryFields.personnes },{
+				label: 'Commentaires', value: secondaryFields.commentaires }
 			])
 		}
 	}, [secondaryFields, fieldConfigs])
