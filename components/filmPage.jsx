@@ -78,57 +78,17 @@ const defautlFilm = {
 	"field_langue": [],
 	"drupal_internal__nid": null,
 	"path": {},
-	"created": null,
-	"changed": null,
 	"field_annees_de_production": null,
-	"field_commentaires": null,
-	"field_cote": null,
-	"field_credits_notes": null,
 	"field_dates_de_production_estime": false,
 	"field_descriptions_autres": [],
 	"field_duree": null,
-	"field_edge_code": null,
-	"field_emplacements": [],
 	"field_films_relies": [],
-	"field_lieux": [],
-	"field_longueur_metrage": null,
-	"field_longueur_nombre_de_bobines": null,
-	"field_longueur_pietage": null,
-	"field_notes": null,
-	"field_numero_identification": null,
 	"field_resume_de_l_institution_de": null,
 	"field_site_visible": null,
-	"field_statut_legal": null,
-	"field_titres_alternatifs": [],
 	"field_titre_attribue": false,
-	"field_titre_de_serie": [],
-	"field_traitement": null,
-	"field_autres": [],
-	"field_commanditaires": [],
 	"field_consultants": [],
-	"field_direction_de_la_photograph": [],
-	"field_distribution": [],
-	"field_effets_speciaux_et_animati": [],
-	"field_emulsion": null,
-	"field_fabricant": null,
-	"field_format": null,
-	"field_format_de_production": [],
-	"field_institution_detentrice": null,
 	"field_jeu": [],
-	"field_langues": [],
-	"field_montage": [],
-	"field_musique": [],
-	"field_narration": [],
-	"field_participation": [],
 	"field_pays_origine": [],
-	"field_personnes": [],
-	"field_production": [],
-	"field_ratio": null,
-	"field_scenario": [],
-	"field_site_photogramme": {},
-	"field_son": null,
-	"field_son_sound": [],
-	"field_type_d_image": null,
 	"field_vedettes_matiere": []
 }
 	
@@ -137,30 +97,41 @@ export function FilmPage( {path} ) {
 	const [ primaryFields, setPrimaryFields ] = useState(null)
 	const [ secondaryFields, setSecondaryFields ] = useState(null)
 	const [ fieldConfigs, setFieldConfigs ] = useState(null)
-	const [ secondaryFieldsReady, setSecondaryFieldsReady] = useState(false)
 	const [ voirPlusOpen, setVoirPlusOpen ] = useState(false)
 	const [ relatedFilms, setRelatedFilms ] = useState(null)
 	const { data : allFilms, isLoading : allFilmsIsLoading, error : allFilmsError } = useFetchAllFilms();
 	
 	function formatField(fieldSource, visibleIfEmpty) {
 		
+		// TODO : Check if taxonomy terms has links to view more related content
 		if (fieldSource) {
 			
-			if (Array.isArray(fieldSource) && fieldSource.length) {
-				// if source is a non empty array of taxonomy term, join terms
-				// TODO : Check if taxonomy terms has links to view more related content
+			if (Array.isArray(fieldSource) && typeof fieldSource[0] === 'object' && "vid" in fieldSource[0]) {
+				// if source is an array of taxonomy term, join terms
 				const array = fieldSource.map( item => item.name )
 				return array.join(', ') 
 			} 
 				
-			else if (typeof fieldSource === 'object' && !Array.isArray(fieldSource)) {
-				// if source is an object o just one taxonomy term
+			else if (typeof fieldSource === 'object' && "vid" in fieldSource) {
+				// if source is an object with just one taxonomy term
 				return fieldSource.name 
 			} 
 			
-			else if (typeof fieldSource === 'string') {
+			else if (typeof fieldSource === 'string' || typeof fieldSource === 'number') {
 				// if source is a string, output it as is
 				return fieldSource
+			}
+			
+			if (Array.isArray(fieldSource) && typeof fieldSource[0] === 'string' ) {
+				// if source is an array of string, join strings
+				const array = fieldSource.map( item => item )
+				return array.join(', ') 
+			} 
+			
+			else if (typeof fieldSource === 'object' && "uri" in fieldSource) {
+				// if source is a URL field
+				console.log('field_url', fieldSource)
+				return (<a href={fieldSource.uri} target='_blank'>{fieldSource.uri}</a>)
 			}
 				
 			else if (visibleIfEmpty) {
@@ -216,6 +187,27 @@ export function FilmPage( {path} ) {
 			_fields.son = formatField(film.field_son)
 			_fields.langues = formatField(film.field_langues)
 			_fields.fabricant = formatField(film.field_fabricant)
+			_fields.emulsion = formatField(film.field_emulsion)
+			_fields.ratio = formatField(film.field_ratio)
+			_fields.longueurM = formatField(film.field_longueur_metrage)
+			_fields.longueurB = formatField(film.field_longueur_nombre_de_bobines)
+			_fields.longueurP = formatField(film.field_longueur_pietage)
+			_fields.institution = formatField(film.field_institution_detentrice)
+			_fields.cote = formatField(film.field_cote)
+			_fields.url = formatField(film.field_url)
+			_fields.titres = formatField(film.field_titres_alternatifs)
+			_fields.serie = formatField(film.field_titre_de_serie)
+			_fields.commanditaires = formatField(film.field_commanditaires)
+			_fields.distribution = formatField(film.field_distribution)
+			_fields.scenario = formatField(film.field_scenario)
+			_fields.narration = formatField(film.field_narration)
+			_fields.photo = formatField(film.field_direction_de_la_photograph)
+			_fields.creditSon = formatField(film.field_son_sound)
+			_fields.musique = formatField(film.field_musique)
+			_fields.montage = formatField(film.field_montage),
+			_fields.effets = formatField(film.field_effets_speciaux_et_animati)
+			_fields.jeu = formatField(film.field_jeu)
+			//_fields. = formatField(film.)
 			
 			setSecondaryFields(_fields)
 		}
@@ -228,7 +220,27 @@ export function FilmPage( {path} ) {
 				label: 'Format', value: secondaryFields.format },{
 				label: 'Son', value: secondaryFields.son },{
 				label: 'Langues de la copie', value: secondaryFields.langues },{
-				label: 'Fabricant de la pellicule', value: secondaryFields.fabricant }
+				label: 'Fabricant de la pellicule', value: secondaryFields.fabricant },{
+				label: 'Émulsion', value: secondaryFields.emulsion },{
+				label: 'Ratio', value: secondaryFields.ratio},{
+				label: 'Longueur : métrage', value : secondaryFields.longueurM },{
+				label: 'Longueur : nombre de bobines', value : secondaryFields.longueurB },{
+				label: 'Longueur : piétage', value : secondaryFields.longueurP },{
+				label: 'Institution détentrice', value: secondaryFields.institution},{
+				label: 'Cote', value: secondaryFields.cote},{
+				label: 'URL institutionnelle', value: secondaryFields.url },{
+				label: 'Titres alternatifs', value: secondaryFields.titres },{
+				label: 'Titre de série', value: secondaryFields.serie },{
+				label: 'Commanditaires', value: secondaryFields.commanditaires },{
+				label: 'Distribution', value: secondaryFields.distribution },{
+				label: 'Scénario', value: secondaryFields.scenario },{
+				label: 'Narration', value: secondaryFields.narration },{
+				label: 'Direction de la photographie', value: secondaryFields.photo },{
+				label: 'Son (crédit)', value: secondaryFields.creditSon },{
+				label: 'Musique', value: secondaryFields.musique },{
+				label: 'Montage', value: secondaryFields.montage },{
+				label: 'Effets spéciaux et animation', value: secondaryFields.effets}, {
+				label: 'Jeu', value: secondaryFields.jeu }
 			])
 		}
 	}, [secondaryFields, fieldConfigs])
@@ -364,7 +376,7 @@ export function FilmPage( {path} ) {
 					{ fieldConfigs ? fieldConfigs.map( (field, index) => {
 						return field.value ? (
 							<div key={index}>
-								<dt>{field.label}:</dt>
+								<dt>{field.label}: </dt>
 								<dd>{field.value}</dd>
 							</div> 
 						) : ''
