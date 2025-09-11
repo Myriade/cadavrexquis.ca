@@ -243,7 +243,7 @@ export function FilmPage( {path} ) {
 	useEffect(() => {
 		if (secondaryFields && !fieldConfigs) {
 			setFieldConfigs([{
-				label: 'Numéro d\'identification', value: secondaryFields.numero },{
+				label: 'Numéro d&apos;identification', value: secondaryFields.numero },{
 				label: 'Format', value: secondaryFields.format },{
 				label: 'Son', value: secondaryFields.son },{
 				label: 'Langues de la copie', value: secondaryFields.langues },{
