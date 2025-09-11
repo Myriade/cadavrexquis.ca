@@ -41,11 +41,29 @@ const Main = styled.main`
 		p {
 			margin-bottom: 1em}}
 		
-	dt, dd {
-		display: inline;}
+	dl > div {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: 0.5ch;}
 		
 	dt {
 		font-weight: bold;}
+		
+	dd {
+		overflow: hidden;
+		a {
+			display: block;
+			max-width: 100%;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;}}
+		
+	#voir-plus {
+		&.hidden {
+			display: none;}
+		&.visible {
+			display: block;}
+	}
 	
 	@container (min-width: 250px) { }
 		
@@ -71,89 +89,95 @@ const defautlFilm = {
 	"field_langue": [],
 	"drupal_internal__nid": null,
 	"path": {},
-	"created": null,
-	"changed": null,
 	"field_annees_de_production": null,
-	"field_commentaires": null,
-	"field_cote": null,
-	"field_credits_notes": null,
 	"field_dates_de_production_estime": false,
 	"field_descriptions_autres": [],
 	"field_duree": null,
-	"field_edge_code": null,
-	"field_emplacements": [],
 	"field_films_relies": [],
-	"field_lieux": [],
-	"field_longueur_metrage": null,
-	"field_longueur_nombre_de_bobines": null,
-	"field_longueur_pietage": null,
-	"field_notes": null,
-	"field_numero_identification": null,
 	"field_resume_de_l_institution_de": null,
 	"field_site_visible": null,
-	"field_statut_legal": null,
-	"field_titres_alternatifs": [],
 	"field_titre_attribue": false,
-	"field_titre_de_serie": [],
-	"field_traitement": null,
-	"field_autres": [],
-	"field_commanditaires": [],
 	"field_consultants": [],
-	"field_direction_de_la_photograph": [],
-	"field_distribution": [],
-	"field_effets_speciaux_et_animati": [],
-	"field_emulsion": null,
-	"field_fabricant": null,
-	"field_format": null,
-	"field_format_de_production": [],
-	"field_institution_detentrice": null,
 	"field_jeu": [],
-	"field_langues": [],
-	"field_montage": [],
-	"field_musique": [],
-	"field_narration": [],
-	"field_participation": [],
 	"field_pays_origine": [],
-	"field_personnes": [],
-	"field_production": [],
-	"field_ratio": null,
-	"field_scenario": [],
-	"field_site_photogramme": {},
-	"field_son": null,
-	"field_son_sound": [],
-	"field_type_d_image": null,
 	"field_vedettes_matiere": []
 }
 	
 export function FilmPage( {path} ) {
 	const { film, isLoading, error } = useFetchUniqueFilm(defautlFilm, path)
-	const [ processedFields, setProcessedFields ] = useState(null)
+	const [ primaryFields, setPrimaryFields ] = useState(null)
+	const [ secondaryFields, setSecondaryFields ] = useState(null)
+	const [ fieldConfigs, setFieldConfigs ] = useState(null)
+	const [ voirPlusOpen, setVoirPlusOpen ] = useState(false)
 	const [ relatedFilms, setRelatedFilms ] = useState(null)
 	const { data : allFilms, isLoading : allFilmsIsLoading, error : allFilmsError } = useFetchAllFilms();
 	
-	// Process fields for presentation
-	useEffect(() => {
-		if (film.id && !isLoading && !error && !processedFields) {
-			const _fields = {}
-			function joinTerms(fieldSource, fieldOutput, optional) {
-				if (fieldSource.length) {
-					const array = fieldSource.map( item => item.name )
-					_fields[fieldOutput] = array.join(', ')
-				} else if (!optional) {
-					_fields[fieldOutput] = 's.o.'
-				}
-				// TODO : optional fields pourla section "voir plus"
+	function formatField(fieldSource, visibleIfEmpty) {
+		
+		// TODO : Check if taxonomy terms has links to view more related content
+		if (fieldSource) {
+			
+			if (Array.isArray(fieldSource) && typeof fieldSource[0] === 'object' && "vid" in fieldSource[0]) {
+				// if source is an array of taxonomy term, join terms
+				const array = fieldSource.map( item => item.name )
+				return array.join(', ') 
+			} 
+				
+			else if (typeof fieldSource === 'object' && "vid" in fieldSource) {
+				// if source is an object with just one taxonomy term
+				return fieldSource.name 
+			} 
+			
+			else if (typeof fieldSource === 'string' || typeof fieldSource === 'number') {
+				// if source is a string, output it as is
+				return fieldSource
 			}
 			
-			// Taxonomies
-			joinTerms(film.field_site_thematique, 'thematique')
-			joinTerms(film.field_production, 'production')
-			joinTerms(film.field_realisation, 'realisation')
-			joinTerms(film.field_langues, 'langues')
-			joinTerms(film.field_consultants, 'consultants', true)
-			joinTerms(film.field_pays_origine, 'pays')
-			joinTerms(film.field_vedettes_matiere, 'matiere')
+			if (Array.isArray(fieldSource) && typeof fieldSource[0] === 'string' ) {
+				// if source is an array of string, join strings
+				const array = fieldSource.map( item => item )
+				return array.join(', ') 
+			} 
 			
+			if (typeof fieldSource === 'object' && 'first' in fieldSource ) {
+				// if source is an object from a drupal double string field (with a first key)
+				const resultat = Object.values(fieldSource).reduce((acc, valeur) => acc + " - " + valeur);
+				return resultat
+			} 
+			
+			else if (typeof fieldSource === 'object' && "uri" in fieldSource) {
+				// if source is a URL field
+				return (<a href={fieldSource.uri} target='_blank' title={fieldSource.uri}>{fieldSource.uri}</a>)
+			}
+			
+			else if (typeof fieldSource === 'object' && "processed" in fieldSource) {
+				// si source is a rich html text field
+				return (<div dangerouslySetInnerHTML={ { __html: fieldSource.processed } } />)
+			}
+				
+			else if (visibleIfEmpty) {
+				// if source is empty but must be presented anyway, output s.o.
+				return 's.o.'
+			}
+		} 
+	}
+	
+	// Format primary visibles fields for presentation
+	useEffect(() => {
+		if (film.id && !isLoading && !error && !primaryFields) {
+			const _fields = {}
+			
+			// Standards fields //
+			// Todo : function to loop in standards fields
+			_fields.thematique = formatField(film.field_site_thematique, true)
+			_fields.production = formatField(film.field_production, true)
+			_fields.realisation = formatField(film.field_realisation,  true)
+			_fields.langue = formatField(film.field_langue, true)
+			_fields.consultants = formatField(film.field_consultants)
+			_fields.pays = formatField(film.field_pays_origine, true)
+			_fields.matiere = formatField(film.field_vedettes_matiere, true)
+			
+			// Special fields //
 			// Vimeo
 			if (film.field_url_interne.length && film.field_url_interne[0] !== null) {  
 				const vimeoId = getVimeoId(film.field_url_interne[0].uri)
@@ -169,9 +193,91 @@ export function FilmPage( {path} ) {
 				_fields.filmType = 's.o.'
 			}
 			
-			setProcessedFields(_fields)
+			setPrimaryFields(_fields)
 		}
-	}, [film, isLoading, error, processedFields])
+	}, [film, isLoading, error, primaryFields])
+	
+	// Format and aggregate Secondary "Voir plus" fields 
+	useEffect(() => {
+		if (primaryFields && !secondaryFields) {
+			const _fields = {}
+			//const _markup = null;
+			
+			_fields.numero = formatField(film.field_numero_identification)
+			_fields.format = formatField(film.field_format)
+			_fields.son = formatField(film.field_son)
+			_fields.langues = formatField(film.field_langues)
+			_fields.fabricant = formatField(film.field_fabricant)
+			_fields.emulsion = formatField(film.field_emulsion)
+			_fields.ratio = formatField(film.field_ratio)
+			_fields.longueurM = formatField(film.field_longueur_metrage)
+			_fields.longueurB = formatField(film.field_longueur_nombre_de_bobines)
+			_fields.longueurP = formatField(film.field_longueur_pietage)
+			_fields.institution = formatField(film.field_institution_detentrice)
+			_fields.cote = formatField(film.field_cote)
+			_fields.url = formatField(film.field_url)
+			_fields.titres = formatField(film.field_titres_alternatifs)
+			_fields.serie = formatField(film.field_titre_de_serie)
+			_fields.commanditaires = formatField(film.field_commanditaires)
+			_fields.distribution = formatField(film.field_distribution)
+			_fields.scenario = formatField(film.field_scenario)
+			_fields.narration = formatField(film.field_narration)
+			_fields.photo = formatField(film.field_direction_de_la_photograph)
+			_fields.creditSon = formatField(film.field_son_sound)
+			_fields.musique = formatField(film.field_musique)
+			_fields.montage = formatField(film.field_montage),
+			_fields.effets = formatField(film.field_effets_speciaux_et_animati)
+			_fields.jeu = formatField(film.field_jeu),
+			_fields.participation = formatField(film.field_participation)
+			_fields.autre = formatField(film.field_autres)
+			_fields.anneesProd = formatField(film.field_annees_de_production)
+			_fields.formatProd = formatField(film.field_format_de_production)
+			_fields.lieux = formatField(film.field_lieux)
+			_fields.personnes = formatField(film.field_personnes)
+			_fields.commentaires = formatField(film.field_commentaires)
+			
+			setSecondaryFields(_fields)
+		}
+	}, [primaryFields, secondaryFields])
+	
+	useEffect(() => {
+		if (secondaryFields && !fieldConfigs) {
+			setFieldConfigs([{
+				label: 'Numéro d\'identification', value: secondaryFields.numero },{
+				label: 'Format', value: secondaryFields.format },{
+				label: 'Son', value: secondaryFields.son },{
+				label: 'Langues de la copie', value: secondaryFields.langues },{
+				label: 'Fabricant de la pellicule', value: secondaryFields.fabricant },{
+				label: 'Émulsion', value: secondaryFields.emulsion },{
+				label: 'Ratio', value: secondaryFields.ratio},{
+				label: 'Longueur : métrage', value : secondaryFields.longueurM },{
+				label: 'Longueur : nombre de bobines', value : secondaryFields.longueurB },{
+				label: 'Longueur : piétage', value : secondaryFields.longueurP },{
+				label: 'Institution détentrice', value: secondaryFields.institution},{
+				label: 'Cote', value: secondaryFields.cote},{
+				label: 'URL institutionnelle', value: secondaryFields.url },{
+				label: 'Titres alternatifs', value: secondaryFields.titres },{
+				label: 'Titre de série', value: secondaryFields.serie },{
+				label: 'Commanditaires', value: secondaryFields.commanditaires },{
+				label: 'Distribution', value: secondaryFields.distribution },{
+				label: 'Scénario', value: secondaryFields.scenario },{
+				label: 'Narration', value: secondaryFields.narration },{
+				label: 'Direction de la photographie', value: secondaryFields.photo },{
+				label: 'Son (crédit)', value: secondaryFields.creditSon },{
+				label: 'Musique', value: secondaryFields.musique },{
+				label: 'Montage', value: secondaryFields.montage },{
+				label: 'Effets spéciaux et animation', value: secondaryFields.effets}, {
+				label: 'Jeu', value: secondaryFields.jeu },{
+				label: 'Participation', value: secondaryFields.participation },{
+				label: 'Autre', value: secondaryFields.autre },{
+				label: 'Années de production', value: secondaryFields.anneesProd },{
+				label: 'Format de production', value: secondaryFields.formatProd },{
+				label: 'Lieux', value: secondaryFields.lieux },{
+				label: 'Personnes', value: secondaryFields.personnes },{
+				label: 'Commentaires', value: secondaryFields.commentaires }
+			])
+		}
+	}, [secondaryFields, fieldConfigs])
 	
 	// Films reliés, À voir aussi
 	useEffect(() => {
@@ -190,6 +296,19 @@ export function FilmPage( {path} ) {
 		}
 	}, [film, relatedFilms, allFilmsIsLoading, allFilms ])
 	
+	// Voir Plus click event handlers
+	function voirPlusToggle() {
+		console.log('Voir plus clicked');
+		if (!voirPlusOpen) {
+			setVoirPlusOpen(true)
+			return
+		}
+		if (voirPlusOpen) {
+			setVoirPlusOpen(false)
+			return
+		}
+	}
+	
 	if (film === 'not-found') {
 		return notFound()
 	}
@@ -197,7 +316,7 @@ export function FilmPage( {path} ) {
 	if (error) {
 		return (
 			<main className='grid content-center text-center'>
-				<p className='error'>Une erreur de chargement sest produite. Vérifiez votre connexion internet, ou avisez-nous si le problème persite.</p>
+				<p className='error'>Une erreur de chargement s'est produite. Vérifiez votre connexion internet, ou avisez-nous si le problème persite.</p>
 			</main>
 		)
 	}
@@ -205,10 +324,10 @@ export function FilmPage( {path} ) {
 	return (
 		<>
 			<Main>
-				{ processedFields && processedFields.vimeoSource ? (
+				{ primaryFields && primaryFields.vimeoSource ? (
 					<div className='vimeo mb-10'>
 						<iframe 
-							src={processedFields.vimeoSource} 
+							src={primaryFields.vimeoSource} 
 							frameBorder="0" 
 							allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" 
 							title=""
@@ -226,14 +345,14 @@ export function FilmPage( {path} ) {
 					{film.field_site_collection === 'cadavre_exquis' ? 
 						<Icone nom='remontage' couleur='var(--color-rouge)' />
 					: ''}
-					{processedFields && processedFields.filmType ? processedFields.filmType : '... chargement'}
+					{primaryFields && primaryFields.filmType ? primaryFields.filmType : '... chargement'}
 				</p>
 				
 				<h1 className='mb-8'>{film.title}</h1>
 				
 				<p className='infos text-xl font-sans mb-4'>
 					{film.field_annees_de_sortie ? film.field_annees_de_sortie : 's.o. (annee de sortie)'}
-					{processedFields && processedFields.thematique ? <span> / {processedFields.thematique}</span> : ''}
+					{primaryFields && primaryFields.thematique ? <span> / {primaryFields.thematique}</span> : ''}
 				</p>
 				
 				<div 
@@ -249,20 +368,19 @@ export function FilmPage( {path} ) {
 					className='description text-lg font-serif mb-6'
 				></div>
 				
-				
 				<dl className='mb-6'>
 					<div>
 						<dt>Production: </dt>
-						<dd>{ processedFields ? processedFields.production : '...' }</dd>
+						<dd>{ primaryFields ? primaryFields.production : '...' }</dd>
 					</div>
 					<div>
 						<dt>Réalisation: </dt>
-						<dd>{ processedFields ? processedFields.realisation : '...' }</dd>
+						<dd>{ primaryFields ? primaryFields.realisation : '...' }</dd>
 					</div>
-					{ processedFields && processedFields.consultants ? (
+					{ primaryFields && primaryFields.consultants ? (
 						<div>
 							<dt>Consultants: </dt>
-							<dd>{processedFields.consultants}</dd>
+							<dd>{primaryFields.consultants}</dd>
 						</div>
 					) : '' }
 					<div>
@@ -271,21 +389,33 @@ export function FilmPage( {path} ) {
 					</div>
 					<div>
 						<dt>Pays d’origine: </dt>
-						<dd>{processedFields ? processedFields.pays : '...'}</dd>
+						<dd>{primaryFields ? primaryFields.pays : '...'}</dd>
 					</div>
 					<div>
 						<dt>Langues: </dt>
-						<dd>{ processedFields ? processedFields.langues : '...' }</dd>
+						<dd>{ primaryFields ? primaryFields.langue : '...' }</dd>
 					</div>
 					<div>
 						<dt>Durée: </dt>
-						<dd>{ film.field_duree ? film.field_duree : 's.o.' }</dd>
+						<dd>{ film.field_duree ? film.field_duree : '...' }</dd>
 					</div>
 					<div>
 						<dt>Vedettes-matières sujet: </dt>
-						<dd>{ processedFields ? processedFields.matiere : '...' }</dd>
+						<dd>{ primaryFields ? primaryFields.matiere : '...' }</dd>
 					</div>
 				</dl>
+				
+				<button className='button mb-6' onClick={voirPlusToggle}>Voir {voirPlusOpen ? 'moins -' : 'plus +'} </button>
+				<dl id='voir-plus' className={ !voirPlusOpen ? `hidden mb-6` : `visible mb-6`}>
+					{ fieldConfigs ? fieldConfigs.map( (field, index) => {
+						return field.value ? (
+							<div key={index}>
+								<dt>{field.label}: </dt>
+								<dd>{field.value}</dd>
+							</div> 
+						) : ''
+					}) : '...' }
+				</dl> 
 				
 			</Main>
 			
@@ -306,11 +436,3 @@ export function FilmPage( {path} ) {
 		</>
 	);
 };
-
-
-/* Pour phase 2 : bouton Voir +
-<button className='button'>Voir plus + </button>
-<dl className='mb-6'>
-	<dd>[ Au clic sur voir +, les autres champs s&apos;afficheront au cas par cas, visibles seulement si contient une donné ]</dd>
-</dl> 
-*/
