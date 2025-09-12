@@ -13,40 +13,40 @@ export function SearchPage({searchSlug}) {
   const { data, isloading, error } = useFetchAllFilms(true)
   
   // Taxonomy Search fields
-  const taxoFields = [
-    {
-      fieldName: 'field_site_thematique',
-      vocabName: 'site_categorie'
-    }, 
-    {
-      fieldName: 'field_realisation',
-      vocabName: 'realisation'
-    },
-    {
-      fieldName: 'field_vedettes_matiere',
-      vocabName: 'vedette_matiere'
-    },
-    {
-      fieldName: 'field_langue',
-      vocabName: 'langue'
-    },
-    {
-      fieldName: 'field_production',
-      vocabName: 'production'
-    },
-    {
-      fieldName: 'field_consultants',
-      vocabName: 'consultant'
-    },
-    {
-      fieldName: 'field_pays_origine',
-      vocabName: 'pays'
-    }
+  const taxoFields = [{ 
+    fieldName: 'field_site_thematique', vocabName: 'site_categorie' },{
+    fieldName: 'field_realisation', vocabName: 'realisation' },{
+    fieldName: 'field_vedettes_matiere', vocabName: 'vedette_matiere' },{
+    fieldName: 'field_langue', vocabName: 'langue' },{
+    fieldName: 'field_production', vocabName: 'production' },{
+    fieldName: 'field_consultants', vocabName: 'consultant' },{
+    fieldName: 'field_pays_origine', vocabName: 'pays' },{
+    fieldName: 'field_format', vocabName: 'format' },{
+    fieldName: 'field_son', vocabName: 'son' },{
+    fieldName: 'field_langues', vocabName : 'langue' },{
+    fieldName: 'field_fabricant', vocabName: 'fabricant' },{
+    fieldName: 'field_emulsion', vocabName : 'emulsion' }, {
+    fieldName: 'field_ratio', vocabName : 'ratio' }, {
+    fieldName: 'field_institution_detentrice', vocabName : 'institution' }, {
+    fieldName: 'field_commanditaires', vocabName: 'commanditaire' },{
+    fieldName: 'field_distribution', vocabName: 'distribution' },{
+    fieldName: 'field_scenario', vocabName: 'scenario' },{
+    fieldName: 'field_narration', vocabName: 'narration' },{
+    fieldName: 'field_direction_de_la_photograph', vocabName: 'direction_de_la_photographie' },{
+    fieldName: 'field_son_sound', vocabName: 'son_sound' },{
+    fieldName: 'field_musique', vocabName: 'musique' },{
+    fieldName: 'field_montage', vocabName: 'montage' },{
+    fieldName: 'field_effets_speciaux_et_animati', vocabName: 'effets_speciaux_et_animation' },{
+    fieldName: 'field_jeu', vocabName: 'jeu' },{
+    fieldName: 'field_participation', vocabName: 'participation' },{
+    fieldName: 'field_autres', vocabName: 'autres' },{
+    fieldName: 'field_format_de_production', vocabName: 'format_de_production' },{
+    fieldName: 'field_personnes', vocabName: 'personnes' }
   ]
   
+  // Convert uri back to readable string
   useEffect(()=>{
     if (!searchTerms) {
-      // Convert uri back to readable string
       const readableSearchTerms = uriToString(searchSlug);
       setSearchTerms(readableSearchTerms)
     }
@@ -112,7 +112,7 @@ export function SearchPage({searchSlug}) {
       
       function loopThroughVocabTerms(fieldName, vocabName) {
         const match = data.data.filter( item => {
-          const termNames = findTermName( item.relationships[fieldName].data, vocabs[vocabName]);
+          const termNames = findTermName( item.relationships[fieldName].data, vocabs[vocabName], vocabName);
           return termNames.toLowerCase().includes(searchTerms.toLowerCase())
         })
         match.forEach( item => { allMatch.push(item) })

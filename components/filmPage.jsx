@@ -167,8 +167,6 @@ export function FilmPage( {path} ) {
 		if (film.id && !isLoading && !error && !primaryFields) {
 			const _fields = {}
 			
-			// Standards fields //
-			// Todo : function to loop in standards fields
 			_fields.thematique = formatField(film.field_site_thematique, true)
 			_fields.production = formatField(film.field_production, true)
 			_fields.realisation = formatField(film.field_realisation,  true)
@@ -201,7 +199,6 @@ export function FilmPage( {path} ) {
 	useEffect(() => {
 		if (primaryFields && !secondaryFields) {
 			const _fields = {}
-			//const _markup = null;
 			
 			_fields.numero = formatField(film.field_numero_identification)
 			_fields.format = formatField(film.field_format)

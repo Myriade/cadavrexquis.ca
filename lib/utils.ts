@@ -1,24 +1,40 @@
 /**
  * Compares two arrays to find corresponding vocabulary term names
- * @param {array} fieldTermsArray (one film's term ids) and vocabArray (all available terms ids ans names)
+ * @param {array} fieldTerms (one film's term ids) and vocabArray (all available terms ids ans names)
  * @returns {string} A list of term names separated with coma
  */
-export function findTermName(fieldTermsArray, vocabArray) {
+export function findTermName(fieldTerms, vocabArray, vocabName) {
   const matchingItems = [];
   
-  fieldTermsArray.forEach( fieldTerm => {
-    const idMatch = vocabArray.find( vocabTerm => {
-      const ref1 = vocabTerm.attributes.termid
-      const ref2 = vocabTerm.attributes.drupal_internal__tid 
-      const test = fieldTerm.meta.drupal_internal__target_id
-      return ref1 === test || ref2 === test
+  function findVocabularyMatch(fieldTerm, vocabArray) {
+    return vocabArray.find(vocabTerm => {
+      const ref1 = vocabTerm.attributes.termid;
+      const ref2 = vocabTerm.attributes.drupal_internal__tid;
+      let test = null;
+      if (fieldTerm && 'meta' in fieldTerm) {
+        test = fieldTerm.meta.drupal_internal__target_id;
+      }
+      return ref1 === test || ref2 === test;
     });
+  }
+  
+  if (Array.isArray(fieldTerms)) {
+    //console.log('--- is Arr', vocabName)
+    fieldTerms.forEach(fieldTerm => {
+      const idMatch = findVocabularyMatch(fieldTerm, vocabArray);
+      
+      if (idMatch && idMatch.attributes.name) {
+        matchingItems.push(idMatch.attributes.name);
+      }
+    });
+  } else if (typeof fieldTerms === 'object') {
+    //console.log('---- is Obj', vocabName)
+    const idMatch = findVocabularyMatch(fieldTerms, vocabArray);
     
-    // If a match is found, add its name to the array
     if (idMatch && idMatch.attributes.name) {
-      matchingItems.push(idMatch.attributes.name)
+      matchingItems.push(idMatch.attributes.name);
     }
-  });
+  }
   
   // Join all names with commas and return
   return matchingItems.join(', ');
