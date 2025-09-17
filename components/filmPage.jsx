@@ -78,29 +78,9 @@ const Main = styled.main`
 const Curated = styled.aside``
 
 const defautlFilm = {
-	"id": null,
-	"field_url_interne": [{uri: null}],
-	"field_site_collection": null,
 	"title": '\u00A0',
 	"field_annees_de_sortie": '\u00A0',
-	"field_site_thematique": [],
 	"field_descriptions_cadavrexquis": [{processed: '\u00A0'}],
-	"field_realisation": [],
-	"field_langue": [],
-	"drupal_internal__nid": null,
-	"path": {},
-	"field_annees_de_production": null,
-	"field_dates_de_production_estime": false,
-	"field_descriptions_autres": [],
-	"field_duree": null,
-	"field_films_relies": [],
-	"field_resume_de_l_institution_de": null,
-	"field_site_visible": null,
-	"field_titre_attribue": false,
-	"field_consultants": [],
-	"field_jeu": [],
-	"field_pays_origine": [],
-	"field_vedettes_matiere": []
 }
 	
 export function FilmPage( {path} ) {
@@ -113,9 +93,31 @@ export function FilmPage( {path} ) {
 	const { data : allFilms, isLoading : allFilmsIsLoading, error : allFilmsError } = useFetchAllFilms();
 	
 	function formatField(fieldSource, visibleIfEmpty) {
-		
 		// TODO : Check if taxonomy terms has links to view more related content
-		if (fieldSource) {
+		
+		// Check if fieldsource is falsy or empty array 
+		function checkIfEmpty(source) {
+			if (!source) { return true }
+			if (Array.isArray(source)) { 
+				if (!source.length) {
+					return true 
+				}
+			}
+			return false
+		}
+		
+		const isEmpty = checkIfEmpty(fieldSource)
+		
+		if (isEmpty) {
+			if (visibleIfEmpty) {
+				// if source is empty but must be presented anyway, output s.o.
+				return 's.o.'
+			} else {
+				return null
+			}
+		}
+		
+		if (!isEmpty) {
 			
 			if (Array.isArray(fieldSource) && typeof fieldSource[0] === 'object' && "vid" in fieldSource[0]) {
 				// if source is an array of taxonomy term, join terms
@@ -154,12 +156,7 @@ export function FilmPage( {path} ) {
 				// si source is a rich html text field
 				return (<div dangerouslySetInnerHTML={ { __html: fieldSource.processed } } />)
 			}
-				
-			else if (visibleIfEmpty) {
-				// if source is empty but must be presented anyway, output s.o.
-				return 's.o.'
-			}
-		} 
+		}
 	}
 	
 	// Format primary visibles fields for presentation
@@ -167,10 +164,13 @@ export function FilmPage( {path} ) {
 		if (film.id && !isLoading && !error && !primaryFields) {
 			const _fields = {}
 			
+			_fields.anneeSortie1 = formatField(film.field_annees_de_sortie)
+			_fields.anneeSortie2 = formatField(film.field_annees_de_sortie, true)
 			_fields.thematique = formatField(film.field_site_thematique, true)
 			_fields.production = formatField(film.field_production, true)
-			_fields.realisation = formatField(film.field_realisation,  true)
+			_fields.realisation = formatField(film.field_realisation, true)
 			_fields.langue = formatField(film.field_langue, true)
+			_fields.duree = formatField(film.field_duree, true)
 			_fields.consultants = formatField(film.field_consultants)
 			_fields.pays = formatField(film.field_pays_origine, true)
 			_fields.matiere = formatField(film.field_vedettes_matiere, true)
@@ -240,7 +240,7 @@ export function FilmPage( {path} ) {
 	useEffect(() => {
 		if (secondaryFields && !fieldConfigs) {
 			setFieldConfigs([{
-				label: 'Numéro d&apos;identification', value: secondaryFields.numero },{
+				label: 'Numéro d’identification', value: secondaryFields.numero },{
 				label: 'Format', value: secondaryFields.format },{
 				label: 'Son', value: secondaryFields.son },{
 				label: 'Langues de la copie', value: secondaryFields.langues },{
@@ -348,8 +348,13 @@ export function FilmPage( {path} ) {
 				<h1 className='mb-8'>{film.title}</h1>
 				
 				<p className='infos text-xl font-sans mb-4'>
-					{film.field_annees_de_sortie ? film.field_annees_de_sortie : 's.o. (annee de sortie)'}
-					{primaryFields && primaryFields.thematique ? <span> / {primaryFields.thematique}</span> : ''}
+					{primaryFields ? <span>
+						{primaryFields.anneeSortie1 ? primaryFields.anneeSortie1 : '' }
+						{primaryFields.thematique ? <span> 
+							{primaryFields.anneeSortie1 && ' / '} 
+							{primaryFields.thematique}
+						</span> : ''}
+					</span> : '...'}
 				</p>
 				
 				<div 
@@ -382,7 +387,7 @@ export function FilmPage( {path} ) {
 					) : '' }
 					<div>
 						<dt>Année de sortie: </dt>
-						<dd>{film.field_annees_de_sortie ? film.field_annees_de_sortie : 's.o.'}</dd>
+						<dd>{primaryFields ? primaryFields.anneeSortie2 : '...' }</dd>
 					</div>
 					<div>
 						<dt>Pays d’origine: </dt>
@@ -394,7 +399,7 @@ export function FilmPage( {path} ) {
 					</div>
 					<div>
 						<dt>Durée: </dt>
-						<dd>{ film.field_duree ? film.field_duree : '...' }</dd>
+						<dd>{ primaryFields ? primaryFields.duree : '...' }</dd>
 					</div>
 					<div>
 						<dt>Vedettes-matières sujet: </dt>
