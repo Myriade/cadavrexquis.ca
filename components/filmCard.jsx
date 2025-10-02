@@ -148,14 +148,19 @@ export function FilmCard({filmdata, shouldwait}) {
             {filmdata.filmThematiques ? filmdata.filmThematiques.noms : ''}</p>
             {filmdata.field_site_collection ? (
               <div className='card__icone'>
-              {filmdata.field_site_collection === 'collection' ? 
-                <Icone nom='collection' title='Film de la collection' />
-              : ''}
-              {filmdata.field_site_collection === 'cadavre_exquis' ? 
-                <Icone nom='remontage' title='Film de remontage' />              
-              : ''}
+                {filmdata.field_site_collection === 'collection' ? 
+                  <Icone nom='collection' title='Film de la collection' />
+                : ''}
+                {filmdata.field_site_collection === 'cadavre_exquis' ? 
+                  <Icone nom='remontage' title='Film de remontage' />              
+                : ''}
               </div>
             ) : ''}
+            {filmdata.type === 'node--article' ?
+              <div className='card__icone'>
+                <Icone nom='document' title='Document' />
+              </div>
+            : ''}
           </div>
         </a>
         <div 

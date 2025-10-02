@@ -307,7 +307,7 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
           <p className='text-center mb-0'>
             {selectedThematique !== 'default' ? `${selectedThematique} : ` : ''}
             {isLoading && '...'}
-            {!isSearch && `${filmsItems.length} films sur ${allFilmsData.data.length}`}
+            {!isSearch && `${filmsItems.length} sur ${allFilmsData.data.length}`}
           </p>
         : '' }
         
@@ -318,7 +318,7 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
             onClick={loadMoreClick}
             ref={loadModeBtnRef}
           >
-            Charger plus de films
+            Charger plus
           </button>
         ) : ''}
       </Styled>

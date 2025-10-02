@@ -158,7 +158,7 @@ export function SearchPage({searchSlug}) {
   return (
     <>
       <h1>Recherche pour « {searchTerms} »</h1>
-      {filteredData ? (<p>Résultat : {filteredData.data.length} films sur {data.data.length}</p>) : ''}
+      {filteredData ? (<p>Résultat : {filteredData.data.length} contenus sur {data.data.length}</p>) : ''}
       <FilmsGrille
         allFilmsData={filteredData} 
         isLoading={isLoading} 
