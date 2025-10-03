@@ -79,13 +79,21 @@ const Styled = styled.div`
   }
 `;
 
-export function FilmCard({filmdata, shouldwait}) {
+export function GridCard({contentObj, contentType, shouldwait}) {
   const gsapCardContainer = useRef()
   const imageElemRef = useRef()
   gsap.registerPlugin(useGSAP);
   
-  const filmAlias = filmdata.path ? `/film${filmdata.path.alias}` : '#'
-  const photogrammeUrl = filmdata.filmImageUrl ? `https://database.cadavrexquis.ca${filmdata.filmImageUrl}` : ''
+  let pathAlias = '#'
+  if (contentType === 'node--film') {
+    pathAlias = contentObj.path ? `/film${contentObj.path.alias}` : '#'
+  } 
+  
+  if (contentType === 'node--article') {
+    pathAlias = contentObj.path ? `document/${contentObj.path.alias}` : '#'
+  }
+  
+  const photogrammeUrl = contentObj.filmImageUrl ? `https://database.cadavrexquis.ca${contentObj.filmImageUrl}` : ''
   
   // GSAP
   const gsapCardInstance = useGSAP(() => {
@@ -118,7 +126,7 @@ export function FilmCard({filmdata, shouldwait}) {
     }, waitTime)
   }, { dependencies: [imageElemRef], scope: gsapCardContainer })
     
-  if (!filmdata) {
+  if (!contentObj) {
     return (
       <Styled className='card'>
         <div className='card__inner'>
@@ -133,30 +141,30 @@ export function FilmCard({filmdata, shouldwait}) {
   return (
     <Styled
       className='card'
-      style={ filmdata.styles ? {minHeight: filmdata.styles.elemHeight} : {}}
+      style={ contentObj.styles ? {minHeight: contentObj.styles.elemHeight} : {}}
       ref={gsapCardContainer}
     >
-      <div className='card__inner' data-cardindex={filmdata.filmIndex}>
+      <div className='card__inner' data-cardindex={contentObj.filmIndex}>
         <a 
           className='card__infos'
-          style={ filmdata.styles ? {background: filmdata.styles.couleur} : {background: 'var(--color-rouge)'}}
-          href={ filmAlias }
+          style={ contentObj.styles ? {background: contentObj.styles.couleur} : {background: 'var(--color-rouge)'}}
+          href={ pathAlias }
         >
-          <h2>{filmdata.title}</h2>
+          <h2>{contentObj.title}</h2>
           <div className='card__footer'>
-            <p>{filmdata.field_annees_de_sortie}<br/>
-            {filmdata.filmThematiques ? filmdata.filmThematiques.noms : ''}</p>
-            {filmdata.field_site_collection ? (
+            <p>{contentObj.field_annees_de_sortie}<br/>
+            {contentObj.filmThematiques ? contentObj.filmThematiques.noms : ''}</p>
+            {contentObj.field_site_collection ? (
               <div className='card__icone'>
-                {filmdata.field_site_collection === 'collection' ? 
+                {contentType === 'node--film' && contentObj.field_site_collection === 'collection' ? 
                   <Icone nom='collection' title='Film de la collection' />
                 : ''}
-                {filmdata.field_site_collection === 'cadavre_exquis' ? 
+                {contentObj.field_site_collection === 'cadavre_exquis' ? 
                   <Icone nom='remontage' title='Film de remontage' />              
                 : ''}
               </div>
             ) : ''}
-            {filmdata.type === 'node--article' ?
+            {contentType === 'node--article' ?
               <div className='card__icone'>
                 <Icone nom='document' title='Document' />
               </div>
@@ -167,14 +175,14 @@ export function FilmCard({filmdata, shouldwait}) {
           className='card__image'
           ref={imageElemRef}
         >
-          { photogrammeUrl && filmdata.styles ? (
+          { photogrammeUrl && contentObj.styles ? (
             <div className='image-wrapper'>
               <Image 
                 src={photogrammeUrl}
                 width={400}
                 height={700}
                 alt=""
-                style={{ objectPosition: filmdata.styles.focus }}
+                style={{ objectPosition: contentObj.styles.focus }}
               />
             </div>
           ): ''}

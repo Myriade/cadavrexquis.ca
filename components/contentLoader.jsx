@@ -23,12 +23,10 @@ export default function ContentLoader({isCollection, isRemontage, isDocuments}) 
         return item.attributes.field_site_collection === 'cadavre_exquis'
       })
       result = {...data, data: filteredData}
-      
     } 
     
     else if (isDocuments) {
       result = docData
-      
     } 
     
     else {
@@ -39,6 +37,8 @@ export default function ContentLoader({isCollection, isRemontage, isDocuments}) 
       docData.data.forEach( item => {
         result.data.push(item) 
       })
+      
+      console.log('docData', docData)
       
       docData.included.forEach( item => {
         if (item.type === 'file--file') {
@@ -65,8 +65,6 @@ export default function ContentLoader({isCollection, isRemontage, isDocuments}) 
   if (isDocuments) {
     title = <h1>Documents</h1>
   }
-  
-  console.log('content', content)
   
   if (content) {
     return (

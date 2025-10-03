@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState, useRef } from 'react'
 import styled from 'styled-components';
-import { FilmCard } from '../components/filmCard';
+import { GridCard } from '../components/gridCard';
 import { ThematiqueFilter } from '../components/thematiqueFilter';
 import { findTermName, createRandomStyles } from '../lib/utils.ts'
 
@@ -38,7 +38,8 @@ const defautlFilm = {
       elemHeight: 'var(--ficheWidth)',
       couleur: '#eee',
     }
-  }
+  },
+  type: 'node--film'
 }
 
 const breakpointColumnsObj = {
@@ -172,7 +173,7 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
             film.attributes.filmImageUrl = imagePath;
         })
         
-        // Create random values for filmCard styles (color and height)      
+        // Create random values for GridCard styles (color and height)      
         createRandomStyles(resultArray)
         
         // Set visible films according to loadBatchQty value
@@ -295,11 +296,12 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
           className="grille"
           columnClassName="grille__column">
           {filmsItems.map( (item, index) => (
-            <FilmCard 
+            <GridCard 
               key={item.attributes.drupal_internal__nid}
-              filmdata={item.attributes}
+              contentObj={item.attributes}
+              contentType={item.type}
               shouldwait={lazyload ? 700 : 0}
-            ></FilmCard>
+            ></GridCard>
           ))}  
         </Masonry>
         
@@ -325,10 +327,11 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
     </div>
   ) : (
     <div className='film-grille'>
-      <FilmCard 
+      <GridCard 
         key={0}
         filmdata={defautlFilm.attributes}
-      ></FilmCard>
+        contentType={defautlFilm.type}
+      ></GridCard>
     </div>
   );
 };

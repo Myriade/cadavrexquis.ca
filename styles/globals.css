@@ -7,7 +7,7 @@
   h1 {
     @apply mb-6 text-4xl md:text-5xl;
     font-family: var(--font-serif)}
-  h2 {
+  h2, .h2-like {
     @apply mb-6 text-2xl tracking-tight;
     line-height: 1.1;
     font-family: var(--font-sans)}}
