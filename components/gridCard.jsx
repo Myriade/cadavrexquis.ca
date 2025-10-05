@@ -93,49 +93,52 @@ export function GridCard({contentObj, contentType, shouldwait}) {
     pathAlias = contentObj.path ? `document/${contentObj.path.alias}` : '#'
   }
   
-  const photogrammeUrl = contentObj.filmImageUrl ? `https://database.cadavrexquis.ca${contentObj.filmImageUrl}` : ''
+  const photogrammeUrl = contentObj && contentObj.filmImageUrl ? `https://database.cadavrexquis.ca${contentObj.filmImageUrl}` : ''
   
   // GSAP
   const gsapCardInstance = useGSAP(() => {
-    const imageElem = imageElemRef.current
-    const waitTime = parseInt(shouldwait)
-    
-    let hide = gsap.to(imageElem, {
-      yPercent: 100,
-      y: 'bottom',
-      duration: 0.4,
-      ease: 'none',
-    });
-    hide.pause()
-    
-    const handleMouseEnter = (e) => {
-      if ( e ) e.preventDefault()
-      hide.play()
-    };
-    
-    const handleMouseLeave = () => {
-      hide.reverse()
-    };
-    
-    setTimeout( () => {
-      if (gsapCardContainer.current && imageElem) {
-        gsapCardContainer.current.addEventListener("mouseover", () => handleMouseEnter());
-        imageElem.addEventListener("touchstart", (e) => handleMouseEnter(e));
-        gsapCardContainer.current.addEventListener("mouseout", handleMouseLeave);
-      }
-    }, waitTime)
-  }, { dependencies: [imageElemRef], scope: gsapCardContainer })
-    
-  if (!contentObj) {
+    if (contentType !== 'squeletton') {
+      const imageElem = imageElemRef.current
+      const waitTime = parseInt(shouldwait)
+      
+      let hide = gsap.to(imageElem, {
+        yPercent: 100,
+        y: 'bottom',
+        duration: 0.4,
+        ease: 'none',
+      });
+      hide.pause()
+      
+      const handleMouseEnter = (e) => {
+        if ( e ) e.preventDefault()
+        hide.play()
+      };
+      
+      const handleMouseLeave = () => {
+        hide.reverse()
+      };
+      
+      setTimeout( () => {
+        if (gsapCardContainer.current && imageElem) {
+          gsapCardContainer.current.addEventListener("mouseover", () => handleMouseEnter());
+          imageElem.addEventListener("touchstart", (e) => handleMouseEnter(e));
+          gsapCardContainer.current.addEventListener("mouseout", handleMouseLeave);
+        }
+      }, waitTime)
+    }
+  }, { dependencies: [imageElemRef, contentType], scope: gsapCardContainer })
+  
+  if (contentType === 'squeletton') {
+    console.log('contentObj SQUELETTON', contentObj)
     return (
       <Styled className='card'>
         <div className='card__inner'>
           <div className='card__infos'>
-            <h2>... chargement</h2>
+            <h2>... chargement from CARD</h2>
           </div>
         </div>
       </Styled>
-    )
+    );
   }
   
   return (

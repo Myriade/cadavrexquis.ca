@@ -28,20 +28,6 @@ const Styled = styled.section`
     margin-inline: auto;}
 `;
 
-const defautlFilm = {
-  attributes: {
-    drupal_internal__nid: 0,
-    title: 'chargement',
-    field_annees_de_sortie: '...',
-    filmThematiques: {noms: '', ids: []},
-    styles: {
-      elemHeight: 'var(--ficheWidth)',
-      couleur: '#eee',
-    }
-  },
-  type: 'node--film'
-}
-
 const breakpointColumnsObj = {
   default: 5,
   1325: 4,
@@ -49,12 +35,13 @@ const breakpointColumnsObj = {
   825: 2
 };
 
-export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, isSearch, isRelated}) {
-  const [filmsItems, setFilmsItems] = useState([defautlFilm])
+export function FilmsGrille({allFilmsData, error, docError, random, lazyload, isSearch, isRelated}) {
+  const [filmsItems, setFilmsItems] = useState()
   const [selectedThematique, setSelectedThematique] = useState('default')
   const [thematiqueVocab, setThematiqueVocab] = useState()
   const [allImages, setAllImages] = useState()
   const [loadBatchQty, setLoadBatchQty] = useState()
+  const [isLoading, setIsLoading] = useState(true)
   
   const displayableFilms = useRef([])
   const newLoadStart = useRef(0)
@@ -65,29 +52,41 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
   
   gsap.registerPlugin(useGSAP);
   
-  // Thématiques vocabulary (l'ensemble de tous les termes présents dans l'ensemble de tous les films)
   useEffect(()=>{
-    if ( allFilmsData && !error && !isLoading && !thematiqueVocab ) {
+    //console.log('allFilmsData.data[0].attributes.type, isLoading', allFilmsData.data[0].attributes.type, isLoading)
+    if (allFilmsData && allFilmsData.data.length) {
+      console.log('FilmsGrille allFilmsData prop', allFilmsData.data[0])
+      if (allFilmsData.data[0].attributes.type === 'squeletton') {
+        console.log('!!! squeletton !!!')
+      } else {
+        setIsLoading(false)
+      }
+    }
+  })
+  
+  // Thématiques vocabulary (l'ensemble de tous les termes présents dans l'ensemble de tous les films)
+  useEffect(() => {
+    if ( allFilmsData && !error && !docError && !thematiqueVocab ) {
       const result = allFilmsData.included.filter( item => {
         return item.type === "taxonomy_term--site_categorie"
       });
       setThematiqueVocab(result)
     }
-  },[allFilmsData, error, isLoading, thematiqueVocab ])
+  },[allFilmsData, error, docError, thematiqueVocab ])
   
   // Les images (l'ensemble de toutes les images présentes dans l'ensemble de tous les films)
   useEffect(()=>{
-    if ( allFilmsData && !error && !isLoading && !allImages) {
+    if ( allFilmsData && !error && !docError && !allImages) {
       const result = allFilmsData.included.filter( item => {
         return item.type === "file--file"
       });
       setAllImages(result)
     }
-  }, [allFilmsData, error, isLoading, allImages])
+  }, [allFilmsData, error, docError, allImages])
   
   // Set loadBatchQty value to int or false from Lazyload prop. 
   useEffect(() => {
-    if (allFilmsData && !error && !loadBatchQty) {
+    if (allFilmsData && !error && !docError && !loadBatchQty) {
       function batchQtySetValue(prop) {
         if (!prop) {
           return false
@@ -108,11 +107,11 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
       const qty = batchQtySetValue(lazyload);
       setLoadBatchQty(qty)
     }
-  },[allFilmsData, error, lazyload, loadBatchQty])
+  },[allFilmsData, error, docError, lazyload, loadBatchQty])
   
   // Process Data array with prop options and set visible items
   useEffect(()=>{
-    if ( allFilmsData && !error && !isLoading && thematiqueVocab && !isDisplayReady.current && !displayableFilms.current.length) {
+    if ( !isLoading && !filmsItems && allFilmsData && !error && !docError && thematiqueVocab && !isDisplayReady.current && !displayableFilms.current.length) {
       function processData(filmsArray) {
         let resultArray = null;
         
@@ -192,11 +191,11 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
       }
       processData(allFilmsData.data)
     }
-  }, [allFilmsData, error, isLoading, allImages, loadBatchQty, random, thematiqueVocab])
+  }, [filmsItems, allFilmsData, error, docError, allImages, loadBatchQty, random, thematiqueVocab])
   
   // GSAP
   const gsapInstance = useGSAP( async () => {
-    if ( !error && filmsItems.length > 1) {
+    if ( !error && !docError && filmsItems) {
       
       function setCardsToLoad() {
         const all = gsapContainer.current.querySelectorAll('.card__inner');
@@ -231,7 +230,7 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
         }
       });
     }
-  }, { dependencies: [filmsItems, error, selectedThematique, loadBatchQty], scope: gsapContainer });
+  }, { dependencies: [filmsItems, error, docError, selectedThematique, loadBatchQty], scope: gsapContainer });
   
   // event handlers
   function loadMoreClick() {
@@ -273,15 +272,14 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
     newLoadEnd.current = filmsItems.length
   }
   
-  if (error) {
-    return (
-      <div className='film-grille grid content-center text-center'>
-        <p className='error'>Une erreur de chargement sest produite. Vérifiez votre connexion internet, ou avisez-nous si le problème persite.</p>
-      </div>
-    )
-  }
+  // render returns 
+  if (error || docError) { return (
+    <div className='film-grille grid content-center text-center'>
+      <p className='error'>Une erreur de chargement sest produite. Vérifiez votre connexion internet, ou avisez-nous si le problème persite.</p>
+    </div>
+  );}
   
-  return allFilmsData ? (
+  if (allFilmsData && filmsItems) { return (
     <div className='film-grille'>
       { !isSearch && !isRelated ? <ThematiqueFilter 
         allThematiques={thematiqueVocab} 
@@ -308,7 +306,6 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
         { !isRelated ? 
           <p className='text-center mb-0'>
             {selectedThematique !== 'default' ? `${selectedThematique} : ` : ''}
-            {isLoading && '...'}
             {!isSearch && `${filmsItems.length} sur ${allFilmsData.data.length}`}
           </p>
         : '' }
@@ -325,13 +322,5 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
         ) : ''}
       </Styled>
     </div>
-  ) : (
-    <div className='film-grille'>
-      <GridCard 
-        key={0}
-        filmdata={defautlFilm.attributes}
-        contentType={defautlFilm.type}
-      ></GridCard>
-    </div>
-  );
+  );}
 };

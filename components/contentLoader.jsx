@@ -3,6 +3,24 @@ import React, { useState, useRef } from 'react'
 import { useFetchAllFilms, useFetchAllDocuments } from '../lib/fecthDrupalData'
 import { FilmsGrille } from '../components/filmsGrille';
 
+const defautlContent = { 
+  data: [{
+    attributes: {
+      drupal_internal__nid: 0,
+      title: 'chargement from GRILLE',
+      field_annees_de_sortie: '...',
+      filmThematiques: {noms: '', ids: []},
+      styles: {
+        elemHeight: 'var(--ficheWidth)',
+        couleur: '#eee',
+      }
+    },
+    type: 'squeletton'
+  }],
+  included: []
+}
+
+
 export default function ContentLoader({isCollection, isRemontage, isDocuments}) {
   const { data, isLoading, error } = useFetchAllFilms()
   const { docData, docIsLoading, docError } = useFetchAllDocuments()
@@ -38,8 +56,6 @@ export default function ContentLoader({isCollection, isRemontage, isDocuments}) 
         result.data.push(item) 
       })
       
-      console.log('docData', docData)
-      
       docData.included.forEach( item => {
         if (item.type === 'file--file') {
           result.included.push(item)
@@ -50,6 +66,7 @@ export default function ContentLoader({isCollection, isRemontage, isDocuments}) 
     setContent(result)
   }
   
+  // Set page titles according to prop
   let title = null
   if (isCollection) {
     title = <h1>Les films de la Collection</h1>
@@ -66,14 +83,28 @@ export default function ContentLoader({isCollection, isRemontage, isDocuments}) 
     title = <h1>Documents</h1>
   }
   
-  if (content) {
+  if (!content || isLoading || docIsLoading) { return (
+    <main className='content-loader'>
+      {title} TEST sans Content
+      <FilmsGrille 
+        allFilmsData={defautlContent}
+        error={error} 
+        docError={docError}
+      >
+      </FilmsGrille>
+    </main>
+  )}
+  
+  // Render a content grid
+  if (content && !isLoading && !docIsLoading && !error && !docError) {
+    console.log('contentLoader content state', content)
     return (
       <main className='content-loader'>
-        {title}
+        {title} TEST avec Content
         <FilmsGrille 
-          allFilmsData={content} 
-          isLoading={isLoading} 
+          allFilmsData={content}
           error={error} 
+          docError={docError}
           random 
           lazyload={10}
         >
