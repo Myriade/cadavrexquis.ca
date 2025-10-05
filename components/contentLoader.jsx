@@ -7,7 +7,7 @@ const defautlContent = {
   data: [{
     attributes: {
       drupal_internal__nid: 0,
-      title: 'chargement from GRILLE',
+      title: 'chargement...',
       field_annees_de_sortie: '...',
       filmThematiques: {noms: '', ids: []},
       styles: {
@@ -15,7 +15,7 @@ const defautlContent = {
         couleur: '#eee',
       }
     },
-    type: 'squeletton'
+    type: 'skeleton'
   }],
   included: []
 }
@@ -33,7 +33,6 @@ export default function ContentLoader({isCollection, isRemontage, isDocuments}) 
         return item.attributes.field_site_collection === 'collection'
       })
       result = {...data, data: filteredData}
-      
     } 
     
     else if (isRemontage) {
@@ -83,32 +82,24 @@ export default function ContentLoader({isCollection, isRemontage, isDocuments}) 
     title = <h1>Documents</h1>
   }
   
+  // render a temp skeloton
   if (!content || isLoading || docIsLoading) { return (
     <main className='content-loader'>
-      {title} TEST sans Content
-      <FilmsGrille 
-        allFilmsData={defautlContent}
-        error={error} 
-        docError={docError}
-      >
-      </FilmsGrille>
+      <FilmsGrille allFilmsData={defautlContent} />
     </main>
   )}
   
   // Render a content grid
   if (content && !isLoading && !docIsLoading && !error && !docError) {
-    console.log('contentLoader content state', content)
     return (
       <main className='content-loader'>
-        {title} TEST avec Content
         <FilmsGrille 
           allFilmsData={content}
           error={error} 
           docError={docError}
           random 
           lazyload={10}
-        >
-        </FilmsGrille>
+        />
       </main>
     );
   }

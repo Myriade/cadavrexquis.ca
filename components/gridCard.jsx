@@ -128,19 +128,6 @@ export function GridCard({contentObj, contentType, shouldwait}) {
     }
   }, { dependencies: [imageElemRef, contentType], scope: gsapCardContainer })
   
-  if (contentType === 'squeletton') {
-    console.log('contentObj SQUELETTON', contentObj)
-    return (
-      <Styled className='card'>
-        <div className='card__inner'>
-          <div className='card__infos'>
-            <h2>... chargement from CARD</h2>
-          </div>
-        </div>
-      </Styled>
-    );
-  }
-  
   return (
     <Styled
       className='card'

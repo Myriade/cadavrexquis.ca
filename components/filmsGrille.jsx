@@ -52,41 +52,39 @@ export function FilmsGrille({allFilmsData, error, docError, random, lazyload, is
   
   gsap.registerPlugin(useGSAP);
   
+  // Determine if content data is loading and squeleton is presented
   useEffect(()=>{
-    //console.log('allFilmsData.data[0].attributes.type, isLoading', allFilmsData.data[0].attributes.type, isLoading)
-    if (allFilmsData && allFilmsData.data.length) {
-      console.log('FilmsGrille allFilmsData prop', allFilmsData.data[0])
-      if (allFilmsData.data[0].attributes.type === 'squeletton') {
-        console.log('!!! squeletton !!!')
-      } else {
+    if (isLoading && allFilmsData.data.length) {
+      const typeIsSkeleton = allFilmsData.data[0].type === 'skeleton'
+      if (!typeIsSkeleton) {
         setIsLoading(false)
       }
     }
-  })
+  },[isLoading, allFilmsData])
   
   // Thématiques vocabulary (l'ensemble de tous les termes présents dans l'ensemble de tous les films)
   useEffect(() => {
-    if ( allFilmsData && !error && !docError && !thematiqueVocab ) {
+    if ( !isLoading && allFilmsData && !error && !docError && !thematiqueVocab ) {
       const result = allFilmsData.included.filter( item => {
         return item.type === "taxonomy_term--site_categorie"
       });
       setThematiqueVocab(result)
     }
-  },[allFilmsData, error, docError, thematiqueVocab ])
+  },[isLoading, allFilmsData, error, docError, thematiqueVocab ])
   
   // Les images (l'ensemble de toutes les images présentes dans l'ensemble de tous les films)
   useEffect(()=>{
-    if ( allFilmsData && !error && !docError && !allImages) {
+    if ( !isLoading && allFilmsData && !error && !docError && !allImages) {
       const result = allFilmsData.included.filter( item => {
         return item.type === "file--file"
       });
       setAllImages(result)
     }
-  }, [allFilmsData, error, docError, allImages])
+  }, [isLoading, allFilmsData, error, docError, allImages])
   
   // Set loadBatchQty value to int or false from Lazyload prop. 
   useEffect(() => {
-    if (allFilmsData && !error && !docError && !loadBatchQty) {
+    if (!isLoading && allFilmsData && !error && !docError && !loadBatchQty) {
       function batchQtySetValue(prop) {
         if (!prop) {
           return false
@@ -107,11 +105,12 @@ export function FilmsGrille({allFilmsData, error, docError, random, lazyload, is
       const qty = batchQtySetValue(lazyload);
       setLoadBatchQty(qty)
     }
-  },[allFilmsData, error, docError, lazyload, loadBatchQty])
+  },[isLoading, allFilmsData, error, docError, lazyload, loadBatchQty])
   
   // Process Data array with prop options and set visible items
   useEffect(()=>{
     if ( !isLoading && !filmsItems && allFilmsData && !error && !docError && thematiqueVocab && !isDisplayReady.current && !displayableFilms.current.length) {
+      
       function processData(filmsArray) {
         let resultArray = null;
         
@@ -191,11 +190,11 @@ export function FilmsGrille({allFilmsData, error, docError, random, lazyload, is
       }
       processData(allFilmsData.data)
     }
-  }, [filmsItems, allFilmsData, error, docError, allImages, loadBatchQty, random, thematiqueVocab])
+  }, [isLoading, filmsItems, allFilmsData, error, docError, allImages, loadBatchQty, random, thematiqueVocab])
   
   // GSAP
   const gsapInstance = useGSAP( async () => {
-    if ( !error && !docError && filmsItems) {
+    if ( !isLoading && !error && !docError && filmsItems) {
       
       function setCardsToLoad() {
         const all = gsapContainer.current.querySelectorAll('.card__inner');
@@ -230,7 +229,7 @@ export function FilmsGrille({allFilmsData, error, docError, random, lazyload, is
         }
       });
     }
-  }, { dependencies: [filmsItems, error, docError, selectedThematique, loadBatchQty], scope: gsapContainer });
+  }, { dependencies: [isLoading, filmsItems, error, docError, selectedThematique, loadBatchQty], scope: gsapContainer });
   
   // event handlers
   function loadMoreClick() {
@@ -272,14 +271,32 @@ export function FilmsGrille({allFilmsData, error, docError, random, lazyload, is
     newLoadEnd.current = filmsItems.length
   }
   
-  // render returns 
+  // render error 
   if (error || docError) { return (
     <div className='film-grille grid content-center text-center'>
       <p className='error'>Une erreur de chargement sest produite. Vérifiez votre connexion internet, ou avisez-nous si le problème persite.</p>
     </div>
   );}
   
-  if (allFilmsData && filmsItems) { return (
+  // render temp skeleton 
+  if (isLoading && allFilmsData && !filmsItems) { 
+    return (
+    <div className='film-grille'>
+      <Styled
+        className='mt-8' 
+        ref={gsapContainer}
+      >
+        <GridCard 
+          contentObj={allFilmsData.data[0].attributes}
+          contentType={allFilmsData.data[0].type}
+        />
+      </Styled>
+    </div>
+  );}
+  
+  // render content grid
+  if (!isLoading && allFilmsData && filmsItems) { 
+    return (
     <div className='film-grille'>
       { !isSearch && !isRelated ? <ThematiqueFilter 
         allThematiques={thematiqueVocab} 
@@ -299,7 +316,7 @@ export function FilmsGrille({allFilmsData, error, docError, random, lazyload, is
               contentObj={item.attributes}
               contentType={item.type}
               shouldwait={lazyload ? 700 : 0}
-            ></GridCard>
+            />
           ))}  
         </Masonry>
         
