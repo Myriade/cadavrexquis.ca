@@ -12,12 +12,23 @@ const defautlContent = {
       filmThematiques: {noms: '', ids: []},
       styles: {
         elemHeight: 'var(--ficheWidth)',
-        couleur: '#eee',
+        couleur: '#ddd',
       }
     },
     type: 'skeleton'
-  }],
-  included: []
+  },{
+    attributes: {
+      drupal_internal__nid: 999,
+      title: '...',
+      field_annees_de_sortie: '...',
+      filmThematiques: {noms: '', ids: []},
+      styles: {
+        elemHeight: 'calc( var(--ficheWidth) * 0.8)',
+        couleur: '#f1f1f1',
+      }
+    },
+    type: 'skeleton'
+  }]
 }
 
 

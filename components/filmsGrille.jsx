@@ -26,6 +26,14 @@ const Styled = styled.section`
     
   .button {
     margin-inline: auto;}
+    
+  &.grille-skeleton {
+    display: flex;
+    gap: 1rem;
+    align-items: start;
+    .card {
+      width: var(--ficheWidth);}
+  }
 `;
 
 const breakpointColumnsObj = {
@@ -279,17 +287,16 @@ export function FilmsGrille({allFilmsData, error, docError, random, lazyload, is
   );}
   
   // render temp skeleton 
-  if (isLoading && allFilmsData && !filmsItems) { 
+  if (isLoading && allFilmsData) { 
     return (
     <div className='film-grille'>
-      <Styled
-        className='mt-8' 
-        ref={gsapContainer}
-      >
-        <GridCard 
-          contentObj={allFilmsData.data[0].attributes}
-          contentType={allFilmsData.data[0].type}
-        />
+      <Styled className='mt-8 grille-skeleton'>
+        {allFilmsData.data.map( (item) => (
+          <GridCard 
+            key={item.attributes.drupal_internal__nid}
+            contentObj={item.attributes}
+          />
+        ))} 
       </Styled>
     </div>
   );}
@@ -310,7 +317,7 @@ export function FilmsGrille({allFilmsData, error, docError, random, lazyload, is
           breakpointCols={breakpointColumnsObj}
           className="grille"
           columnClassName="grille__column">
-          {filmsItems.map( (item, index) => (
+          {filmsItems.map( (item) => (
             <GridCard 
               key={item.attributes.drupal_internal__nid}
               contentObj={item.attributes}
