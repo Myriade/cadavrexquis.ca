@@ -73,6 +73,7 @@ export function SearchPage({searchSlug}) {
     
   },[vocabs, data])
   
+  
   useEffect(()=>{
     if (data && searchTerms && vocabs && !filteredData && !isLoading && hasNoResult === null) {
       
@@ -112,8 +113,10 @@ export function SearchPage({searchSlug}) {
       
       function loopThroughVocabTerms(fieldName, vocabName) {
         const match = data.data.filter( item => {
-          const termNames = findTermName( item.relationships[fieldName].data, vocabs[vocabName], vocabName);
-          return termNames.toLowerCase().includes(searchTerms.toLowerCase())
+          if (Object.hasOwn(item.relationships, fieldName) ) {
+            const termNames = findTermName( item.relationships[fieldName].data, vocabs[vocabName], vocabName);
+            return termNames.toLowerCase().includes(searchTerms.toLowerCase())
+          }
         })
         match.forEach( item => { allMatch.push(item) })
       }
@@ -141,13 +144,15 @@ export function SearchPage({searchSlug}) {
     }
   },[searchTerms, vocabs, filteredData, isLoading, hasNoResult, data])
   
+  // Disable loading state
   useEffect(()=>{
     if ( (filteredData || hasNoResult) && !isLoading) {
       setIsloading(false)
     }
   },[filteredData, hasNoResult, isLoading])
   
-  if (hasNoResult && !isLoading) {
+  // No results message render
+  if (data && hasNoResult && !isLoading) {
     return (
       <div>
         <p className='mb-6 text-3xl md:text-4xl'>Aucun résultat pour « {searchTerms} »</p>
@@ -155,7 +160,8 @@ export function SearchPage({searchSlug}) {
     )
   }
   
-  return (
+  // Results render 
+  if (data && !hasNoResult && !isLoading) { return (
     <>
       <h1>Recherche pour « {searchTerms} »</h1>
       {filteredData ? (<p>Résultat : {filteredData.data.length} contenus sur {data.data.length}</p>) : ''}
@@ -166,5 +172,5 @@ export function SearchPage({searchSlug}) {
         isSearch
       ></FilmsGrille>
     </>
-  )
+  )}
 }

@@ -62,7 +62,7 @@ export function FilmsGrille({contentData, error, docError, random, lazyload, isS
   
   // Determine if content data is loading and squeleton is presented
   useEffect(()=>{
-    if (isLoading && contentData.data.length) {
+    if (isLoading && contentData && contentData.data.length) {
       const typeIsSkeleton = contentData.data[0].type === 'skeleton'
       if (!typeIsSkeleton) {
         setIsLoading(false)
