@@ -90,7 +90,7 @@ export function GridCard({contentObj, contentType, shouldwait}) {
   } 
   
   if (contentType === 'node--article') {
-    pathAlias = contentObj.path ? `document/${contentObj.path.alias}` : '#'
+    pathAlias = contentObj.path ? `/document${contentObj.path.alias}` : '#'
   }
   
   const photogrammeUrl = contentObj && contentObj.filmImageUrl ? `https://database.cadavrexquis.ca${contentObj.filmImageUrl}` : ''

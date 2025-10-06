@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState, useRef } from 'react'
-import { useFetchAllFilms } from '../lib/fecthDrupalData'
+import { useFetchFilmsAndDocuments } from '../lib/fecthDrupalData'
 import { uriToString, findTermName } from '../lib/utils.ts';
 import { FilmsGrille } from '../components/filmsGrille';
 
@@ -10,7 +10,7 @@ export function SearchPage({searchSlug}) {
   const [filteredData, setFilteredData] = useState(null)
   const [hasNoResult, setHasNoResult] = useState(null)
   const [vocabs, setVocabs] = useState(null)
-  const { data, isloading, error } = useFetchAllFilms(true)
+  const { data, isloading, error } = useFetchFilmsAndDocuments(true)
   
   // Taxonomy Search fields
   const taxoFields = [{ 
@@ -160,7 +160,7 @@ export function SearchPage({searchSlug}) {
       <h1>Recherche pour « {searchTerms} »</h1>
       {filteredData ? (<p>Résultat : {filteredData.data.length} contenus sur {data.data.length}</p>) : ''}
       <FilmsGrille
-        allFilmsData={filteredData} 
+        contentData={filteredData} 
         isLoading={isLoading} 
         error={error} 
         isSearch

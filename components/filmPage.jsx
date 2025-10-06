@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components';
 import { notFound } from 'next/navigation'
-import { useFetchUniqueFilm, useFetchAllFilms } from '../lib/fecthDrupalData'
+import { useFetchUniqueFilm, useFetchFilmsAndDocuments } from '../lib/fecthDrupalData'
 import { getVimeoId, findTermName } from '../lib/utils.ts'
 
 import { FilmsGrille } from '../components/filmsGrille'
@@ -90,7 +90,7 @@ export function FilmPage( {path} ) {
 	const [ fieldConfigs, setFieldConfigs ] = useState(null)
 	const [ voirPlusOpen, setVoirPlusOpen ] = useState(false)
 	const [ relatedFilms, setRelatedFilms ] = useState(null)
-	const { data : allFilms, isLoading : allFilmsIsLoading, error : allFilmsError } = useFetchAllFilms();
+	const { data : allFilms, isLoading : allFilmsIsLoading, error : allFilmsError } = useFetchFilmsAndDocuments();
 	
 	function formatField(fieldSource, visibleIfEmpty) {
 		// TODO : Check if taxonomy terms has links to view more related content
@@ -426,7 +426,7 @@ export function FilmPage( {path} ) {
 					<hr className='mb-6' />
 					<h2>À voir aussi</h2>
 					<FilmsGrille 
-						allFilmsData={relatedFilms}
+						contentData={relatedFilms}
 						error={allFilmsError}
 						isLoading={allFilmsIsLoading}
 						isRelated

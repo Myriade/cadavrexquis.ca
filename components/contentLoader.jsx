@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useRef } from 'react'
-import { useFetchAllFilms, useFetchAllDocuments } from '../lib/fecthDrupalData'
+import { useFetchFilmsAndDocuments } from '../lib/fecthDrupalData'
 import { FilmsGrille } from '../components/filmsGrille';
 
 const defautlContent = { 
@@ -33,44 +33,38 @@ const defautlContent = {
 
 
 export default function ContentLoader({isCollection, isRemontage, isDocuments}) {
-  const { data, isLoading, error } = useFetchAllFilms()
-  const { docData, docIsLoading, docError } = useFetchAllDocuments()
+  const { data, isLoading, error } = useFetchFilmsAndDocuments()
   const [content, setContent] = useState(null)
   
-  if ( !content && data && docData && !isLoading && !error && !docIsLoading && !docError) {
+  if ( !content && data && !isLoading && !error) {
     let result = null;
     if (isCollection) {
       const filteredData = data.data.filter( item => {
-        return item.attributes.field_site_collection === 'collection'
+        if (Object.hasOwn(item.attributes, "field_site_collection")) {
+          return item.attributes.field_site_collection === 'collection'
+        }
       })
       result = {...data, data: filteredData}
     } 
     
     else if (isRemontage) {
       const filteredData = data.data.filter( item => {
-        return item.attributes.field_site_collection === 'cadavre_exquis'
+        if (Object.hasOwn(item.attributes, "field_site_collection")) {
+          return item.attributes.field_site_collection === 'cadavre_exquis'
+        }
       })
       result = {...data, data: filteredData}
     } 
     
     else if (isDocuments) {
-      result = docData
+      const filteredData = data.data.filter( item => {
+        return item.type === 'node--article'
+      })
+      result = {...data, data: filteredData}
     } 
     
     else {
-      // fill content variable with films
       result = data
-      
-      // then add documents to content variable
-      docData.data.forEach( item => {
-        result.data.push(item) 
-      })
-      
-      docData.included.forEach( item => {
-        if (item.type === 'file--file') {
-          result.included.push(item)
-        }
-      })
     }
     
     setContent(result)
@@ -94,20 +88,19 @@ export default function ContentLoader({isCollection, isRemontage, isDocuments}) 
   }
   
   // render a temp skeloton
-  if (!content || isLoading || docIsLoading) { return (
+  if (!content || isLoading) { return (
     <main className='content-loader'>
-      <FilmsGrille allFilmsData={defautlContent} />
+      <FilmsGrille contentData={defautlContent} />
     </main>
   )}
   
   // Render a content grid
-  if (content && !isLoading && !docIsLoading && !error && !docError) {
+  if (content && !isLoading && !error) {
     return (
       <main className='content-loader'>
         <FilmsGrille 
-          allFilmsData={content}
-          error={error} 
-          docError={docError}
+          contentData={content}
+          error={error}
           random 
           lazyload={10}
         />
