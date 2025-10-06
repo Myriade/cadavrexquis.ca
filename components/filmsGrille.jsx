@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState, useRef } from 'react'
 import styled from 'styled-components';
-import { FilmCard } from '../components/filmCard';
+import { GridCard } from '../components/gridCard';
 import { ThematiqueFilter } from '../components/thematiqueFilter';
 import { findTermName, createRandomStyles } from '../lib/utils.ts'
 
@@ -26,20 +26,15 @@ const Styled = styled.section`
     
   .button {
     margin-inline: auto;}
-`;
-
-const defautlFilm = {
-  attributes: {
-    drupal_internal__nid: 0,
-    title: 'chargement',
-    field_annees_de_sortie: '...',
-    filmThematiques: {noms: '', ids: []},
-    styles: {
-      elemHeight: 'var(--ficheWidth)',
-      couleur: '#eee',
-    }
+    
+  &.grille-skeleton {
+    display: flex;
+    gap: 1rem;
+    align-items: start;
+    .card {
+      width: var(--ficheWidth);}
   }
-}
+`;
 
 const breakpointColumnsObj = {
   default: 5,
@@ -48,12 +43,13 @@ const breakpointColumnsObj = {
   825: 2
 };
 
-export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, isSearch, isRelated}) {
-  const [filmsItems, setFilmsItems] = useState([defautlFilm])
+export function FilmsGrille({contentData, error, docError, random, lazyload, isSearch, isRelated}) {
+  const [filmsItems, setFilmsItems] = useState()
   const [selectedThematique, setSelectedThematique] = useState('default')
   const [thematiqueVocab, setThematiqueVocab] = useState()
   const [allImages, setAllImages] = useState()
   const [loadBatchQty, setLoadBatchQty] = useState()
+  const [isLoading, setIsLoading] = useState(true)
   
   const displayableFilms = useRef([])
   const newLoadStart = useRef(0)
@@ -64,29 +60,39 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
   
   gsap.registerPlugin(useGSAP);
   
-  // Thématiques vocabulary (l'ensemble de tous les termes présents dans l'ensemble de tous les films)
+  // Determine if content data is loading and squeleton is presented
   useEffect(()=>{
-    if ( allFilmsData && !error && !isLoading && !thematiqueVocab ) {
-      const result = allFilmsData.included.filter( item => {
+    if (isLoading && contentData && contentData.data.length) {
+      const typeIsSkeleton = contentData.data[0].type === 'skeleton'
+      if (!typeIsSkeleton) {
+        setIsLoading(false)
+      }
+    }
+  },[isLoading, contentData])
+  
+  // Thématiques vocabulary (l'ensemble de tous les termes présents dans l'ensemble de tous les films)
+  useEffect(() => {
+    if ( !isLoading && contentData && !error && !docError && !thematiqueVocab ) {
+      const result = contentData.included.filter( item => {
         return item.type === "taxonomy_term--site_categorie"
       });
       setThematiqueVocab(result)
     }
-  },[allFilmsData, error, isLoading, thematiqueVocab ])
+  },[isLoading, contentData, error, docError, thematiqueVocab ])
   
   // Les images (l'ensemble de toutes les images présentes dans l'ensemble de tous les films)
   useEffect(()=>{
-    if ( allFilmsData && !error && !isLoading && !allImages) {
-      const result = allFilmsData.included.filter( item => {
+    if ( !isLoading && contentData && !error && !docError && !allImages) {
+      const result = contentData.included.filter( item => {
         return item.type === "file--file"
       });
       setAllImages(result)
     }
-  }, [allFilmsData, error, isLoading, allImages])
+  }, [isLoading, contentData, error, docError, allImages])
   
   // Set loadBatchQty value to int or false from Lazyload prop. 
   useEffect(() => {
-    if (allFilmsData && !error && !loadBatchQty) {
+    if (!isLoading && contentData && !error && !docError && !loadBatchQty) {
       function batchQtySetValue(prop) {
         if (!prop) {
           return false
@@ -107,11 +113,12 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
       const qty = batchQtySetValue(lazyload);
       setLoadBatchQty(qty)
     }
-  },[allFilmsData, error, lazyload, loadBatchQty])
+  },[isLoading, contentData, error, docError, lazyload, loadBatchQty])
   
   // Process Data array with prop options and set visible items
   useEffect(()=>{
-    if ( allFilmsData && !error && !isLoading && thematiqueVocab && !isDisplayReady.current && !displayableFilms.current.length) {
+    if ( !isLoading && !filmsItems && contentData && !error && !docError && thematiqueVocab && !isDisplayReady.current && !displayableFilms.current.length) {
+      
       function processData(filmsArray) {
         let resultArray = null;
         
@@ -126,7 +133,7 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
         };
         
         if (random) { 
-          resultArray = randomizeData(allFilmsData.data) 
+          resultArray = randomizeData(contentData.data) 
         } else {
           resultArray = filmsArray
         }
@@ -172,7 +179,7 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
             film.attributes.filmImageUrl = imagePath;
         })
         
-        // Create random values for filmCard styles (color and height)      
+        // Create random values for GridCard styles (color and height)      
         createRandomStyles(resultArray)
         
         // Set visible films according to loadBatchQty value
@@ -189,13 +196,13 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
         setFirstVisibleItems(resultArray)
         isDisplayReady.current = true
       }
-      processData(allFilmsData.data)
+      processData(contentData.data)
     }
-  }, [allFilmsData, error, isLoading, allImages, loadBatchQty, random, thematiqueVocab])
+  }, [isLoading, filmsItems, contentData, error, docError, allImages, loadBatchQty, random, thematiqueVocab])
   
   // GSAP
   const gsapInstance = useGSAP( async () => {
-    if ( !error && filmsItems.length > 1) {
+    if ( !isLoading && !error && !docError && filmsItems) {
       
       function setCardsToLoad() {
         const all = gsapContainer.current.querySelectorAll('.card__inner');
@@ -230,7 +237,7 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
         }
       });
     }
-  }, { dependencies: [filmsItems, error, selectedThematique, loadBatchQty], scope: gsapContainer });
+  }, { dependencies: [isLoading, filmsItems, error, docError, selectedThematique, loadBatchQty], scope: gsapContainer });
   
   // event handlers
   function loadMoreClick() {
@@ -272,15 +279,31 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
     newLoadEnd.current = filmsItems.length
   }
   
-  if (error) {
-    return (
-      <div className='film-grille grid content-center text-center'>
-        <p className='error'>Une erreur de chargement sest produite. Vérifiez votre connexion internet, ou avisez-nous si le problème persite.</p>
-      </div>
-    )
-  }
+  // render error 
+  if (error || docError) { return (
+    <div className='film-grille grid content-center text-center'>
+      <p className='error'>Une erreur de chargement sest produite. Vérifiez votre connexion internet, ou avisez-nous si le problème persite.</p>
+    </div>
+  );}
   
-  return allFilmsData ? (
+  // render temp skeleton 
+  if (isLoading && contentData) { 
+    return (
+    <div className='film-grille'>
+      <Styled className='mt-8 grille-skeleton'>
+        {contentData.data.map( (item) => (
+          <GridCard 
+            key={item.attributes.drupal_internal__nid}
+            contentObj={item.attributes}
+          />
+        ))} 
+      </Styled>
+    </div>
+  );}
+  
+  // render content grid
+  if (!isLoading && contentData && filmsItems) { 
+    return (
     <div className='film-grille'>
       { !isSearch && !isRelated ? <ThematiqueFilter 
         allThematiques={thematiqueVocab} 
@@ -294,20 +317,20 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
           breakpointCols={breakpointColumnsObj}
           className="grille"
           columnClassName="grille__column">
-          {filmsItems.map( (item, index) => (
-            <FilmCard 
+          {filmsItems.map( (item) => (
+            <GridCard 
               key={item.attributes.drupal_internal__nid}
-              filmdata={item.attributes}
+              contentObj={item.attributes}
+              contentType={item.type}
               shouldwait={lazyload ? 700 : 0}
-            ></FilmCard>
+            />
           ))}  
         </Masonry>
         
         { !isRelated ? 
           <p className='text-center mb-0'>
             {selectedThematique !== 'default' ? `${selectedThematique} : ` : ''}
-            {isLoading && '...'}
-            {!isSearch && `${filmsItems.length} films sur ${allFilmsData.data.length}`}
+            {!isSearch && `${filmsItems.length} sur ${contentData.data.length}`}
           </p>
         : '' }
         
@@ -318,17 +341,10 @@ export function FilmsGrille({allFilmsData, isLoading, error, random, lazyload, i
             onClick={loadMoreClick}
             ref={loadModeBtnRef}
           >
-            Charger plus de films
+            Charger plus
           </button>
         ) : ''}
       </Styled>
     </div>
-  ) : (
-    <div className='film-grille'>
-      <FilmCard 
-        key={0}
-        filmdata={defautlFilm.attributes}
-      ></FilmCard>
-    </div>
-  );
+  );}
 };

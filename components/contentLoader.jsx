@@ -1,34 +1,81 @@
 'use client'
 import React, { useState, useRef } from 'react'
-import { useFetchAllFilms } from '../lib/fecthDrupalData'
+import { useFetchFilmsAndDocuments } from '../lib/fecthDrupalData'
 import { FilmsGrille } from '../components/filmsGrille';
 
-export default function ContentLoader({isCollection, isRemontage, isDocments}) {
-  const { data, isLoading, error } = useFetchAllFilms()
-  let content = null;
+const defautlContent = { 
+  data: [{
+    attributes: {
+      drupal_internal__nid: 0,
+      title: 'chargement...',
+      field_annees_de_sortie: '...',
+      filmThematiques: {noms: '', ids: []},
+      styles: {
+        elemHeight: 'var(--ficheWidth)',
+        couleur: '#ddd',
+      }
+    },
+    type: 'skeleton'
+  },{
+    attributes: {
+      drupal_internal__nid: 999,
+      title: '...',
+      field_annees_de_sortie: '...',
+      filmThematiques: {noms: '', ids: []},
+      styles: {
+        elemHeight: 'calc( var(--ficheWidth) * 0.8)',
+        couleur: '#f1f1f1',
+      }
+    },
+    type: 'skeleton'
+  }]
+}
+
+
+export default function ContentLoader({isCollection, isRemontage, isDocuments}) {
+  const { data, isLoading, error } = useFetchFilmsAndDocuments()
+  const [content, setContent] = useState(null)
   
-  if ( data && !isLoading && !error) {
+  if ( !content && data && !isLoading && !error) {
+    let result = null;
     if (isCollection) {
       const filteredData = data.data.filter( item => {
-        return item.attributes.field_site_collection === 'collection'
+        if (Object.hasOwn(item.attributes, "field_site_collection")) {
+          return item.attributes.field_site_collection === 'collection'
+        }
       })
-      content = {...data, data: filteredData}
-    } else if (isRemontage) {
+      result = {...data, data: filteredData}
+    } 
+    
+    else if (isRemontage) {
       const filteredData = data.data.filter( item => {
-        return item.attributes.field_site_collection === 'cadavre_exquis'
+        if (Object.hasOwn(item.attributes, "field_site_collection")) {
+          return item.attributes.field_site_collection === 'cadavre_exquis'
+        }
       })
-      content = {...data, data: filteredData}
-    } else if (isDocments) {
-      
-    } else {
-      content = data
+      result = {...data, data: filteredData}
+    } 
+    
+    else if (isDocuments) {
+      const filteredData = data.data.filter( item => {
+        return item.type === 'node--article'
+      })
+      result = {...data, data: filteredData}
+    } 
+    
+    else {
+      result = data
     }
+    
+    setContent(result)
   }
   
+  // Set page titles according to prop
   let title = null
   if (isCollection) {
     title = <h1>Les films de la Collection</h1>
   }
+  
   if (isRemontage) {
     title = (<>
       <h1 className='mb-0'>Les cadavres exquis</h1>
@@ -36,17 +83,28 @@ export default function ContentLoader({isCollection, isRemontage, isDocments}) {
     </>)
   }
   
-  return (
+  if (isDocuments) {
+    title = <h1>Documents</h1>
+  }
+  
+  // render a temp skeloton
+  if (!content || isLoading) { return (
     <main className='content-loader'>
-      {title}
-      <FilmsGrille 
-        allFilmsData={content} 
-        isLoading={isLoading} 
-        error={error} 
-        random 
-        lazyload={10}
-      >
-      </FilmsGrille>
+      <FilmsGrille contentData={defautlContent} />
     </main>
-  );
+  )}
+  
+  // Render a content grid
+  if (content && !isLoading && !error) {
+    return (
+      <main className='content-loader'>
+        <FilmsGrille 
+          contentData={content}
+          error={error}
+          random 
+          lazyload={10}
+        />
+      </main>
+    );
+  }
 }

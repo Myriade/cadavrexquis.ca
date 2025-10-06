@@ -48,4 +48,6 @@ npm run lint
 GIT push to main on Github repo. It triggers a Netlify deployment.
 
 
-
+## Actions sur DB Drupal depuis migration
+- Adaptation du node type Article pour les documents (renommé Document)
+- Ajout de deux nodes Documents tests

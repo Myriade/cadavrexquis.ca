@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState, useRef } from 'react'
-import { useFetchAllFilms } from '../lib/fecthDrupalData'
+import { useFetchFilmsAndDocuments } from '../lib/fecthDrupalData'
 import { uriToString, findTermName } from '../lib/utils.ts';
 import { FilmsGrille } from '../components/filmsGrille';
 
@@ -10,7 +10,7 @@ export function SearchPage({searchSlug}) {
   const [filteredData, setFilteredData] = useState(null)
   const [hasNoResult, setHasNoResult] = useState(null)
   const [vocabs, setVocabs] = useState(null)
-  const { data, isloading, error } = useFetchAllFilms(true)
+  const { data, isloading, error } = useFetchFilmsAndDocuments(true)
   
   // Taxonomy Search fields
   const taxoFields = [{ 
@@ -73,6 +73,7 @@ export function SearchPage({searchSlug}) {
     
   },[vocabs, data])
   
+  
   useEffect(()=>{
     if (data && searchTerms && vocabs && !filteredData && !isLoading && hasNoResult === null) {
       
@@ -112,8 +113,10 @@ export function SearchPage({searchSlug}) {
       
       function loopThroughVocabTerms(fieldName, vocabName) {
         const match = data.data.filter( item => {
-          const termNames = findTermName( item.relationships[fieldName].data, vocabs[vocabName], vocabName);
-          return termNames.toLowerCase().includes(searchTerms.toLowerCase())
+          if (Object.hasOwn(item.relationships, fieldName) ) {
+            const termNames = findTermName( item.relationships[fieldName].data, vocabs[vocabName], vocabName);
+            return termNames.toLowerCase().includes(searchTerms.toLowerCase())
+          }
         })
         match.forEach( item => { allMatch.push(item) })
       }
@@ -141,13 +144,15 @@ export function SearchPage({searchSlug}) {
     }
   },[searchTerms, vocabs, filteredData, isLoading, hasNoResult, data])
   
+  // Disable loading state
   useEffect(()=>{
     if ( (filteredData || hasNoResult) && !isLoading) {
       setIsloading(false)
     }
   },[filteredData, hasNoResult, isLoading])
   
-  if (hasNoResult && !isLoading) {
+  // No results message render
+  if (data && hasNoResult && !isLoading) {
     return (
       <div>
         <p className='mb-6 text-3xl md:text-4xl'>Aucun résultat pour « {searchTerms} »</p>
@@ -155,16 +160,17 @@ export function SearchPage({searchSlug}) {
     )
   }
   
-  return (
+  // Results render 
+  if (data && !hasNoResult && !isLoading) { return (
     <>
       <h1>Recherche pour « {searchTerms} »</h1>
-      {filteredData ? (<p>Résultat : {filteredData.data.length} films sur {data.data.length}</p>) : ''}
+      {filteredData ? (<p>Résultat : {filteredData.data.length} contenus sur {data.data.length}</p>) : ''}
       <FilmsGrille
-        allFilmsData={filteredData} 
+        contentData={filteredData} 
         isLoading={isLoading} 
         error={error} 
         isSearch
       ></FilmsGrille>
     </>
-  )
+  )}
 }
