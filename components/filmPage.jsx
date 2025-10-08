@@ -335,14 +335,21 @@ export function FilmPage( {path} ) {
 					<div className='vimeo min-h-60 md:min-h-80 lg:min-h-[65vh] mb-6 loading'><span className='text-6xl'>...</span></div>
 				)}
 				
-				<p className='film-type text-xl mb-6'>
-					{film.field_site_collection === 'collection' ? 
-						<Icone nom='collection' couleur='var(--color-rouge)' />
-					: ''}
-					{film.field_site_collection === 'cadavre_exquis' ? 
-						<Icone nom='remontage' couleur='var(--color-rouge)' />
-					: ''}
-					{primaryFields && primaryFields.filmType ? primaryFields.filmType : '... chargement'}
+				<p className='mb-6'>
+					{primaryFields ? <span>
+						{film.field_site_collection === 'collection' ? 
+							<a href='/collection' className='film-type text-xl'>
+								<Icone nom='collection' couleur='var(--color-rouge)' />
+								<span className='info'>Collection</span>
+							</a> 
+						: ''}
+						{film.field_site_collection === 'cadavre_exquis' ? 
+							<a href='/remontage' className='film-type text-xl'>
+								<Icone nom='remontage' couleur='var(--color-rouge)' />
+								<span className='info'>Cadavre exquis</span>
+							</a>
+						: ''}
+					</span> : <span className='film-type text-xl'>... chargement</span>}
 				</p>
 				
 				<h1 className='mb-8'>{film.title}</h1>
