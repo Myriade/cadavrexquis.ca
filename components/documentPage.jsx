@@ -107,7 +107,7 @@ export function DocumentPage( {path} ) {
 				</span> : ''}
 			</p>
 			
-			<div className='min-h-[25vh]' dangerouslySetInnerHTML={{__html: 
+			<div className='min-h-[25vh] mb-10' dangerouslySetInnerHTML={{__html: 
 				!isLoading && body ? body : `<span class='body-skeleton text-xl'>...</span>`
 			}} />
 		</Main>
