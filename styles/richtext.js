@@ -43,5 +43,9 @@ export default function richTextCss() {
 		figure.align-right {
 			float: right;
 			margin-left: 1.5em;}
+			
+		figure.align-center {
+			margin-inline: auto;
+		}
 	`
 }

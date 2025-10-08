@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
 import styled from 'styled-components';
 import { notFound } from 'next/navigation'
 import { useFetchUniqueDocument } from '../lib/fecthDrupalData'
@@ -8,6 +9,16 @@ import richTextCss from '../styles/richtext'
 
 const Main = styled.main`
 	${richTextCss()}
+	.image-wrapper {
+		position: relative;
+		height: 50vh;
+		&--skeleton {
+			background: var(--color-grispale);}}
+			
+	.body-skeleton {
+		text-transform: uppercase;
+		color: var(--color-rouge);
+	}
 `
 
 const defautlDocument = {
@@ -17,9 +28,9 @@ const defautlDocument = {
 	
 export function DocumentPage( {path} ) {
 	const { document, isLoading, error } = useFetchUniqueDocument(defautlDocument, path)
-	let body = null
 	
-	//Process images : change relative src path to absolutes
+	// Process images in body : change relative src path to absolutes
+	let body = null
 	if ( !isLoading && document ) {
 		console.log('document', document)
 		const rawBody = document.body.processed
@@ -44,9 +55,23 @@ export function DocumentPage( {path} ) {
 	
 	return (
 		<Main>
-			<h1>{document.title}</h1>
-			<div dangerouslySetInnerHTML={{__html: 
-				!isLoading && body ? body : '... chargement'
+			{ !isLoading && document.field_site_photogramme && document.field_site_photogramme.uri ? (
+				<div className='image-wrapper'>
+					<Image 
+						src={`https://database.cadavrexquis.ca${document.field_site_photogramme.uri.url}`}
+						alt=""
+						fill={true}
+						style={{objectFit: "cover"}}
+					/>
+				</div>
+			) : (
+				<div className='image-wrapper image-wrapper--skeleton p-4'>
+					<p className='text-xl'>...</p>
+				</div>
+			)}
+			<h1 className='mt-10'>{document.title}</h1>
+			<div className='min-h-[25vh]' dangerouslySetInnerHTML={{__html: 
+				!isLoading && body ? body : `<span class='body-skeleton text-xl'>Chargement...</span>`
 			}} />
 		</Main>
 	)
