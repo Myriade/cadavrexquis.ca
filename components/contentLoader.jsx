@@ -90,7 +90,10 @@ export default function ContentLoader({isCollection, isRemontage, isDocuments}) 
   // render a temp skeloton
   if (!content || isLoading) { return (
     <main className='content-loader'>
-      <ContentGrid contentData={defautlContent} />
+      <ContentGrid 
+        contentData={defautlContent} 
+        hideItemCount
+      />
     </main>
   )}
   
@@ -103,6 +106,8 @@ export default function ContentLoader({isCollection, isRemontage, isDocuments}) 
           error={error}
           random 
           lazyload={10}
+          showFilter={!isDocuments}
+          showTotalCount
         />
       </main>
     );

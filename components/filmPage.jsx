@@ -437,6 +437,7 @@ export function FilmPage( {path} ) {
 						error={allFilmsError}
 						isLoading={allFilmsIsLoading}
 						isRelated
+						hideItemCount
 					/>
 					
 				</Curated>

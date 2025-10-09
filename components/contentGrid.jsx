@@ -43,7 +43,7 @@ const breakpointColumnsObj = {
   825: 2
 };
 
-export function ContentGrid({contentData, error, docError, random, lazyload, isSearch, isRelated}) {
+export function ContentGrid({contentData, error, docError, random, lazyload, showFilter, hideItemCount, showTotalCount}) {
   const [filmsItems, setFilmsItems] = useState()
   const [selectedThematique, setSelectedThematique] = useState('default')
   const [thematiqueVocab, setThematiqueVocab] = useState()
@@ -305,7 +305,7 @@ export function ContentGrid({contentData, error, docError, random, lazyload, isS
   if (!isLoading && contentData && filmsItems) { 
     return (
     <div className='film-grille'>
-      { !isSearch && !isRelated ? <ThematiqueFilter 
+      { showFilter ? <ThematiqueFilter 
         allThematiques={thematiqueVocab} 
         onThematiqueChange={thematiqueChangeHandler} 
       /> : ''}
@@ -327,10 +327,10 @@ export function ContentGrid({contentData, error, docError, random, lazyload, isS
           ))}  
         </Masonry>
         
-        { !isRelated ? 
+        { !hideItemCount ? 
           <p className='text-center mb-0'>
             {selectedThematique !== 'default' ? `${selectedThematique} : ` : ''}
-            {!isSearch && `${filmsItems.length} sur ${contentData.data.length}`}
+            {showTotalCount ? `${filmsItems.length} sur ${contentData.data.length}` : ''}
           </p>
         : '' }
         
