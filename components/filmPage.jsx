@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation'
 import { useFetchUniqueFilm, useFetchFilmsAndDocuments } from '../lib/fecthDrupalData'
 import { getVimeoId, findTermName } from '../lib/utils.ts'
 
-import { FilmsGrille } from '../components/filmsGrille'
+import { ContentGrid } from '../components/contentGrid'
 import Icone from '../components/icone'
 
 const Main = styled.main`
@@ -432,13 +432,12 @@ export function FilmPage( {path} ) {
 				<Curated className='mb-6'>
 					<hr className='mb-6' />
 					<h2>À voir aussi</h2>
-					<FilmsGrille 
+					<ContentGrid 
 						contentData={relatedFilms}
 						error={allFilmsError}
 						isLoading={allFilmsIsLoading}
 						isRelated
-					>
-					</FilmsGrille>
+					/>
 					
 				</Curated>
 			: ''}

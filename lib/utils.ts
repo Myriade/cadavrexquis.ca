@@ -101,7 +101,7 @@ export function createRandomStyles(filmsArray) {
     
     // height style
     const randomHeightFactor = Math.random() * (1.4 - 0.75) + 0.3;
-    const height = `calc( var(--ficheWidth) * ${randomHeightFactor})`
+    const height = `calc( var(--cardWidth) * ${randomHeightFactor})`
     film.attributes.styles.elemHeight = height;
     
     // couleur

@@ -18,7 +18,7 @@ const Styled = styled.div`
   .card__inner {
     display: grid;
     grid-template: 1fr / 1fr;
-    margin-bottom: var(--ficheMarge);
+    margin-bottom: var(--cardMarge);
     overflow: hidden;}
   
   .card__image {
@@ -79,7 +79,7 @@ const Styled = styled.div`
   }
 `;
 
-export function GridCard({contentObj, contentType, shouldwait}) {
+export function Card({contentObj, contentType, shouldwait}) {
   const gsapCardContainer = useRef()
   const imageElemRef = useRef()
   gsap.registerPlugin(useGSAP);

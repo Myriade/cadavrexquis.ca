@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { useFetchFilmsAndDocuments } from '../lib/fecthDrupalData'
 import { uriToString, findTermName } from '../lib/utils.ts';
-import { FilmsGrille } from '../components/filmsGrille';
+import { ContentGrid } from '../components/contentGrid';
 
 export function SearchPage({searchSlug}) {
   const [isLoading, setIsloading] = useState()
@@ -165,12 +165,12 @@ export function SearchPage({searchSlug}) {
     <>
       <h1>Recherche pour « {searchTerms} »</h1>
       {filteredData ? (<p>Résultat : {filteredData.data.length} contenus sur {data.data.length}</p>) : ''}
-      <FilmsGrille
+      <ContentGrid
         contentData={filteredData} 
         isLoading={isLoading} 
         error={error} 
         isSearch
-      ></FilmsGrille>
+      />
     </>
   )}
 }

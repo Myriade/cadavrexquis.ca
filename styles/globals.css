@@ -41,14 +41,14 @@ html {
   --color-gris: #231F20;
   --color-grispale: #f0eeee;
   
-  --ficheWidth: 350px;
-  --ficheMarge: 6px;
+  --cardWidth: 350px;
+  --cardMarge: 6px;
   
   color: var(--color-noir);
 }
 
 @media (min-with: 1080px) {
-  --ficheWidth: 400px;}
+  --cardWidth: 400px;}
 
 /* Typography */
 @font-face {

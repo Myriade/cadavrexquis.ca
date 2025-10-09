@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState, useRef } from 'react'
 import styled from 'styled-components';
-import { GridCard } from '../components/gridCard';
+import { Card } from '../components/card';
 import { ThematiqueFilter } from '../components/thematiqueFilter';
 import { findTermName, createRandomStyles } from '../lib/utils.ts'
 
@@ -15,14 +15,14 @@ const Styled = styled.section`
   
   .grille {
     display: flex;
-    margin-left: calc( -1 * var(--ficheMarge)); /* gutter size offset */
+    margin-left: calc( -1 * var(--cardMarge)); /* gutter size offset */
     width: auto;
     margin-bottom: 2rem;}
   
   .grille__column {
-    padding-left: var(--ficheMarge); /* gutter size */
+    padding-left: var(--cardMarge); /* gutter size */
     background-clip: padding-box;
-    max-width: var(--ficheWidth);}
+    max-width: var(--cardWidth);}
     
   .button {
     margin-inline: auto;}
@@ -32,7 +32,7 @@ const Styled = styled.section`
     gap: 1rem;
     align-items: start;
     .card {
-      width: var(--ficheWidth);}
+      width: var(--cardWidth);}
   }
 `;
 
@@ -43,7 +43,7 @@ const breakpointColumnsObj = {
   825: 2
 };
 
-export function FilmsGrille({contentData, error, docError, random, lazyload, isSearch, isRelated}) {
+export function ContentGrid({contentData, error, docError, random, lazyload, isSearch, isRelated}) {
   const [filmsItems, setFilmsItems] = useState()
   const [selectedThematique, setSelectedThematique] = useState('default')
   const [thematiqueVocab, setThematiqueVocab] = useState()
@@ -179,7 +179,7 @@ export function FilmsGrille({contentData, error, docError, random, lazyload, isS
             film.attributes.filmImageUrl = imagePath;
         })
         
-        // Create random values for GridCard styles (color and height)      
+        // Create random values for Card styles (color and height)      
         createRandomStyles(resultArray)
         
         // Set visible films according to loadBatchQty value
@@ -292,7 +292,7 @@ export function FilmsGrille({contentData, error, docError, random, lazyload, isS
     <div className='film-grille'>
       <Styled className='mt-8 grille-skeleton'>
         {contentData.data.map( (item) => (
-          <GridCard 
+          <Card 
             key={item.attributes.drupal_internal__nid}
             contentObj={item.attributes}
           />
@@ -318,7 +318,7 @@ export function FilmsGrille({contentData, error, docError, random, lazyload, isS
           className="grille"
           columnClassName="grille__column">
           {filmsItems.map( (item) => (
-            <GridCard 
+            <Card 
               key={item.attributes.drupal_internal__nid}
               contentObj={item.attributes}
               contentType={item.type}

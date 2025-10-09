@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useRef } from 'react'
 import { useFetchFilmsAndDocuments } from '../lib/fecthDrupalData'
-import { FilmsGrille } from '../components/filmsGrille';
+import { ContentGrid } from '../components/contentGrid';
 
 const defautlContent = { 
   data: [{
@@ -11,7 +11,7 @@ const defautlContent = {
       field_annees_de_sortie: '...',
       filmThematiques: {noms: '', ids: []},
       styles: {
-        elemHeight: 'var(--ficheWidth)',
+        elemHeight: 'var(--cardWidth)',
         couleur: '#ddd',
       }
     },
@@ -23,7 +23,7 @@ const defautlContent = {
       field_annees_de_sortie: '...',
       filmThematiques: {noms: '', ids: []},
       styles: {
-        elemHeight: 'calc( var(--ficheWidth) * 0.8)',
+        elemHeight: 'calc( var(--cardWidth) * 0.8)',
         couleur: '#f1f1f1',
       }
     },
@@ -90,7 +90,7 @@ export default function ContentLoader({isCollection, isRemontage, isDocuments}) 
   // render a temp skeloton
   if (!content || isLoading) { return (
     <main className='content-loader'>
-      <FilmsGrille contentData={defautlContent} />
+      <ContentGrid contentData={defautlContent} />
     </main>
   )}
   
@@ -98,7 +98,7 @@ export default function ContentLoader({isCollection, isRemontage, isDocuments}) 
   if (content && !isLoading && !error) {
     return (
       <main className='content-loader'>
-        <FilmsGrille 
+        <ContentGrid 
           contentData={content}
           error={error}
           random 
