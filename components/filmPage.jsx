@@ -436,7 +436,6 @@ export function FilmPage( {path} ) {
 						contentData={relatedFilms}
 						error={allFilmsError}
 						isLoading={allFilmsIsLoading}
-						isRelated
 						hideItemCount
 					/>
 					

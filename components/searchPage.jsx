@@ -4,6 +4,34 @@ import { useFetchFilmsAndDocuments } from '../lib/fecthDrupalData'
 import { uriToString, findTermName } from '../lib/utils.ts';
 import { ContentGrid } from '../components/contentGrid';
 
+const defautlContent = { 
+  data: [{
+    attributes: {
+      drupal_internal__nid: 0,
+      title: 'chargement...',
+      field_annees_de_sortie: '...',
+      filmThematiques: {noms: '', ids: []},
+      styles: {
+        elemHeight: 'var(--cardWidth)',
+        couleur: '#ddd',
+      }
+    },
+    type: 'skeleton'
+  },{
+    attributes: {
+      drupal_internal__nid: 999,
+      title: '...',
+      field_annees_de_sortie: '...',
+      filmThematiques: {noms: '', ids: []},
+      styles: {
+        elemHeight: 'calc( var(--cardWidth) * 0.8)',
+        couleur: '#f1f1f1',
+      }
+    },
+    type: 'skeleton'
+  }]
+}
+
 export function SearchPage({searchSlug}) {
   const [isLoading, setIsloading] = useState()
   const [searchTerms, setSearchTerms] = useState()
@@ -160,6 +188,16 @@ export function SearchPage({searchSlug}) {
     )
   }
   
+  // render a temp skeloton
+  if (!data || isLoading) { return (
+    <main className='content-loader'>
+      <ContentGrid 
+        contentData={defautlContent} 
+        hideItemCount
+      />
+    </main>
+  )}
+  
   // Results render 
   if (data && !hasNoResult && !isLoading) { return (
     <>
@@ -167,9 +205,7 @@ export function SearchPage({searchSlug}) {
       {filteredData ? (<p>Résultat : {filteredData.data.length} contenus sur {data.data.length}</p>) : ''}
       <ContentGrid
         contentData={filteredData} 
-        isLoading={isLoading} 
         error={error} 
-        isSearch
       />
     </>
   )}
