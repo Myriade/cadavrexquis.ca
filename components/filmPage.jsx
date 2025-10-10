@@ -51,7 +51,7 @@ const Main = styled.main`
 		
 	dd {
 		overflow: hidden;
-		a {
+		a.ellipse {
 			display: block;
 			max-width: 100%;
 			white-space: nowrap;
@@ -92,10 +92,11 @@ export function FilmPage( {path} ) {
 	const [ relatedFilms, setRelatedFilms ] = useState(null)
 	const { data : allFilms, isLoading : allFilmsIsLoading, error : allFilmsError } = useFetchFilmsAndDocuments();
 	
+	// Reusable function to format a film field data from its source to its display 
 	function formatField(fieldSource, visibleIfEmpty) {
 		// TODO : Check if taxonomy terms has links to view more related content
 		
-		// Check if fieldsource is falsy or empty array 
+		// Check if a fieldsource is falsy or empty array 
 		function checkIfEmpty(source) {
 			if (!source) { return true }
 			if (Array.isArray(source)) { 
@@ -119,41 +120,43 @@ export function FilmPage( {path} ) {
 		
 		if (!isEmpty) {
 			
+			// if source is an array of taxonomy term, join terms
 			if (Array.isArray(fieldSource) && typeof fieldSource[0] === 'object' && "vid" in fieldSource[0]) {
-				// if source is an array of taxonomy term, join terms
-				const array = fieldSource.map( item => item.name )
+				const array = fieldSource.map( 
+					item => `<a href="/films/${item.name}" title="Voir les contenus reliés">${item.name}</a>`
+				)
 				return array.join(', ') 
 			} 
-				
+			
+			// if source is an object with just one taxonomy term
 			else if (typeof fieldSource === 'object' && "vid" in fieldSource) {
-				// if source is an object with just one taxonomy term
-				return fieldSource.name 
+				return `<a href="/films/${fieldSource.name}" title="Voir les contenus reliés">${fieldSource.name}</a>`
 			} 
 			
+			// if source is a string, output it as is
 			else if (typeof fieldSource === 'string' || typeof fieldSource === 'number') {
-				// if source is a string, output it as is
 				return fieldSource
 			}
 			
+			// if source is an array of string, join strings
 			if (Array.isArray(fieldSource) && typeof fieldSource[0] === 'string' ) {
-				// if source is an array of string, join strings
 				const array = fieldSource.map( item => item )
 				return array.join(', ') 
 			} 
 			
+			// if source is an object from a drupal double string field (with a first key)
 			if (typeof fieldSource === 'object' && 'first' in fieldSource ) {
-				// if source is an object from a drupal double string field (with a first key)
 				const resultat = Object.values(fieldSource).reduce((acc, valeur) => acc + " - " + valeur);
 				return resultat
 			} 
 			
+			// if source is a URL field
 			else if (typeof fieldSource === 'object' && "uri" in fieldSource) {
-				// if source is a URL field
-				return (<a href={fieldSource.uri} target='_blank' title={fieldSource.uri}>{fieldSource.uri}</a>)
+				return `<a class="ellipse" href=${fieldSource.uri} target="_blank" title=${fieldSource.uri}>${fieldSource.uri}</a>`
 			}
 			
+			// si source is a rich html text field
 			else if (typeof fieldSource === 'object' && "processed" in fieldSource) {
-				// si source is a rich html text field
 				return (<div dangerouslySetInnerHTML={ { __html: fieldSource.processed } } />)
 			}
 		}
@@ -295,7 +298,6 @@ export function FilmPage( {path} ) {
 	
 	// Voir Plus click event handlers
 	function voirPlusToggle() {
-		console.log('Voir plus clicked');
 		if (!voirPlusOpen) {
 			setVoirPlusOpen(true)
 			return
@@ -359,7 +361,9 @@ export function FilmPage( {path} ) {
 						{primaryFields.anneeSortie1 ? primaryFields.anneeSortie1 : '' }
 						{primaryFields.thematique ? <span> 
 							{primaryFields.anneeSortie1 && ' / '} 
-							{primaryFields.thematique}
+							<span dangerouslySetInnerHTML={{ 
+								__html: primaryFields.thematique
+							}} />
 						</span> : ''}
 					</span> : '...'}
 				</p>
@@ -380,16 +384,22 @@ export function FilmPage( {path} ) {
 				<dl className='mb-6'>
 					<div>
 						<dt>Production: </dt>
-						<dd>{ primaryFields ? primaryFields.production : '...' }</dd>
+						<dd dangerouslySetInnerHTML={ primaryFields ? { 
+							__html: primaryFields.production
+						} : { __html: '...'}} />
 					</div>
 					<div>
 						<dt>Réalisation: </dt>
-						<dd>{ primaryFields ? primaryFields.realisation : '...' }</dd>
+						<dd dangerouslySetInnerHTML={ primaryFields ? { 
+							__html: primaryFields.realisation
+						} : { __html: '...'}} />
 					</div>
 					{ primaryFields && primaryFields.consultants ? (
 						<div>
 							<dt>Consultants: </dt>
-							<dd>{primaryFields.consultants}</dd>
+							<dd dangerouslySetInnerHTML={ primaryFields ? { 
+								__html: primaryFields.consultants
+							} : { __html: '...'}} />
 						</div>
 					) : '' }
 					<div>
@@ -398,11 +408,15 @@ export function FilmPage( {path} ) {
 					</div>
 					<div>
 						<dt>Pays d’origine: </dt>
-						<dd>{primaryFields ? primaryFields.pays : '...'}</dd>
+						<dd dangerouslySetInnerHTML={ primaryFields ? { 
+							__html: primaryFields.pays
+						} : { __html: '...'}} />
 					</div>
 					<div>
 						<dt>Langues: </dt>
-						<dd>{ primaryFields ? primaryFields.langue : '...' }</dd>
+						<dd dangerouslySetInnerHTML={ primaryFields ? { 
+							__html: primaryFields.langue
+						} : { __html: '...'}} />
 					</div>
 					<div>
 						<dt>Durée: </dt>
@@ -410,7 +424,9 @@ export function FilmPage( {path} ) {
 					</div>
 					<div>
 						<dt>Vedettes-matières sujet: </dt>
-						<dd>{ primaryFields ? primaryFields.matiere : '...' }</dd>
+						<dd dangerouslySetInnerHTML={ primaryFields ? { 
+							__html: primaryFields.matiere
+						} : { __html: '...'}} />
 					</div>
 				</dl>
 				
@@ -420,7 +436,7 @@ export function FilmPage( {path} ) {
 						return field.value ? (
 							<div key={index}>
 								<dt>{field.label}: </dt>
-								<dd>{field.value}</dd>
+								<dd dangerouslySetInnerHTML={{ __html: field.value }}/>
 							</div> 
 						) : ''
 					}) : '...' }

@@ -52,7 +52,6 @@ export function DocumentPage( {path} ) {
 	// Process images in body : change relative src path to absolutes
 	let body = null
 	if ( !isLoading && document ) {
-		console.log('document', document)
 		const rawBody = document.body.processed
 		if (rawBody.includes('<img ') ) {
 			body = modifyImageSources(rawBody)
