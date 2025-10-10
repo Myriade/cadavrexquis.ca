@@ -21,7 +21,7 @@ const defautlContent = {
     attributes: {
       drupal_internal__nid: 999,
       title: '...',
-      field_annees_de_sortie: '...',
+      field_annees_de_sortie: 'la première recherche est plus longue, merci de patienter',
       filmThematiques: {noms: '', ids: []},
       styles: {
         elemHeight: 'calc( var(--cardWidth) * 0.8)',

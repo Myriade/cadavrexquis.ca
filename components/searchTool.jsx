@@ -88,7 +88,7 @@ export function SearchTool() {
         return encodeURIComponent(trimmed)
       };
       const uri = stringToUri(searchTerms);
-      router.push(`/films/${uri}`);
+      router.push(`/recherche/${uri}`);
       setSearchTerms('')
     } else {
       e.target.classList.toggle('focus')

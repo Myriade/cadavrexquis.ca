@@ -123,14 +123,14 @@ export function FilmPage( {path} ) {
 			// if source is an array of taxonomy term, join terms
 			if (Array.isArray(fieldSource) && typeof fieldSource[0] === 'object' && "vid" in fieldSource[0]) {
 				const array = fieldSource.map( 
-					item => `<a href="/films/${item.name}" title="Voir les contenus reliés">${item.name}</a>`
+					item => `<a href="/recherche/${item.name}" title="Voir les contenus reliés">${item.name}</a>`
 				)
 				return array.join(', ') 
 			} 
 			
 			// if source is an object with just one taxonomy term
 			else if (typeof fieldSource === 'object' && "vid" in fieldSource) {
-				return `<a href="/films/${fieldSource.name}" title="Voir les contenus reliés">${fieldSource.name}</a>`
+				return `<a href="/recherche/${fieldSource.name}" title="Voir les contenus reliés">${fieldSource.name}</a>`
 			} 
 			
 			// if source is a string, output it as is
