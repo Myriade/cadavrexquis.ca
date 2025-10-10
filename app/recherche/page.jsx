@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { SearchPage } from '../../../components/searchPage';
+import { SearchTool } from '../../components/searchTool';
 
 export const metadata = {
 	title: 'Recherche - Cadavre exquis',
@@ -13,7 +13,9 @@ export default async function Page({ params }) {
 	
 	return (
 		<main>
-			<SearchPage searchSlug={slug}></SearchPage>
+			<h2>Recherche</h2>
+			<p className='mb-4'>Entrez un terme dans l’outil ci-dessous pour chercher parmi les films et documents.</p>
+			<SearchTool isFullWidth />
 		</main>
 	)
 }

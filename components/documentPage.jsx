@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import styled from 'styled-components';
+import { useHeadTitle } from "../components/head-title/provider";
 import { notFound } from 'next/navigation'
 import { useFetchUniqueDocument } from '../lib/fecthDrupalData'
 import { modifyImageSources } from '../lib/utils'
@@ -48,6 +49,17 @@ const defautlDocument = {
 	
 export function DocumentPage( {path} ) {
 	const { document, isLoading, error } = useFetchUniqueDocument(defautlDocument, path)
+	const { setTitle } = useHeadTitle()
+	
+	// Titre meta pour la page
+	useEffect(() => {
+		if (document?.title) {
+			setTitle(`${document.title} - Cadavre exquis`);
+		}
+		
+		// Cleanup: reset title when component unmounts
+		return () => setTitle("");
+	}, [document?.title, setTitle]);
 	
 	// Process images in body : change relative src path to absolutes
 	let body = null

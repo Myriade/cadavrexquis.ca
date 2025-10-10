@@ -90,6 +90,7 @@ export default function ContentLoader({isCollection, isRemontage, isDocuments}) 
   // render a temp skeloton
   if (!content || isLoading) { return (
     <main className='content-loader'>
+      {title}
       <ContentGrid 
         contentData={defautlContent} 
         hideItemCount
@@ -101,6 +102,7 @@ export default function ContentLoader({isCollection, isRemontage, isDocuments}) 
   if (content && !isLoading && !error) {
     return (
       <main className='content-loader'>
+        {title}
         <ContentGrid 
           contentData={content}
           error={error}

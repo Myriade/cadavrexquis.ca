@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components';
 import { notFound } from 'next/navigation'
+import { useHeadTitle } from "../components/head-title/provider";
 import { useFetchUniqueFilm, useFetchFilmsAndDocuments } from '../lib/fecthDrupalData'
 import { getVimeoId, findTermName } from '../lib/utils.ts'
 
@@ -85,12 +86,23 @@ const defautlFilm = {
 	
 export function FilmPage( {path} ) {
 	const { film, isLoading, error } = useFetchUniqueFilm(defautlFilm, path)
+	const { setTitle } = useHeadTitle()
 	const [ primaryFields, setPrimaryFields ] = useState(null)
 	const [ secondaryFields, setSecondaryFields ] = useState(null)
 	const [ fieldConfigs, setFieldConfigs ] = useState(null)
 	const [ voirPlusOpen, setVoirPlusOpen ] = useState(false)
 	const [ relatedFilms, setRelatedFilms ] = useState(null)
 	const { data : allFilms, isLoading : allFilmsIsLoading, error : allFilmsError } = useFetchFilmsAndDocuments();
+	
+	// Titre meta pour la page
+	useEffect(() => {
+		if (film?.title) {
+			setTitle(`${film.title} - Cadavre exquis`);
+		}
+		
+		// Cleanup: reset title when component unmounts
+		return () => setTitle("");
+	}, [film?.title, setTitle]);
 	
 	// Reusable function to format a film field data from its source to its display 
 	function formatField(fieldSource, visibleIfEmpty) {

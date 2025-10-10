@@ -41,6 +41,7 @@ const SearchIcon = () => {
 const Styled = styled.form`
   display: flex;
   gap: 0.25rem;
+  justify-content: space-between;
   
   &.focus {
     border: 1px solid black;}
@@ -55,6 +56,11 @@ const Styled = styled.form`
   input:focus {
     width: 30ch;
     max-width: 60vw;}
+    
+  input.full-width,
+  input.full-width:focus {
+    width: 100ch;
+    max-width: 70vw;}
   
   button {
     padding-inline: 0.5em;
@@ -75,7 +81,7 @@ const Styled = styled.form`
   }
 `
 
-export function SearchTool() {
+export function SearchTool({isFullWidth}) {
   const [searchTerms, setSearchTerms] = useState('');
   const router = useRouter();
 
@@ -110,6 +116,7 @@ export function SearchTool() {
         onChange={handleChange}
         placeholder="Chercher"
         aria-label="Rechercher un terme"
+        className={ isFullWidth ? 'full-width' : ''}
       />
       <button type="submit" aria-label="Search">
         <SearchIcon />
