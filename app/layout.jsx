@@ -20,17 +20,15 @@ export default function RootLayout({ children }) {
         </head>
         
         <body className="antialiased">
-          <TempProtectLayout>
-            <div className="flex flex-col min-h-screen px-6 bg-grid-pattern sm:px-12">
-              <div className="flex flex-col w-full max-w-7xl mx-auto grow">
-                <Header />
-                <div className="grow relative">
-                  {children}
-                </div>
-                <Footer />
+          <div className="flex flex-col min-h-screen px-6 bg-grid-pattern sm:px-12">
+            <div className="flex flex-col w-full max-w-7xl mx-auto grow">
+              <Header />
+              <div className="grow relative">
+                {children}
               </div>
+              <Footer />
             </div>
-          </TempProtectLayout>
+          </div>
         </body>
       </html>
     </HeadTitleProvider>
