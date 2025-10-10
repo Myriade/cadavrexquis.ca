@@ -71,7 +71,7 @@ html {
 
 @font-face {
   font-family: "Circular";
-  src: url("fontes/CircularStd-BookItalic.otf") format('truetype');
+  src: url("fontes/CircularStd-BoldItalic.otf") format('truetype');
   font-weight: bold;
   font-style: italic;}
 
