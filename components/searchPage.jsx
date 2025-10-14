@@ -139,6 +139,7 @@ export function SearchPage({searchSlug}) {
         rechercherValeur(item.attributes, searchTerms, index)
       })
       
+      // Loop through Taxonomy vocabularies terms
       function loopThroughVocabTerms(fieldName, vocabName) {
         const match = data.data.filter( item => {
           if (Object.hasOwn(item.relationships, fieldName) ) {
