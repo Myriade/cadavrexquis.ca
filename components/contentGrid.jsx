@@ -334,7 +334,7 @@ export function ContentGrid({contentData, error, docError, random, lazyload, sho
           </p>
         : '' }
         
-        {lazyload ? (
+        {lazyload && contentData.data.length > 10 ? (
           <button 
             id='load-more' 
             className='button' 

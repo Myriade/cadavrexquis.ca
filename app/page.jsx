@@ -1,5 +1,6 @@
 import ContentLoader from '../components/contentLoader';
 import Mission from '../components/mission';
+import FeaturedContent from '../components/featuredContent';
 
 export const metadata = {
   title: 'Cadavre exquis, “ouvroir de cinéma potentiel” (OUCIPO)',
@@ -37,5 +38,7 @@ export default function Page() {
     <ContentLoader/>
     <hr/>
     <Mission />
+    <hr/>
+    <FeaturedContent />
   </>);
 }
