@@ -10,6 +10,7 @@ import logoCac from 'assets/logo-cac.svg'
 import logoCam from 'assets/logo-cam.svg'
 import logoCinex from 'assets/logo-cinexmedia.png'
 import logoLabo from 'assets/logo-labocinemedias.png'
+import logoBiblio from 'assets/logo-biblio-sceau-RVB.svg'
 
 const Styled = styled.footer`
   .logos {
@@ -57,6 +58,9 @@ export function Footer() {
         </a>
         <a href='https://labocinemedias.ca' target='_blank'>
           <Image src={logoLabo} alt="Laboratoire CinéMédias" className="h-12 w-auto"/>
+        </a>
+        <a href='https://bib.umontreal.ca/' target='_blank'>
+          <Image src={logoBiblio} alt="Les bibliothèques de l'Université de Montréal" className="h-12 w-auto"/>
         </a>
       </div>
     </Styled>
