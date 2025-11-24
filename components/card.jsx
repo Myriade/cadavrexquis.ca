@@ -6,10 +6,24 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import Icone from '../components/icone'
 
+const CloseIcon = () => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 15">
+      <line className="close-line" x1="15" y1="0" x2="0" y2="15"/>
+      <line className="close-line" x1="0" y1="0" x2="15" y2="15"/>
+    </svg>
+  )
+};
+
 const zoomFactor = 1.75;
 
 const Styled = styled.div`
   --padding: 1.25rem;
+  
+  .close-line {
+    fill: none;
+    stroke: #000;
+    stroke-miterlimit: 10;}
   
   display: grid;
   container-type: inline-size;
@@ -39,10 +53,21 @@ const Styled = styled.div`
   
   .card__infos {
     grid-area: 1 / 1;
+    position: relative;
+    display: grid;}
+  
+  .card__link {
+    display: block;
     padding: var(--padding);
     display: grid;
     align-content: space-between;
     break-inside: avoid-column;}
+    
+  .card__close {
+    position: absolute;
+    inset: 5px 5px auto auto;
+    width: 1rem;
+    height: 1rem;}
     
   .card__footer {
     display: grid;
@@ -77,6 +102,10 @@ const Styled = styled.div`
     .card__footer {
       font-size: 0.9rem}
   }
+  
+  @media (pointer: fine) {
+    .card__close {
+      display: none;}}
 `;
 
 export function Card({contentObj, contentType, shouldwait}) {
@@ -125,6 +154,10 @@ export function Card({contentObj, contentType, shouldwait}) {
           gsapCardContainer.current.addEventListener("mouseout", handleMouseLeave);
         }
       }, waitTime)
+      
+      const closeBtn = gsapCardContainer.current.querySelector('.card__close');
+      gsapCardContainer.current.addEventListener("click", handleMouseLeave);
+      
     }
   }, { dependencies: [imageElemRef, contentType], scope: gsapCardContainer })
   
@@ -135,32 +168,37 @@ export function Card({contentObj, contentType, shouldwait}) {
       ref={gsapCardContainer}
     >
       <div className='card__inner' data-cardindex={contentObj.filmIndex}>
-        <a 
+        <div 
           className='card__infos'
           style={ contentObj.styles ? {background: contentObj.styles.couleur} : {background: 'var(--color-rouge)'}}
-          href={ pathAlias }
         >
-          <h2>{contentObj.title}</h2>
-          <div className='card__footer'>
-            <p>{contentObj.field_annees_de_sortie}<br/>
-            {contentObj.filmThematiques ? contentObj.filmThematiques.noms : ''}</p>
-            {contentObj.field_site_collection ? (
-              <div className='card__icone'>
-                {contentType === 'node--film' && contentObj.field_site_collection === 'collection' ? 
-                  <Icone nom='collection' title='Film de la collection' />
-                : ''}
-                {contentObj.field_site_collection === 'cadavre_exquis' ? 
-                  <Icone nom='remontage' title='Film de remontage' />              
-                : ''}
-              </div>
-            ) : ''}
-            {contentType === 'node--article' ?
-              <div className='card__icone'>
-                <Icone nom='document' title='Document' />
-              </div>
-            : ''}
-          </div>
-        </a>
+          <a className='card__link' href={ pathAlias }>
+            <h2>{contentObj.title}</h2>
+            <div className='card__footer'>
+              <p>{contentObj.field_annees_de_sortie}<br/>
+              {contentObj.filmThematiques ? contentObj.filmThematiques.noms : ''}</p>
+              {contentObj.field_site_collection ? (
+                <div className='card__icone'>
+                  {contentType === 'node--film' && contentObj.field_site_collection === 'collection' ? 
+                    <Icone nom='collection' title='Film de la collection' />
+                  : ''}
+                  {contentObj.field_site_collection === 'cadavre_exquis' ? 
+                    <Icone nom='remontage' title='Film de remontage' />              
+                  : ''}
+                </div>
+              ) : ''}
+              {contentType === 'node--article' ?
+                <div className='card__icone'>
+                  <Icone nom='document' title='Document' />
+                </div>
+              : ''}
+            </div>
+          </a>
+          
+          <button className="card__close">
+            <CloseIcon />
+          </button>
+        </div>
         <div 
           className='card__image'
           ref={imageElemRef}
