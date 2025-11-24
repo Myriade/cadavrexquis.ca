@@ -195,9 +195,11 @@ export function Card({contentObj, contentType, shouldwait}) {
             </div>
           </a>
           
-          <button className="card__close">
-            <CloseIcon />
-          </button>
+          { contentType !== 'squeletton' ?
+            <button className="card__close">
+              <CloseIcon />
+            </button>
+          : ''}
         </div>
         <div 
           className='card__image'
