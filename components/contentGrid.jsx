@@ -50,6 +50,7 @@ export function ContentGrid({contentData, error, docError, random, lazyload, sho
   const [allImages, setAllImages] = useState()
   const [loadBatchQty, setLoadBatchQty] = useState()
   const [isLoading, setIsLoading] = useState(true)
+  const [thematiqueId, setThematiqueId] = useState(0)
   
   const displayableFilms = useRef([])
   const newLoadStart = useRef(0)
@@ -200,6 +201,29 @@ export function ContentGrid({contentData, error, docError, random, lazyload, sho
     }
   }, [isLoading, filmsItems, contentData, error, docError, allImages, loadBatchQty, random, thematiqueVocab])
   
+  // Check if theme argument is present in url ans set it in a state
+  useEffect(()=>{
+    if (!thematiqueId && thematiqueVocab && filmsItems) {
+      const url = new URL(window.location.href);
+      if (url.search.includes("?theme=")) {
+        const themeEncoded = url.search.substring(7);
+        const themeDecoded = decodeURIComponent(themeEncoded.replace(/\+/g, ' '));
+        const term = thematiqueVocab.find( elem => elem.attributes.name === themeDecoded)
+        if (term) {
+          const termId = term.attributes.termid
+          setThematiqueId(termId)
+        }
+      }  
+    }
+  }, [thematiqueId, thematiqueVocab, filmsItems])
+  
+  // Trigger thematique filter if thematiqueId is set
+  useEffect(()=>{
+    if (thematiqueId && !hideItemCount) {
+      thematiqueChangeHandler(thematiqueId)
+    }
+  },[thematiqueId])
+  
   // GSAP
   const gsapInstance = useGSAP( async () => {
     if ( !isLoading && !error && !docError && filmsItems) {
@@ -254,12 +278,31 @@ export function ContentGrid({contentData, error, docError, random, lazyload, sho
     }
   }
   
+  function thematiqueClickHandler(id) {
+    // Met à jour l'argument d'url theme
+    if (thematiqueVocab) {
+      const url = new URL(window.location.href);
+      if (id === 'all') {
+        url.searchParams.delete('theme')
+        window.history.pushState({}, '', url);
+        setThematiqueId('all')
+      } else {
+        const termData = thematiqueVocab.find( elem => elem.attributes.termid === id)
+        const termName = termData.attributes.name
+        url.searchParams.set('theme', termName);
+        window.history.pushState({}, '', url);
+        setThematiqueId(id)
+      }
+    }
+  }
+  
   function thematiqueChangeHandler(id) {
+    // Déclenché par le changement l'url
     if (loadModeBtnRef.current) {
       loadModeBtnRef.current.style.display = 'none'
     }
     
-    if (id === 'all') {
+    if (id === 'all' ) {
       setFilmsItems(displayableFilms.current)
       setSelectedThematique('Toutes catégories')
     } else {
@@ -307,7 +350,8 @@ export function ContentGrid({contentData, error, docError, random, lazyload, sho
     <div className='film-grille'>
       { showFilter ? <ThematiqueFilter 
         allThematiques={thematiqueVocab} 
-        onThematiqueChange={thematiqueChangeHandler} 
+        onThematiqueChange={thematiqueClickHandler} 
+        activeThematique={thematiqueId}
       /> : ''}
       <Styled
         className='mt-8' 

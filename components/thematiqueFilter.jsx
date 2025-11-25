@@ -22,20 +22,19 @@ const Styled = styled.section`
   }
 `;
 
-export function ThematiqueFilter({ allThematiques, onThematiqueChange }) {
+export function ThematiqueFilter({ allThematiques, onThematiqueChange, activeThematique }) {
   const wrapElem = useRef()
   
-  // Click Event handlers
-  function onBtnClick(e) {
-    const allBtnElems = wrapElem.current.children
-    const selectedElem = e.target
-    Array.from(allBtnElems).forEach( elem => elem.classList.remove('selected'))
-    selectedElem.classList.add('selected')
-  }
-  
-  function resetAll(e) {
-    const allBtnElems = wrapElem.current.children
-    Array.from(allBtnElems).forEach( elem => elem.classList.remove('selected'))
+  if (wrapElem.current) {
+    if (activeThematique && activeThematique !== 'all') {
+      const allBtnElems = wrapElem.current.children
+      const selectedElem = allBtnElems.namedItem(`term-id-${activeThematique}`)
+      Array.from(allBtnElems).forEach( elem => elem.classList.remove('selected'))
+      selectedElem.classList.add('selected')
+    } else if (!activeThematique || activeThematique === 'all') {
+      const allBtnElems = wrapElem.current.children
+      Array.from(allBtnElems).forEach( elem => elem.classList.remove('selected'))
+    }
   }
     
   return (
@@ -45,7 +44,6 @@ export function ThematiqueFilter({ allThematiques, onThematiqueChange }) {
       <button 
         className='button'
         onClick={ (e) => {
-          onBtnClick(e)
           onThematiqueChange('all')
         }}
       >
@@ -54,9 +52,9 @@ export function ThematiqueFilter({ allThematiques, onThematiqueChange }) {
       {allThematiques ? allThematiques.map( thematique => (
         <button 
           className='button' 
+          id={`term-id-${thematique.attributes.termid}`}
           key={thematique.attributes.termid}
           onClick={ (e) => {
-            onBtnClick(e)
             onThematiqueChange(thematique.attributes.termid)
           }}
         >
