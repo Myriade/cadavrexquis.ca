@@ -1,5 +1,4 @@
 "use client";
-
 import { trackAppRouter } from "@socialgouv/matomo-next";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";

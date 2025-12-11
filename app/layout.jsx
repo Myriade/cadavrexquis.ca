@@ -5,7 +5,7 @@ import { Footer } from '../components/footer';
 import { Header } from '../components/header';
 
 import { Suspense } from "react";
-import { MatomoAnalytics } from "./matomo";
+import { MatomoAnalytics } from "./matomo-analytics";
 
 export const metadata = {
   title: {
@@ -23,7 +23,10 @@ https://nextjs.org/docs/messages/react-hydration-error
 */
 
 export default function RootLayout({ children }) {
-  return (
+  return ( <>
+    <Suspense fallback={null}>
+      <MatomoAnalytics />
+    </Suspense>
     <HeadTitleProvider>
       <html lang="fr">
         <head>
@@ -43,11 +46,8 @@ export default function RootLayout({ children }) {
               </div>
             </div>
           </TempProtectLayout>
-          <Suspense fallback={null}>
-            <MatomoAnalytics />
-          </Suspense>
         </body>
       </html>
     </HeadTitleProvider>
-  );
+  </>);
 }
