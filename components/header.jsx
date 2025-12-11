@@ -4,7 +4,7 @@ import Link from 'next/link'
 import styled from 'styled-components'
 import { OffCanvas } from '../components/offCanvas'
 import { SearchTool } from '../components/searchTool'
-import logo from 'assets/cadavre-exquis-logo.svg'
+import logo from '../assets/cadavre-exquis-logo.svg'
 
 const Styled = styled.header`
   z-index: 25;

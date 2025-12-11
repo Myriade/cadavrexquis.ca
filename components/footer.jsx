@@ -3,14 +3,14 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Menu } from '../components/menu'
 import styled from 'styled-components';
-import logoZoom from 'assets/logo-zoom-out.svg'
-import logoOff from 'assets/logo-off-screen.svg'
-import logoHors from 'assets/logo-hors-champ.svg'
-import logoCac from 'assets/logo-cac.svg'
-import logoCam from 'assets/logo-cam.svg'
-import logoCinex from 'assets/logo-cinexmedia.png'
-import logoLabo from 'assets/logo-labocinemedias.png'
-import logoBiblio from 'assets/logo-biblio-sceau-RVB.svg'
+import logoZoom from '../assets/logo-zoom-out.svg'
+import logoOff from '../assets/logo-off-screen.svg'
+import logoHors from '../assets/logo-hors-champ.svg'
+import logoCac from '../assets/logo-cac.svg'
+import logoCam from '../assets/logo-cam.svg'
+import logoCinex from '../assets/logo-cinexmedia.png'
+import logoLabo from '../assets/logo-labocinemedias.png'
+import logoBiblio from '../assets/logo-biblio-sceau-RVB.svg'
 
 const Styled = styled.footer`
   .logos {

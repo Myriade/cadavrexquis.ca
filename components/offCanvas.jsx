@@ -6,7 +6,7 @@ import Icone from '../components/icone'
 import styled from 'styled-components'
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import logo from 'assets/cadavre-exquis-logo.svg'
+import logo from '../assets/cadavre-exquis-logo.svg'
 
 const HamburgerIcon = () => {
 	return (
