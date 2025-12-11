@@ -80,7 +80,7 @@ export const uriToString = (uri) => {
     return decoded
   } catch (error) {
     console.error('Error decoding slug:', error);
-    return slug; // Return original slug if decoding fails
+    return uri; // Return original slug if decoding fails
   }
 };
 
