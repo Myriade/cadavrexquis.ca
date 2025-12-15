@@ -1,4 +1,4 @@
-'use client'
+  'use client'
 import React, { useRef } from 'react'
 import Image from 'next/image'
 import styled from 'styled-components';
@@ -48,7 +48,7 @@ const Styled = styled.div`
   .image-wrapper > img {
     position: absolute;
     width: 100%;
-    height: 90%;
+    height: 100%;
     object-fit: none;}
   
   .card__infos {
@@ -123,6 +123,15 @@ export function Card({contentObj, contentType, shouldwait}) {
   }
   
   const photogrammeUrl = contentObj && contentObj.filmImageUrl ? `https://database.cadavrexquis.ca${contentObj.filmImageUrl}` : ''
+  
+  let verticalFocus = '';
+  if (contentObj.styles && contentObj.styles.focus) {
+    if (contentObj.styles.focus.includes('top')) {
+      verticalFocus = 'center 25%'
+    } else if (contentObj.styles.focus.includes('bottom')) {
+      verticalFocus = 'center 70%'
+    }
+  }
   
   // GSAP
   const gsapCardInstance = useGSAP(() => {
@@ -206,7 +215,10 @@ export function Card({contentObj, contentType, shouldwait}) {
           ref={imageElemRef}
         >
           { photogrammeUrl && contentObj.styles ? (
-            <div className='image-wrapper'>
+            <div 
+              className='image-wrapper'
+              style={{transformOrigin: verticalFocus }}
+            >
               <Image 
                 src={photogrammeUrl}
                 width={400}
