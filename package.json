@@ -1,6 +1,6 @@
 {
     "name": "Cadavre exquis, projet créatif pour l'Université de Montréal",
-    "version": "1.3",
+    "version": "1.4",
     "private": true,
     "scripts": {
         "dev": "next dev",
