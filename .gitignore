@@ -40,3 +40,5 @@ yarn-error.log*
 .netlify
 
 TODOS.md
+
+.idea/
