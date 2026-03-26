@@ -122,7 +122,7 @@ export function Card({contentObj, contentType, shouldwait}) {
     pathAlias = contentObj.path ? `/document${contentObj.path.alias}` : '#'
   }
   
-  const photogrammeUrl = contentObj && contentObj.filmImageUrl ? `https://database.cadavrexquis.ca${contentObj.filmImageUrl}` : ''
+  const photogrammeUrl = contentObj && contentObj.filmImageUrl ? `${process.env.NEXT_PUBLIC_DRUPAL_BASE_URL.replace(/\/$/, '')}${contentObj.filmImageUrl}` : ''
   
   let verticalFocus = '';
   if (contentObj.styles && contentObj.styles.focus) {

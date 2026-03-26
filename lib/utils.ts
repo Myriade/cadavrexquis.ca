@@ -131,7 +131,7 @@ export function modifyImageSources(htmlString) {
     // Check if the src starts with "/sites/default/files"
     if (srcValue.startsWith('/sites/default/files')) {
       // Replace the src value with the new URL
-      const newSrc = `https://database.cadavrexquis.ca${srcValue}`;
+      const newSrc = `${process.env.NEXT_PUBLIC_DRUPAL_BASE_URL.replace(/\/$/, '')}${srcValue}`;
       // Replace the old src with the new src in the original match
       return match.replace(`src="${srcValue}"`, `src="${newSrc}"`);
     }

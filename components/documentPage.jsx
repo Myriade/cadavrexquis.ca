@@ -89,7 +89,7 @@ export function DocumentPage( {path} ) {
 			{ !isLoading && document.field_site_photogramme && document.field_site_photogramme.uri ? (
 				<div className='image-wrapper'>
 					<Image 
-						src={`https://database.cadavrexquis.ca${document.field_site_photogramme.uri.url}`}
+						src={`${process.env.NEXT_PUBLIC_DRUPAL_BASE_URL.replace(/\/$/, '')}${document.field_site_photogramme.uri.url}`}
 						alt=""
 						fill={true}
 						style={{objectFit: "cover"}}

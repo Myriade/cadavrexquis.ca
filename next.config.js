@@ -5,7 +5,7 @@ const nextConfig = {
         remotePatterns: [
         {
             protocol: 'https',
-            hostname: 'database.cadavrexquis.ca',
+            hostname: new URL(process.env.NEXT_PUBLIC_DRUPAL_BASE_URL).hostname,
             port: '',
             pathname: '/sites/default/files/**',
             search: '',
