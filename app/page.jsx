@@ -1,4 +1,4 @@
-import ContentLoader from '../components/contentLoader';
+import ContentCatalogue from '../components/ContentCatalogue';
 import Mission from '../components/mission';
 import FeaturedContent from '../components/featuredContent';
 
@@ -35,7 +35,7 @@ export const metadata = {
 
 export default function Page() {
   return (<>
-    <ContentLoader/>
+    <ContentCatalogue/>
     <hr/>
     <Mission />
     <hr/>

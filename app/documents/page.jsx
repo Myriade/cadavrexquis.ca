@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import ContentLoader from '../../components/contentLoader';
+import ContentCatalogue from '../../components/ContentCatalogue';
 
 export const metadata = {
   title: 'Documents - Cadavre exquis',
@@ -8,7 +8,7 @@ export const metadata = {
 
 export default async function Page() {
   return (
-    <ContentLoader isDocuments />
+    <ContentCatalogue isDocuments />
   );
 }
 

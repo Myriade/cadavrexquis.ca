@@ -32,7 +32,7 @@ const defautlContent = {
 }
 
 
-export default function ContentLoader({isCollection, isRemontage, isDocuments}) {
+export default function ContentCatalogue({isCollection, isRemontage, isDocuments}) {
   const { data, isLoading, error } = useFetchCards()
   const [content, setContent] = useState(null)
   
