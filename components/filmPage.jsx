@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components';
 import { notFound } from 'next/navigation'
 import { useHeadTitle } from "../components/head-title/provider";
-import { useFetchUniqueFilm, useFetchFilmsAndDocuments } from '../lib/fecthDrupalData'
+import { useFetchUniqueFilm, useFetchCards } from '../lib/fecthDrupalData'
 import { getVimeoId, findTermName } from '../lib/utils.ts'
 
 import { ContentGrid } from '../components/contentGrid'
@@ -92,7 +92,7 @@ export function FilmPage( {path} ) {
 	const [ fieldConfigs, setFieldConfigs ] = useState(null)
 	const [ voirPlusOpen, setVoirPlusOpen ] = useState(false)
 	const [ relatedFilms, setRelatedFilms ] = useState(null)
-	const { data : allFilms, isLoading : allFilmsIsLoading, error : allFilmsError } = useFetchFilmsAndDocuments();
+	const { data : allFilms, isLoading : allFilmsIsLoading, error : allFilmsError } = useFetchCards();
 	
 	// Titre meta pour la page
 	useEffect(() => {

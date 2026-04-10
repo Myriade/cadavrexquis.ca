@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useRef } from 'react'
-import { useFetchFilmsAndDocuments } from '../lib/fecthDrupalData'
+import { useFetchCards } from '../lib/fecthDrupalData'
 import { ContentGrid } from '../components/contentGrid';
 
 const defautlContent = { 
@@ -33,7 +33,7 @@ const defautlContent = {
 
 
 export default function ContentLoader({isCollection, isRemontage, isDocuments}) {
-  const { data, isLoading, error } = useFetchFilmsAndDocuments()
+  const { data, isLoading, error } = useFetchCards()
   const [content, setContent] = useState(null)
   
   if ( !content && data && !isLoading && !error) {

@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState, useRef } from 'react'
-import { useFetchFilmsAndDocuments } from '../lib/fecthDrupalData'
+import { useFetchCards } from '../lib/fecthDrupalData'
 import { uriToString, findTermName } from '../lib/utils.ts';
 import { ContentGrid } from '../components/contentGrid';
 
@@ -38,7 +38,7 @@ export function SearchPage({searchSlug}) {
   const [filteredData, setFilteredData] = useState(null)
   const [hasNoResult, setHasNoResult] = useState(null)
   const [vocabs, setVocabs] = useState(null)
-  const { data, isloading, error } = useFetchFilmsAndDocuments(true)
+  const { data, isloading, error } = useFetchCards(true)
   
   // Taxonomy Search fields
   const taxoFields = [{ 
