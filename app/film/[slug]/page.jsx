@@ -1,4 +1,5 @@
 import { FilmPage } from '../../../components/filmPage';
+import { CardsDataProvider } from '../../../lib/CardsDataProvider';
 
 export default async function Page({ params }) {
 	
@@ -6,6 +7,8 @@ export default async function Page({ params }) {
 	const { slug } = await params
 	
 	return (
-		<FilmPage path={slug}></FilmPage>
+		<CardsDataProvider>
+			<FilmPage path={slug}></FilmPage>
+		</CardsDataProvider>
 	)
 }

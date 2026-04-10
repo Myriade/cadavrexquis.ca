@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import ContentCatalogue from '../../components/ContentCatalogue';
+import { CardsDataProvider } from '../../lib/CardsDataProvider';
 
 export const metadata = {
   title: 'Collection - Cadavre exquis',
@@ -8,7 +9,9 @@ export const metadata = {
 
 export default async function Page() {
   return (
-    <ContentCatalogue isCollection />
+    <CardsDataProvider>
+      <ContentCatalogue isCollection />
+    </CardsDataProvider>
   );
 }
 

@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useRef } from 'react'
-import { useFetchCards } from '../lib/fecthDrupalData'
+import { useCardsData } from '../lib/CardsDataProvider'
 import { ContentGrid } from '../components/contentGrid';
 
 const defautlContent = { 
@@ -33,7 +33,7 @@ const defautlContent = {
 
 
 export default function ContentCatalogue({isCollection, isRemontage, isDocuments}) {
-  const { data, isLoading, error } = useFetchCards()
+  const { data, isLoading, error } = useCardsData()
   const [content, setContent] = useState(null)
   
   if ( !content && data && !isLoading && !error) {

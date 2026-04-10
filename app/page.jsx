@@ -1,6 +1,7 @@
 import ContentCatalogue from '../components/ContentCatalogue';
 import Mission from '../components/mission';
 import FeaturedContent from '../components/featuredContent';
+import { CardsDataProvider } from '../lib/CardsDataProvider';
 
 export const metadata = {
   title: 'Cadavre exquis, “ouvroir de cinéma potentiel” (OUCIPO)',
@@ -34,11 +35,13 @@ export const metadata = {
 }
 
 export default function Page() {
-  return (<>
-    <ContentCatalogue/>
-    <hr/>
-    <Mission />
-    <hr/>
-    <FeaturedContent />
-  </>);
+  return (
+    <CardsDataProvider>
+      <ContentCatalogue/>
+      <hr/>
+      <Mission />
+      <hr/>
+      <FeaturedContent />
+    </CardsDataProvider>
+  );
 }
