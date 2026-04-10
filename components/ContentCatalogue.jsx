@@ -89,7 +89,7 @@ export default function ContentCatalogue({isCollection, isRemontage, isDocuments
   
   // render a temp skeloton
   if (!content || isLoading) { return (
-    <main className='content-loader'>
+    <main id='content-catalogue'>
       {title}
       <ContentGrid 
         contentData={defautlContent} 
@@ -101,7 +101,7 @@ export default function ContentCatalogue({isCollection, isRemontage, isDocuments
   // Render a content grid
   if (content && !isLoading && !error) {
     return (
-      <main className='content-loader'>
+      <main id='content-catalogue'>
         {title}
         <ContentGrid 
           contentData={content}

@@ -191,12 +191,10 @@ export function SearchPage({searchSlug}) {
   
   // render a temp skeloton
   if (!data || isLoading) { return (
-    <main className='content-loader'>
-      <ContentGrid 
-        contentData={defautlContent} 
-        hideItemCount
-      />
-    </main>
+    <ContentGrid
+      contentData={defautlContent}
+      hideItemCount
+    />
   )}
   
   // Results render 
