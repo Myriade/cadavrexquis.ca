@@ -94,17 +94,6 @@ export function FilmPage( {path} ) {
 	const [ voirPlusOpen, setVoirPlusOpen ] = useState(false)
 	const [ relatedFilms, setRelatedFilms ] = useState(null)
 	const { data : allFilms, isLoading : allFilmsIsLoading, error : allFilmsError } = useCardsData();
-	
-	// Titre meta pour la page
-	useEffect(() => {
-		if (film?.title) {
-			setTitle(`${film.title} - Cadavre exquis`);
-		}
-		
-		// Cleanup: reset title when component unmounts
-		return () => setTitle("");
-	}, [film?.title, setTitle]);
-	
 	// Reusable function to format a film field data from its source to its display 
 	function formatField(fieldSource, visibleIfEmpty) {
 		// TODO : Check if taxonomy terms has links to view more related content
