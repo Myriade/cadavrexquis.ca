@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import { MatomoAnalytics } from "./matomo-analytics";
 
 export const metadata = {
+  metadataBase: new URL('https://cadavrexquis.ca'),
   title: {
     default: 'Cadavre exquis'
   }

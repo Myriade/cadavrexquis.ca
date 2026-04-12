@@ -1,13 +1,13 @@
 import { FilmPage } from '../../../components/filmPage';
 import { CardsDataProvider } from '../../../lib/CardsDataProvider';
-import { fetchFilmMetadata } from '../../../lib/fetchFilmMetadata';
+import { fetchFilmMetadata } from '../../../lib/fetchNodeMetadata';
 
 export async function generateMetadata({ params }) {
 	const { slug } = await params;
 	const film = await fetchFilmMetadata(slug);
 
 	if (!film) {
-		return { title: "Film - Cadavre exquis" };
+		return { title: "Film - Cadavre exquis", alternates: { canonical: `/film/${slug}` } };
 	}
 
 	const title = `${film.title} - Cadavre exquis`;
@@ -26,6 +26,7 @@ export async function generateMetadata({ params }) {
 	const metadata = {
 		title: title,
 		description: description,
+		alternates: { canonical: `/film/${slug}` },
 		openGraph: {
 			title: title,
 			description: description,

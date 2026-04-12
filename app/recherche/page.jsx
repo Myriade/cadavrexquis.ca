@@ -4,6 +4,13 @@ import { SearchTool } from '../../components/searchTool';
 export const metadata = {
 	title: 'Recherche - Cadavre exquis',
 	description: 'Rechercher parmi les films et les documents du projet Cadavre Exquis',
+	alternates: { canonical: `/recherche/` },
+	openGraph: {
+		title: 'Recherche - Cadavre exquis',
+		description: 'Rechercher parmi les films et les documents du projet Cadavre Exquis',
+		url: '/recherche/',
+		images: [{ url: '/cadavdre-exquis-og-pages.png' }],
+	},
 }
 
 export default async function Page({ params }) {
